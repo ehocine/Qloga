@@ -17,12 +17,12 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import dagger.hilt.android.AndroidEntryPoint
 import eac.qloga.android.features.intro.presentation.IntroViewModel
 import eac.qloga.android.features.shared.util.*
+import eac.qloga.android.features.viewmodels.AuthenticationViewModel
 import eac.qloga.android.ui.theme.QLOGATheme
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -34,8 +34,9 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-private fun BuildScreen(){
+private fun BuildScreen() {
     val introViewModel = hiltViewModel<IntroViewModel>()
+    val authenticationViewModel = hiltViewModel<AuthenticationViewModel>()
 
     val isDarkTheme = remember { mutableStateOf(false) }
     val isDynamicColor = remember { mutableStateOf(false) }
@@ -49,16 +50,24 @@ private fun BuildScreen(){
             color = MaterialTheme.colorScheme.background
         ) {
             val navController = rememberAnimatedNavController()
+            val actions = remember(navController) { NavigationActions(navController) }
 
             AnimatedNavHost(
                 navController = navController,
-                startDestination = Screen.Intro.route,
+                startDestination = Screen.SignIn.route,
+//                startDestination = if (!signInViewModel.loggedIn.value) Screen.SignIn.route else Screen.Intro.route,
                 builder = {
-                    intro(navController,introViewModel)
-                 //   testing(navController)
-                 // testing(navController)
-                 //   testingText()
-                 // previews(navController,introViewModel)
+                    intro(navController, introViewModel, authenticationViewModel, actions)
+                    signIn(
+                        navController = navController,
+                        viewModel = authenticationViewModel,
+                        actions = actions
+                    )
+                    screen2(viewModel = authenticationViewModel, actions = actions)
+                    //   testing(navController)
+                    // testing(navController)
+                    //   testingText()
+                    // previews(navController,introViewModel)
                 }
             )
         }
