@@ -7,5 +7,5 @@ import retrofit2.http.GET
 interface IEnrollsApiService {
 
     @GET("p4p/")
-    suspend fun enrolls(): ResponseEnrollsModel
+    suspend fun enrolls(): Response<ResponseEnrollsModel>
 }

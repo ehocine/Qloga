@@ -8,25 +8,29 @@ import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
-import eac.qloga.android.features.BrowserState
+import eac.qloga.android.core.services.BrowserState
+import eac.qloga.android.core.util.LoadingState
 import eac.qloga.android.features.shared.util.NavigationActions
-import eac.qloga.android.features.viewmodels.ApiViewModel
-import eac.qloga.android.features.viewmodels.AuthenticationViewModel
+import eac.qloga.android.core.viewmodels.ApiViewModel
+import eac.qloga.android.core.viewmodels.AuthenticationViewModel
 
 @Composable
-fun Screen2(authViewModel: AuthenticationViewModel, actions: NavigationActions) {
+fun Screen2(
+    authViewModel: AuthenticationViewModel,
+    apiViewModel: ApiViewModel,
+    actions: NavigationActions
+) {
     val context = LocalContext.current
-
-    val apiViewModel = hiltViewModel<ApiViewModel>()
     val oktaState by authViewModel.oktaState.collectAsState(BrowserState.Loading)
-    val responseEnrollsModel by ApiViewModel.responseEnrollsModel
+    val responseEnrollsModel by apiViewModel.responseEnrollsModel
+
+    LaunchedEffect(key1 = true) {
+        apiViewModel.getEnrollsLoadingState.emit(LoadingState.IDLE)
+    }
 
     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
         Column(

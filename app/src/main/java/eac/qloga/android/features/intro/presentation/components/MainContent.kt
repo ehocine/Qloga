@@ -14,12 +14,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import eac.qloga.android.R
 import eac.qloga.android.features.sign_in.convertTimeStampToDate
-import eac.qloga.android.models.User
+import eac.qloga.android.data.model.User
 
 @Composable
 fun MainContent(
@@ -83,14 +82,6 @@ fun MainContent(
                     ) { onClickEnrolled() },
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "Already enrolled",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontSize = 17.sp
-                    ),
-                    color = MaterialTheme.colorScheme.primary,
-                    textDecoration = TextDecoration.Underline
-                )
                 Text(
                     text = "Signed in as: ${user.userName}",
                     style = MaterialTheme.typography.titleMedium.copy(

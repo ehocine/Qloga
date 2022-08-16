@@ -11,7 +11,8 @@ import eac.qloga.android.features.intro.presentation.IntroScreen
 import eac.qloga.android.features.intro.presentation.IntroViewModel
 import eac.qloga.android.features.screen2.Screen2
 import eac.qloga.android.features.sign_in.SignIn
-import eac.qloga.android.features.viewmodels.AuthenticationViewModel
+import eac.qloga.android.core.viewmodels.ApiViewModel
+import eac.qloga.android.core.viewmodels.AuthenticationViewModel
 
 fun enterTransition(): EnterTransition {
     return slideInHorizontally(
@@ -67,8 +68,8 @@ fun NavGraphBuilder.intro(
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.signIn(
-    navController: NavController,
-    viewModel: AuthenticationViewModel,
+    authViewModel: AuthenticationViewModel,
+    apiViewModel: ApiViewModel,
     actions: NavigationActions
 ) {
     composable(
@@ -78,8 +79,8 @@ fun NavGraphBuilder.signIn(
         exitTransition = { exitTransition() }
     ) {
         SignIn(
-            navController = navController,
-            authViewModel = viewModel,
+            authViewModel = authViewModel,
+            apiViewModel = apiViewModel,
             actions = actions
         )
     }
@@ -87,7 +88,8 @@ fun NavGraphBuilder.signIn(
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.screen2(
-    viewModel: AuthenticationViewModel,
+    authViewModel: AuthenticationViewModel,
+    apiViewModel: ApiViewModel,
     actions: NavigationActions
 ) {
     composable(
@@ -96,7 +98,7 @@ fun NavGraphBuilder.screen2(
         popEnterTransition = { popEnterTransition() },
         exitTransition = { exitTransition() }
     ) {
-        Screen2(viewModel, actions)
+        Screen2(authViewModel, apiViewModel, actions)
     }
 }
 

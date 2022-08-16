@@ -1,4 +1,4 @@
-package eac.qloga.android.features.viewmodels
+package eac.qloga.android.core.viewmodels
 
 import android.app.Application
 import android.util.Log
@@ -7,11 +7,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import eac.qloga.android.core.services.OktaManager
 import eac.qloga.android.data.api.APIHelper
 import eac.qloga.android.data.model.ResponseEnrollsModel
 import eac.qloga.android.di.retrofit.AppInterceptor
-import eac.qloga.android.features.LoadingState
-import eac.qloga.android.features.OktaManager
+import eac.qloga.android.core.util.LoadingState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -28,20 +28,22 @@ class ApiViewModel @Inject constructor(
 
     var getEnrollsLoadingState = MutableStateFlow(LoadingState.IDLE)
 
-    companion object{
-        var responseEnrollsModel: MutableState<ResponseEnrollsModel> = mutableStateOf(
-            ResponseEnrollsModel()
-        )
-    }
+    val responseEnrollsModel: MutableState<ResponseEnrollsModel> = mutableStateOf(
+        ResponseEnrollsModel()
+    )
 
     fun getEnrolls() {
         viewModelScope.launch(Dispatchers.IO) {
             interceptor.setAccessToken(oktaManager.gettingOktaToken())
             getEnrollsLoadingState.emit(LoadingState.LOADING)
             try {
-                responseEnrollsModel.value = apiHelper.enrolls()
-                Log.d("Tag", "$responseEnrollsModel")
-                getEnrollsLoadingState.emit(LoadingState.LOADED)
+                val response = apiHelper.enrolls()
+                if (response.isSuccessful) {
+                    responseEnrollsModel.value = response.body()!!
+                    getEnrollsLoadingState.emit(LoadingState.LOADED)
+                } else {
+                    getEnrollsLoadingState.emit(LoadingState.ERROR)
+                }
             } catch (e: Exception) {
                 getEnrollsLoadingState.emit(LoadingState.ERROR)
                 Log.e("error", e.toString())

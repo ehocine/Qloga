@@ -1,4 +1,4 @@
-package eac.qloga.android.features.viewmodels
+package eac.qloga.android.core.viewmodels
 
 import android.app.Application
 import android.content.Context
@@ -7,9 +7,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import eac.qloga.android.features.BrowserState
-import eac.qloga.android.features.OktaManager
-import eac.qloga.android.models.User
+import eac.qloga.android.core.services.BrowserState
+import eac.qloga.android.core.services.OktaManager
+import eac.qloga.android.data.model.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -20,8 +20,6 @@ class AuthenticationViewModel @Inject constructor(
     application: Application,
     private val oktaManager: OktaManager,
 ) : AndroidViewModel(application) {
-
-    //    private val _oktaState = MutableStateFlow<BrowserState>(BrowserState.Loading)
     val oktaState: Flow<BrowserState> = oktaManager.oktaState
     var loggedIn: MutableStateFlow<Boolean> = oktaManager.loggedIn
     var signedInUser: MutableState<User> = mutableStateOf(User())

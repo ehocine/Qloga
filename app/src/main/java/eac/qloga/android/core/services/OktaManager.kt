@@ -1,4 +1,4 @@
-package eac.qloga.android.features
+package eac.qloga.android.core.services
 
 import android.content.Context
 import android.util.Log
@@ -9,7 +9,7 @@ import com.okta.authfoundation.client.OidcClientResult
 import com.okta.authfoundationbootstrap.CredentialBootstrap
 import com.okta.webauthenticationui.WebAuthenticationClient.Companion.createWebAuthenticationClient
 import eac.qloga.android.BuildConfig
-import eac.qloga.android.models.User
+import eac.qloga.android.data.model.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -150,9 +150,6 @@ sealed class BrowserState {
         val errorMessage: String?
     ) : BrowserState() {
         companion object {
-            /**
-             * Creates the [LoggedIn] state using the [CredentialBootstrap.defaultCredential]s ID Token name claim.
-             */
             suspend fun create(errorMessage: String? = null): BrowserState {
                 val credential = CredentialBootstrap.defaultCredential()
                 val name = credential.idToken()?.name ?: ""
@@ -166,11 +163,6 @@ sealed class BrowserState {
     }
 
     companion object {
-        /**
-         * Creates the [BrowserState] given the [CredentialBootstrap.defaultCredential]s presence of a token.
-         *
-         * @return Either [LoggedIn] or [LoggedOut].
-         */
         suspend fun currentCredentialState(errorMessage: String? = null): BrowserState {
             val credential = CredentialBootstrap.defaultCredential()
             return if (credential.token == null) {

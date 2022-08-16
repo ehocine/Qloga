@@ -11,12 +11,12 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import eac.qloga.android.features.BrowserState
+import eac.qloga.android.core.services.BrowserState
 import eac.qloga.android.features.intro.presentation.components.LeftNavBar
 import eac.qloga.android.features.intro.presentation.components.MainContent
 import eac.qloga.android.features.intro.presentation.components.SearchBar
 import eac.qloga.android.features.shared.util.NavigationActions
-import eac.qloga.android.features.viewmodels.AuthenticationViewModel
+import eac.qloga.android.core.viewmodels.AuthenticationViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)

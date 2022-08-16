@@ -1,4 +1,4 @@
-package eac.qloga.android.models
+package eac.qloga.android.data.model
 
 data class User(
     val userName: String? = "",

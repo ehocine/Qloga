@@ -1,4 +1,4 @@
-package eac.qloga.android.features
+package eac.qloga.android.core.util
 
 class LoadingState private constructor(val status: Status) {
     companion object {
