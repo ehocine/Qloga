@@ -6,16 +6,28 @@ plugins {
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
 }
-
+def oktaProperties = new Properties()
+rootProject.file("okta.properties").withInputStream { oktaProperties.load(it) }
 android {
     compileSdk 32
 
-        defaultConfig {
+    defaultConfig {
         applicationId "eac.qloga.android"
         minSdk 21
         targetSdk 32
         versionCode 1
         versionName "1.0"
+        multiDexEnabled = true
+
+
+        buildConfigField "String", 'DISCOVERY_URL', "\"${oktaProperties.getProperty('discoveryUrl')}\""
+        buildConfigField "String", 'CLIENT_ID', "\"${oktaProperties.getProperty('clientId')}\""
+        buildConfigField "String", 'SIGN_IN_REDIRECT_URI', "\"${oktaProperties.getProperty('signInRedirectUri')}\""
+        buildConfigField "String", 'SIGN_OUT_REDIRECT_URI', "\"${oktaProperties.getProperty('signOutRedirectUri')}\""
+
+        defaultConfig.manifestPlaceholders = [
+                "webAuthenticationRedirectScheme": parseScheme(oktaProperties.getProperty('signInRedirectUri'))
+        ]
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -62,6 +74,11 @@ android {
 
 dependencies {
 
+    implementation files('libs/qqq-models.jar')
+    implementation files('libs/p4p-models.jar')
+
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.2.0'
+
     implementation 'androidx.core:core-ktx:1.8.0'
     implementation "androidx.compose.ui:ui:$compose_version"
     implementation 'androidx.compose.material3:material3:1.0.0-alpha12'
@@ -80,11 +97,6 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
 
 //    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'
-
-    def retrofit_version = "2.9.0"
-    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
-    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
-    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
 
     def hilt_version = "2.38.1"
     implementation "com.google.dagger:hilt-android:$hilt_version"
@@ -149,4 +161,35 @@ dependencies {
     // Compose navigation library
     //implementation 'io.github.raamcosta.compose-destinations:shared:1.5.8-beta'
     //ksp 'io.github.raamcosta.compose-destinations:ksp:1.5.8-beta'
+
+    //OKTA authentication
+    implementation(platform('com.okta.kotlin:bom:0.6.0-BETA'))
+    implementation('com.okta.kotlin:auth-foundation-bootstrap')
+    implementation('com.okta.kotlin:web-authentication-ui')
+
+    //Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.google.code.gson:gson:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.6'
+
+
+    implementation 'com.squareup.retrofit2:converter-scalars:2.1.0'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.3'
+
+    //jackson
+    implementation 'com.squareup.retrofit2:converter-jackson:2.9.0'
+    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.13.3'
+
+    //MultiDESC
+    def multidex_version = "2.0.1"
+    implementation("androidx.multidex:multidex:$multidex_version")
+}
+
+static def parseScheme(String uri) {
+    def index = uri.indexOf(':/')
+    if (index == -1) {
+        throw new IllegalStateException("Scheme is not in a valid format.")
+    }
+    return uri.substring(0, index)
 }

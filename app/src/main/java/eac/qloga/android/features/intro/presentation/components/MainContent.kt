@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -13,31 +14,33 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import eac.qloga.android.R
+import eac.qloga.android.features.sign_in.convertTimeStampToDate
+import eac.qloga.android.data.model.User
 
 @Composable
 fun MainContent(
     modifier: Modifier = Modifier,
-    onClickProviderSearch: () -> Unit ,
+    onClickProviderSearch: () -> Unit,
     onClickRequest: () -> Unit,
     onClickBecomeProvider: () -> Unit,
-    onClickEnrolled: () -> Unit
+    onClickEnrolled: () -> Unit,
+    user: User,
+    onLogOutClicked: () -> Unit
 ) {
     val scrollState = rememberScrollState()
     val interactionSource = remember { MutableInteractionSource() }
 
-    BoxWithConstraints(modifier = modifier){
+    BoxWithConstraints(modifier = modifier) {
         Column(
             modifier = Modifier
                 .fillMaxHeight()
                 .verticalScroll(scrollState)
-                .padding(top = 4.dp)
-            ,
+                .padding(top = 4.dp),
             verticalArrangement = Arrangement.SpaceBetween
-        ){
+        ) {
             // request
             ItemCard(
                 modifier = Modifier.weight(1f),
@@ -68,25 +71,46 @@ fun MainContent(
             }
 
             //already enrolled
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .clip(CircleShape)
-                .padding(top = 16.dp, bottom = 8.dp)
-                .clickable(
-                    interactionSource = interactionSource,
-                    indication = null
-                ) { onClickEnrolled() }
-                ,
-                contentAlignment = Alignment.Center
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(CircleShape)
+                    .padding(top = 16.dp, bottom = 8.dp)
+                    .clickable(
+                        interactionSource = interactionSource,
+                        indication = null
+                    ) { onClickEnrolled() },
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Already enrolled",
+                    text = "Signed in as: ${user.userName}",
                     style = MaterialTheme.typography.titleMedium.copy(
-                        fontSize = 17.sp
-                    ),
-                    color = MaterialTheme.colorScheme.primary,
-                    textDecoration = TextDecoration.Underline
+                        fontSize = 13.sp
+                    )
                 )
+                Text(
+                    text = "Email: ${user.email}",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontSize = 13.sp
+                    )
+                )
+                Text(
+                    text = "Token expires at: ${
+                        user.tokenExpiration?.let {
+                            convertTimeStampToDate(
+                                it.toLong()
+                            )
+                        }
+                    }",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontSize = 13.sp
+                    )
+                )
+                Button(onClick = {
+                    onLogOutClicked()
+                }) {
+                    Text(text = "Log out")
+                }
             }
         }
     }
