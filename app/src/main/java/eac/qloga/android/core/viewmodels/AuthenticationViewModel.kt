@@ -57,6 +57,15 @@ class AuthenticationViewModel @Inject constructor(
         }
     }
 
+    fun googleLogin(context: Context) {
+        viewModelScope.launch {
+            if (oktaManager.googleSignIn(context)) {
+                signedInUser.value = oktaManager.getUserInfo()
+                Log.d("Tag", "User: ${signedInUser.value}")
+            }
+        }
+    }
+
     fun oktaLogout(context: Context) {
         viewModelScope.launch {
             if (oktaManager.logout(context)) {

@@ -98,6 +98,9 @@ fun SignIn(
                         },
                         appleSignIn = {
                             authViewModel.appleLogin(context)
+                        },
+                        googleSignIn = {
+                            authViewModel.googleLogin(context)
                         }
                     )
                 }
@@ -109,7 +112,8 @@ fun SignIn(
 @Composable
 fun Buttons(
     oktaOnclick: () -> Unit,
-    appleSignIn: () -> Unit
+    appleSignIn: () -> Unit,
+    googleSignIn: () -> Unit
 ) {
     Column {
         Spacer(modifier = Modifier.padding(10.dp))
@@ -128,6 +132,10 @@ fun Buttons(
                 appleSignIn()
             }
         )
+        Spacer(modifier = Modifier.padding(5.dp))
+        Button(onClick = { googleSignIn() }) {
+            Text(text = "Sign in with Google")
+        }
     }
 
 }
