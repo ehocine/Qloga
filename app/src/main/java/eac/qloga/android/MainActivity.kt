@@ -15,10 +15,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import dagger.hilt.android.AndroidEntryPoint
-import eac.qloga.android.features.intro.presentation.IntroViewModel
-import eac.qloga.android.features.shared.util.*
 import eac.qloga.android.core.viewmodels.ApiViewModel
 import eac.qloga.android.core.viewmodels.AuthenticationViewModel
+import eac.qloga.android.features.intro.presentation.IntroViewModel
+import eac.qloga.android.features.shared.util.*
 import eac.qloga.android.ui.theme.QLOGATheme
 
 @AndroidEntryPoint
@@ -57,7 +57,6 @@ private fun BuildScreen() {
             AnimatedNavHost(
                 navController = navController,
                 startDestination = Screen.SignIn.route,
-//                startDestination = if (!signInViewModel.loggedIn.value) Screen.SignIn.route else Screen.Intro.route,
                 builder = {
                     intro(navController, introViewModel, authenticationViewModel, actions)
                     signIn(
@@ -70,10 +69,6 @@ private fun BuildScreen() {
                         apiViewModel = apiViewModel,
                         actions = actions
                     )
-                    //   testing(navController)
-                    // testing(navController)
-                    //   testingText()
-                    // previews(navController,introViewModel)
                 }
             )
         }

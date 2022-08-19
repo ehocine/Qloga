@@ -2,6 +2,7 @@ package eac.qloga.android.core.viewmodels
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
@@ -11,7 +12,6 @@ import eac.qloga.android.core.services.BrowserState
 import eac.qloga.android.core.services.OktaManager
 import eac.qloga.android.data.model.User
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,7 +21,6 @@ class AuthenticationViewModel @Inject constructor(
     private val oktaManager: OktaManager,
 ) : AndroidViewModel(application) {
     val oktaState: Flow<BrowserState> = oktaManager.oktaState
-    var loggedIn: MutableStateFlow<Boolean> = oktaManager.loggedIn
     var signedInUser: MutableState<User> = mutableStateOf(User())
 
     init {
@@ -45,6 +44,15 @@ class AuthenticationViewModel @Inject constructor(
         viewModelScope.launch {
             if (oktaManager.login(context)) {
                 signedInUser.value = oktaManager.getUserInfo()
+            }
+        }
+    }
+
+    fun appleLogin(context: Context) {
+        viewModelScope.launch {
+            if (oktaManager.appleSignIn(context)) {
+                signedInUser.value = oktaManager.getUserInfo()
+                Log.d("Tag", "User: ${signedInUser.value}")
             }
         }
     }

@@ -13,13 +13,8 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 @HiltAndroidApp
 class QlogaApplication : Application() {
 
-//    @Inject
-//    lateinit var oktaManager: OktaManager
-
     override fun onCreate() {
         super.onCreate()
-//        oktaManager = OktaManager(this)
-        // Initializes Auth Foundation and Credential Bootstrap classes for use in the Activity.
         AuthFoundationDefaults.cache = SharedPreferencesCache.create(this)
         val oidcConfiguration = OidcConfiguration(
             clientId = BuildConfig.CLIENT_ID,
