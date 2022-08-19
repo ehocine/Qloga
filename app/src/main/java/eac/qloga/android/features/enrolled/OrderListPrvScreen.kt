@@ -3,36 +3,39 @@ package eac.qloga.android.features.negotiation.presentation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import eac.qloga.android.R
+import eac.qloga.android.core.services.BrowserState
+import eac.qloga.android.core.viewmodels.AuthenticationViewModel
 import eac.qloga.android.features.intro.presentation.components.ItemCard
 import eac.qloga.android.features.intro.presentation.components.LeftNavBar
 import eac.qloga.android.features.intro.util.ServiceCategory
-import eac.qloga.android.features.shared.util.Screen
+import eac.qloga.android.features.shared.util.NavigationActions
 import eac.qloga.android.ui.theme.LightGreen10
-import kotlinx.coroutines.launch
+import eac.qloga.android.ui.theme.green1
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OrderListPrvScreen(
     navController: NavController,
-    viewModel: OrderListPrvViewModel
+    authViewModel: AuthenticationViewModel,
+    viewModel: OrderListPrvViewModel,
+    actions: NavigationActions
 ) {
-    val selectedNavItemIndex = remember{ mutableStateOf(0) }
-    val selectedNavItem = remember{ mutableStateOf<ServiceCategory?>(null)}
+    val context = LocalContext.current
+    val selectedNavItemIndex = remember { mutableStateOf(0) }
+    val selectedNavItem = remember { mutableStateOf<ServiceCategory?>(null) }
     val containerHorizontalPadding = 24.dp
     val scope = rememberCoroutineScope()
+    val oktaState by authViewModel.oktaState.collectAsState(BrowserState.Loading)
+
 
     Scaffold { paddingValues ->
 
@@ -44,8 +47,7 @@ fun OrderListPrvScreen(
                     start = containerHorizontalPadding,
                     end = containerHorizontalPadding,
                     top = 16.dp
-                )
-            ,
+                ),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -53,8 +55,7 @@ fun OrderListPrvScreen(
                 modifier = Modifier
                     .clip(RoundedCornerShape(topStart = 16.dp))
                     .background(LightGreen10)
-                    .padding(horizontal = 8.dp)
-                ,
+                    .padding(horizontal = 8.dp),
                 topSpace = 0.dp,
                 selectedNav = selectedNavItem.value,
                 onClickItem = { selectedNavItem.value = it }
@@ -64,27 +65,45 @@ fun OrderListPrvScreen(
                     .fillMaxHeight()
                     .weight(1f)
             ) {
-               CustomerCard(
-                   onClickCard = {
+                CustomerCard(
+                    onClickCard = {
 //                       scope.launch {
-  //                         navController.navigate(Screen.CustomerNavContainer.route){
-    //                           launchSingleTop = true
-      //                     }
-        //               }
-                   }
-               )
-               ProviderCard(
-                   onClickCard = {
-          //             scope.launch {
-            //               navController.navigate(Screen.ProviderNavContainer.route){
-              //                 launchSingleTop = true
-                //           }
-                  //     }
-                   }
-               )
+                        //                         navController.navigate(Screen.CustomerNavContainer.route){
+                        //                           launchSingleTop = true
+                        //                     }
+                        //               }
+                    }
+                )
+                ProviderCard(
+                    onClickCard = {
+                        //             scope.launch {
+                        //               navController.navigate(Screen.ProviderNavContainer.route){
+                        //                 launchSingleTop = true
+                        //           }
+                        //     }
+                    }
+                )
+
+                when (oktaState) {
+                    is BrowserState.Loading -> {
+                        CircularProgressIndicator(color = green1)
+                    }
+                    is BrowserState.LoggedOut -> {
+                        actions.goToSignIn.invoke()
+                    }
+                    else -> {
+                        Button(onClick = {
+                            authViewModel.oktaLogout(context)
+                        }) {
+                            Text(text = "Log out")
+                        }
+                    }
+                }
+
             }
         }
     }
+
 }
 
 @Composable
@@ -120,7 +139,7 @@ fun ProviderCard(
     val cardHeight = 280.dp
 
     Box(
-        modifier  = modifier
+        modifier = modifier
             .clip(RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp))
             .background(LightGreen10)
     ) {
@@ -132,8 +151,7 @@ fun ProviderCard(
         ) {
             ItemCard(
                 modifier = Modifier
-                    .height(cardHeight)
-                ,
+                    .height(cardHeight),
                 imageModifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 32.dp, end = 32.dp, top = 16.dp),

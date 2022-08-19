@@ -68,7 +68,9 @@ private fun BuildScreen() {
                     )
                     orderListPrv(
                         navController = navController,
-                        viewModel = orderListPrvViewModel
+                        authViewModel = authenticationViewModel,
+                        viewModel = orderListPrvViewModel,
+                        actions = actions
                     )
                 }
             )

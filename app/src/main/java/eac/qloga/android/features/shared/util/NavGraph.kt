@@ -7,13 +7,13 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
 import com.google.accompanist.navigation.animation.composable
-import eac.qloga.android.features.intro.presentation.IntroScreen
-import eac.qloga.android.features.intro.presentation.IntroViewModel
-import eac.qloga.android.features.sign_in.SignIn
 import eac.qloga.android.core.viewmodels.ApiViewModel
 import eac.qloga.android.core.viewmodels.AuthenticationViewModel
+import eac.qloga.android.features.intro.presentation.IntroScreen
+import eac.qloga.android.features.intro.presentation.IntroViewModel
 import eac.qloga.android.features.negotiation.presentation.OrderListPrvScreen
 import eac.qloga.android.features.negotiation.presentation.OrderListPrvViewModel
+import eac.qloga.android.features.sign_in.SignIn
 
 fun enterTransition(): EnterTransition {
     return slideInHorizontally(
@@ -90,18 +90,22 @@ fun NavGraphBuilder.signIn(
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.orderListPrv(
     navController: NavController,
-    viewModel: OrderListPrvViewModel
-){
+    authViewModel: AuthenticationViewModel,
+    viewModel: OrderListPrvViewModel,
+    actions: NavigationActions
+) {
     composable(
         route = Screen.OrderListPrv.route,
-        enterTransition = { enterTransition()},
+        enterTransition = { enterTransition() },
         popEnterTransition = { popEnterTransition() },
         popExitTransition = { popExitTransition() },
         exitTransition = { exitTransition() }
-    ){
+    ) {
         OrderListPrvScreen(
             navController = navController,
+            authViewModel = authViewModel,
             viewModel = viewModel,
+            actions = actions
         )
     }
 }
@@ -136,7 +140,7 @@ class NavigationActions(navController: NavController) {
     }
 }
 
-fun popExitTransition(): ExitTransition{
+fun popExitTransition(): ExitTransition {
     return slideOutHorizontally(
         targetOffsetX = { 300 },
         animationSpec = tween(
