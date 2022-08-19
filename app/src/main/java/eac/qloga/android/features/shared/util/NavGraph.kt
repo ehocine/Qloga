@@ -9,10 +9,11 @@ import androidx.navigation.NavGraphBuilder
 import com.google.accompanist.navigation.animation.composable
 import eac.qloga.android.features.intro.presentation.IntroScreen
 import eac.qloga.android.features.intro.presentation.IntroViewModel
-import eac.qloga.android.features.screen2.Screen2
 import eac.qloga.android.features.sign_in.SignIn
 import eac.qloga.android.core.viewmodels.ApiViewModel
 import eac.qloga.android.core.viewmodels.AuthenticationViewModel
+import eac.qloga.android.features.negotiation.presentation.OrderListPrvScreen
+import eac.qloga.android.features.negotiation.presentation.OrderListPrvViewModel
 
 fun enterTransition(): EnterTransition {
     return slideInHorizontally(
@@ -87,18 +88,21 @@ fun NavGraphBuilder.signIn(
 }
 
 @OptIn(ExperimentalAnimationApi::class)
-fun NavGraphBuilder.screen2(
-    authViewModel: AuthenticationViewModel,
-    apiViewModel: ApiViewModel,
-    actions: NavigationActions
-) {
+fun NavGraphBuilder.orderListPrv(
+    navController: NavController,
+    viewModel: OrderListPrvViewModel
+){
     composable(
-        Screen.Screen2.route,
-        enterTransition = { enterTransition() },
+        route = Screen.OrderListPrv.route,
+        enterTransition = { enterTransition()},
         popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
         exitTransition = { exitTransition() }
-    ) {
-        Screen2(authViewModel, apiViewModel, actions)
+    ){
+        OrderListPrvScreen(
+            navController = navController,
+            viewModel = viewModel,
+        )
     }
 }
 
@@ -124,10 +128,20 @@ class NavigationActions(navController: NavController) {
             launchSingleTop = true
         }
     }
-    val goToScreen2: () -> Unit = {
-        navController.navigate(Screen.Screen2.route) {
+    val goToOrderLisrPrv: () -> Unit = {
+        navController.navigate(Screen.OrderListPrv.route) {
             popUpTo(navController.graph.findStartDestination().id)
             launchSingleTop = true
         }
     }
+}
+
+fun popExitTransition(): ExitTransition{
+    return slideOutHorizontally(
+        targetOffsetX = { 300 },
+        animationSpec = tween(
+            durationMillis = 600,
+            easing = FastOutSlowInEasing
+        )
+    ) + fadeOut(animationSpec = tween(600))
 }

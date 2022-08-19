@@ -70,7 +70,7 @@ fun SignIn(
                         }
                         LoadingState.LOADED -> {
                             if (responseEnrollsModel.CUSTOMER != null || responseEnrollsModel.PROVIDER != null) {
-                                actions.goToScreen2.invoke()
+                                actions.goToOrderLisrPrv.invoke()
 
                             } else {
                                 actions.goToIntro.invoke()

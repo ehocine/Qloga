@@ -18,6 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import eac.qloga.android.core.viewmodels.ApiViewModel
 import eac.qloga.android.core.viewmodels.AuthenticationViewModel
 import eac.qloga.android.features.intro.presentation.IntroViewModel
+import eac.qloga.android.features.negotiation.presentation.OrderListPrvViewModel
 import eac.qloga.android.features.shared.util.*
 import eac.qloga.android.ui.theme.QLOGATheme
 
@@ -39,6 +40,7 @@ private fun BuildScreen() {
     val introViewModel = hiltViewModel<IntroViewModel>()
     val authenticationViewModel = hiltViewModel<AuthenticationViewModel>()
     val apiViewModel = hiltViewModel<ApiViewModel>()
+    val orderListPrvViewModel = hiltViewModel<OrderListPrvViewModel>()
 
     val isDarkTheme = remember { mutableStateOf(false) }
     val isDynamicColor = remember { mutableStateOf(false) }
@@ -64,10 +66,9 @@ private fun BuildScreen() {
                         apiViewModel = apiViewModel,
                         actions = actions
                     )
-                    screen2(
-                        authViewModel = authenticationViewModel,
-                        apiViewModel = apiViewModel,
-                        actions = actions
+                    orderListPrv(
+                        navController = navController,
+                        viewModel = orderListPrvViewModel
                     )
                 }
             )

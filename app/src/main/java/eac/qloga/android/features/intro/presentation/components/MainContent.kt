@@ -82,30 +82,6 @@ fun MainContent(
                     ) { onClickEnrolled() },
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "Signed in as: ${user.userName}",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontSize = 13.sp
-                    )
-                )
-                Text(
-                    text = "Email: ${user.email}",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontSize = 13.sp
-                    )
-                )
-                Text(
-                    text = "Token expires at: ${
-                        user.tokenExpiration?.let {
-                            convertTimeStampToDate(
-                                it.toLong()
-                            )
-                        }
-                    }",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontSize = 13.sp
-                    )
-                )
                 Button(onClick = {
                     onLogOutClicked()
                 }) {
