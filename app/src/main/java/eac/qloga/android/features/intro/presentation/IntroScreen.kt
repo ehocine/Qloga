@@ -12,6 +12,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import eac.qloga.android.core.services.BrowserState
+import eac.qloga.android.core.util.LoadingState
+import eac.qloga.android.core.viewmodels.ApiViewModel
 import eac.qloga.android.features.intro.presentation.components.LeftNavBar
 import eac.qloga.android.features.intro.presentation.components.MainContent
 import eac.qloga.android.features.intro.presentation.components.SearchBar
@@ -25,6 +27,7 @@ fun IntroScreen(
     navController: NavController,
     viewModel: IntroViewModel,
     authViewModel: AuthenticationViewModel,
+    apiViewModel: ApiViewModel,
     actions: NavigationActions
 ) {
     val context = LocalContext.current
@@ -37,6 +40,10 @@ fun IntroScreen(
 
     val signedInUser by authViewModel.signedInUser
     val oktaState by authViewModel.oktaState.collectAsState(BrowserState.Loading)
+
+    LaunchedEffect(key1 = true) {
+        apiViewModel.getEnrollsLoadingState.emit(LoadingState.IDLE)
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),

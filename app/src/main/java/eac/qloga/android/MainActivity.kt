@@ -60,7 +60,13 @@ private fun BuildScreen() {
                 navController = navController,
                 startDestination = Screen.SignIn.route,
                 builder = {
-                    intro(navController, introViewModel, authenticationViewModel, actions)
+                    intro(
+                        navController,
+                        introViewModel,
+                        authenticationViewModel,
+                        apiViewModel,
+                        actions
+                    )
                     signIn(
                         authViewModel = authenticationViewModel,
                         apiViewModel = apiViewModel,
@@ -69,6 +75,7 @@ private fun BuildScreen() {
                     orderListPrv(
                         navController = navController,
                         authViewModel = authenticationViewModel,
+                        apiViewModel = apiViewModel,
                         viewModel = orderListPrvViewModel,
                         actions = actions
                     )

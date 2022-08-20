@@ -50,6 +50,7 @@ fun NavGraphBuilder.intro(
     navController: NavController,
     viewModel: IntroViewModel,
     authenticationViewModel: AuthenticationViewModel,
+    apiViewModel: ApiViewModel,
     actions: NavigationActions
 ) {
     composable(
@@ -62,6 +63,7 @@ fun NavGraphBuilder.intro(
             navController = navController,
             viewModel = viewModel,
             authViewModel = authenticationViewModel,
+            apiViewModel = apiViewModel,
             actions = actions
         )
     }
@@ -91,6 +93,7 @@ fun NavGraphBuilder.signIn(
 fun NavGraphBuilder.orderListPrv(
     navController: NavController,
     authViewModel: AuthenticationViewModel,
+    apiViewModel: ApiViewModel,
     viewModel: OrderListPrvViewModel,
     actions: NavigationActions
 ) {
@@ -104,6 +107,7 @@ fun NavGraphBuilder.orderListPrv(
         OrderListPrvScreen(
             navController = navController,
             authViewModel = authViewModel,
+            apiViewModel = apiViewModel,
             viewModel = viewModel,
             actions = actions
         )
