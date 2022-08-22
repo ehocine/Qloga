@@ -1,4 +1,4 @@
-package eac.qloga.android.features.negotiation.presentation
+package eac.qloga.android.features.enrolled
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,7 +13,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import eac.qloga.android.R
 import eac.qloga.android.core.services.BrowserState
-import eac.qloga.android.core.util.LoadingState
 import eac.qloga.android.core.viewmodels.ApiViewModel
 import eac.qloga.android.core.viewmodels.AuthenticationViewModel
 import eac.qloga.android.features.intro.presentation.components.ItemCard
@@ -28,7 +27,6 @@ import eac.qloga.android.ui.theme.green1
 fun OrderListPrvScreen(
     navController: NavController,
     authViewModel: AuthenticationViewModel,
-    apiViewModel: ApiViewModel,
     viewModel: OrderListPrvViewModel,
     actions: NavigationActions
 ) {
@@ -36,13 +34,7 @@ fun OrderListPrvScreen(
     val selectedNavItemIndex = remember { mutableStateOf(0) }
     val selectedNavItem = remember { mutableStateOf<ServiceCategory?>(null) }
     val containerHorizontalPadding = 24.dp
-    val scope = rememberCoroutineScope()
     val oktaState by authViewModel.oktaState.collectAsState(BrowserState.Loading)
-
-    LaunchedEffect(key1 = true) {
-        apiViewModel.getEnrollsLoadingState.emit(LoadingState.IDLE)
-    }
-
 
     Scaffold { paddingValues ->
 
@@ -90,13 +82,14 @@ fun OrderListPrvScreen(
                         //     }
                     }
                 )
-
                 when (oktaState) {
                     is BrowserState.Loading -> {
                         CircularProgressIndicator(color = green1)
                     }
                     is BrowserState.LoggedOut -> {
-                        actions.goToSignIn.invoke()
+                        LaunchedEffect(key1 = true) {
+                            actions.goToSignIn.invoke()
+                        }
                     }
                     else -> {
                         Button(onClick = {

@@ -11,9 +11,10 @@ import eac.qloga.android.core.viewmodels.ApiViewModel
 import eac.qloga.android.core.viewmodels.AuthenticationViewModel
 import eac.qloga.android.features.intro.presentation.IntroScreen
 import eac.qloga.android.features.intro.presentation.IntroViewModel
-import eac.qloga.android.features.negotiation.presentation.OrderListPrvScreen
-import eac.qloga.android.features.negotiation.presentation.OrderListPrvViewModel
+import eac.qloga.android.features.enrolled.OrderListPrvScreen
+import eac.qloga.android.features.enrolled.OrderListPrvViewModel
 import eac.qloga.android.features.sign_in.SignIn
+import eac.qloga.android.features.splash_screen.SplashScreen
 
 fun enterTransition(): EnterTransition {
     return slideInHorizontally(
@@ -43,6 +44,27 @@ fun popEnterTransition(): EnterTransition {
             easing = FastOutSlowInEasing
         )
     ) + fadeIn(animationSpec = tween(600))
+}
+
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.splashScreen(
+    authViewModel: AuthenticationViewModel,
+    apiViewModel: ApiViewModel,
+    actions: NavigationActions
+) {
+    composable(
+        Screen.SplashScreen.route,
+        enterTransition = { enterTransition() },
+        popEnterTransition = { popEnterTransition() },
+        exitTransition = { exitTransition() }
+    ) {
+        SplashScreen(
+            authViewModel = authViewModel,
+            apiViewModel = apiViewModel,
+            actions = actions
+        )
+    }
 }
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -93,7 +115,6 @@ fun NavGraphBuilder.signIn(
 fun NavGraphBuilder.orderListPrv(
     navController: NavController,
     authViewModel: AuthenticationViewModel,
-    apiViewModel: ApiViewModel,
     viewModel: OrderListPrvViewModel,
     actions: NavigationActions
 ) {
@@ -107,7 +128,6 @@ fun NavGraphBuilder.orderListPrv(
         OrderListPrvScreen(
             navController = navController,
             authViewModel = authViewModel,
-            apiViewModel = apiViewModel,
             viewModel = viewModel,
             actions = actions
         )

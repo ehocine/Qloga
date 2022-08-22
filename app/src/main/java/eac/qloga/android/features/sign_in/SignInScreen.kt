@@ -21,7 +21,6 @@ import eac.qloga.android.core.viewmodels.ApiViewModel
 import eac.qloga.android.core.viewmodels.AuthenticationViewModel
 import eac.qloga.android.features.shared.util.NavigationActions
 import eac.qloga.android.ui.theme.green1
-import kotlinx.coroutines.launch
 
 
 @Composable
@@ -37,6 +36,10 @@ fun SignIn(
 
     val getEnrollsState by apiViewModel.getEnrollsLoadingState.collectAsState()
     val responseEnrollsModel by apiViewModel.responseEnrollsModel
+
+    LaunchedEffect(key1 = oktaState is BrowserState.LoggedIn) {
+        apiViewModel.getEnrolls()
+    }
 
     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
         Column(
@@ -61,9 +64,6 @@ fun SignIn(
                     CircularProgressIndicator(color = green1)
                 }
                 is BrowserState.LoggedIn -> {
-                    LaunchedEffect(key1 = true) {
-                        apiViewModel.getEnrolls()
-                    }
                     when (getEnrollsState) {
                         LoadingState.LOADING -> {
                             CircularProgressIndicator(color = green1)
@@ -75,20 +75,8 @@ fun SignIn(
                             } else {
                                 actions.goToIntro.invoke()
                             }
-
                         }
-                        else -> {
-                            Text(text = "Error connecting to the server occurred")
-                            Button(onClick = {
-                                scope.launch {
-                                    apiViewModel.getEnrollsLoadingState.emit(LoadingState.IDLE)
-                                }
-                                authViewModel.oktaLogout(context)
-                            }) {
-                                Text(text = "Log out")
-
-                            }
-                        }
+                        else -> Unit
                     }
                 }
                 else -> {

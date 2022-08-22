@@ -4,9 +4,10 @@ sealed class Screen(
     val route: String,
     val titleName: String = ""
 ) {
+    object SplashScreen : Screen("splash_screen", "Splash Screen")
     object Intro : Screen("intro", "Intro")
     object SignIn : Screen("sign_in", "Sign In")
-    object OrderListPrv: Screen("order_list_prv", "")
+    object OrderListPrv : Screen("order_list_prv", "")
     // object Screen2 : Screen("screen_2", "Screen 2")
     // object ProviderSearch: Screen("provider_search", "Provider Search")
     //object Previews: Screen("previews", "Reviews")
@@ -33,6 +34,7 @@ sealed class Screen(
             //       ProviderSearchEmpty,
             //     CustomerNavContainer,
             //    OrderListPrv,
+            SplashScreen,
             Intro,
             SignIn,
             OrderListPrv
