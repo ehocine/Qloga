@@ -24,10 +24,10 @@ import eac.qloga.android.ui.theme.green1
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OrderListPrvScreen(
+fun EnrolledScreen(
     navController: NavController,
     authViewModel: AuthenticationViewModel,
-    viewModel: OrderListPrvViewModel,
+    viewModel: EnrolledViewModel,
     actions: NavigationActions
 ) {
     val context = LocalContext.current

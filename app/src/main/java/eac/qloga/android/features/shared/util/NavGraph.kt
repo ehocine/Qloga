@@ -11,8 +11,8 @@ import eac.qloga.android.core.viewmodels.ApiViewModel
 import eac.qloga.android.core.viewmodels.AuthenticationViewModel
 import eac.qloga.android.features.intro.presentation.IntroScreen
 import eac.qloga.android.features.intro.presentation.IntroViewModel
-import eac.qloga.android.features.enrolled.OrderListPrvScreen
-import eac.qloga.android.features.enrolled.OrderListPrvViewModel
+import eac.qloga.android.features.enrolled.EnrolledScreen
+import eac.qloga.android.features.enrolled.EnrolledViewModel
 import eac.qloga.android.features.sign_in.SignIn
 import eac.qloga.android.features.splash_screen.SplashScreen
 
@@ -112,20 +112,20 @@ fun NavGraphBuilder.signIn(
 }
 
 @OptIn(ExperimentalAnimationApi::class)
-fun NavGraphBuilder.orderListPrv(
+fun NavGraphBuilder.enrolled(
     navController: NavController,
     authViewModel: AuthenticationViewModel,
-    viewModel: OrderListPrvViewModel,
+    viewModel: EnrolledViewModel,
     actions: NavigationActions
 ) {
     composable(
-        route = Screen.OrderListPrv.route,
+        route = Screen.Enrolled.route,
         enterTransition = { enterTransition() },
         popEnterTransition = { popEnterTransition() },
         popExitTransition = { popExitTransition() },
         exitTransition = { exitTransition() }
     ) {
-        OrderListPrvScreen(
+        EnrolledScreen(
             navController = navController,
             authViewModel = authViewModel,
             viewModel = viewModel,
@@ -157,7 +157,7 @@ class NavigationActions(navController: NavController) {
         }
     }
     val goToOrderLisrPrv: () -> Unit = {
-        navController.navigate(Screen.OrderListPrv.route) {
+        navController.navigate(Screen.Enrolled.route) {
             popUpTo(navController.graph.findStartDestination().id)
             launchSingleTop = true
         }

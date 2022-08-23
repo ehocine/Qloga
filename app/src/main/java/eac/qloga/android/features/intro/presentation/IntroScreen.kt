@@ -109,7 +109,7 @@ fun IntroScreen(
                                     onClickBecomeProvider = {
                                         scope.launch {
                                             if (isAlreadyEnrolled.value) {
-                                                //   navController.navigate(Screen.OrderListPrv.route){
+                                                //   navController.navigate(Screen.EnrolledPrv.route){
                                                 //       launchSingleTop = true
                                                 //   }
                                             } else {
@@ -122,7 +122,7 @@ fun IntroScreen(
                                     onClickRequest = {
                                         scope.launch {
                                             if (isAlreadyEnrolled.value) {
-                                                //    navController.navigate(Screen.OrderListPrv.route){
+                                                //    navController.navigate(Screen.Enrolled.route){
                                                 //        launchSingleTop = true
                                                 //    }
                                             } else {
@@ -141,7 +141,7 @@ fun IntroScreen(
                                     },
                                     onClickEnrolled = {
                                         scope.launch {
-                                            //    navController.navigate(Screen.OrderListPrv.route){
+                                            //    navController.navigate(Screen.Enrolled.route){
                                             //        launchSingleTop = true
                                             //    }
                                         }
