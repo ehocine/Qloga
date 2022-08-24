@@ -8,10 +8,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import eac.qloga.android.core.services.OktaManager
+import eac.qloga.android.core.util.LoadingState
 import eac.qloga.android.data.api.APIHelper
 import eac.qloga.android.data.model.ResponseEnrollsModel
 import eac.qloga.android.di.retrofit.AppInterceptor
-import eac.qloga.android.core.util.LoadingState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -43,10 +43,11 @@ class ApiViewModel @Inject constructor(
                     getEnrollsLoadingState.emit(LoadingState.LOADED)
                 } else {
                     getEnrollsLoadingState.emit(LoadingState.ERROR)
+                    Log.d("Error", "Code: ${response.code()}, message: ${response.errorBody()}")
                 }
             } catch (e: Exception) {
                 getEnrollsLoadingState.emit(LoadingState.ERROR)
-                Log.e("error", e.toString())
+                Log.d("error", e.toString())
             }
         }
     }

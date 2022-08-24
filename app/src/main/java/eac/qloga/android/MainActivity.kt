@@ -15,10 +15,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import dagger.hilt.android.AndroidEntryPoint
-import eac.qloga.android.features.intro.presentation.IntroViewModel
-import eac.qloga.android.features.shared.util.*
 import eac.qloga.android.core.viewmodels.ApiViewModel
 import eac.qloga.android.core.viewmodels.AuthenticationViewModel
+import eac.qloga.android.features.enrolled.EnrolledViewModel
+import eac.qloga.android.features.intro.presentation.IntroViewModel
+import eac.qloga.android.features.shared.util.*
 import eac.qloga.android.ui.theme.QLOGATheme
 
 @AndroidEntryPoint
@@ -39,6 +40,7 @@ private fun BuildScreen() {
     val introViewModel = hiltViewModel<IntroViewModel>()
     val authenticationViewModel = hiltViewModel<AuthenticationViewModel>()
     val apiViewModel = hiltViewModel<ApiViewModel>()
+    val enrolledViewModel = hiltViewModel<EnrolledViewModel>()
 
     val isDarkTheme = remember { mutableStateOf(false) }
     val isDynamicColor = remember { mutableStateOf(false) }
@@ -56,24 +58,31 @@ private fun BuildScreen() {
 
             AnimatedNavHost(
                 navController = navController,
-                startDestination = Screen.SignIn.route,
-//                startDestination = if (!signInViewModel.loggedIn.value) Screen.SignIn.route else Screen.Intro.route,
+                startDestination = Screen.SplashScreen.route,
                 builder = {
-                    intro(navController, introViewModel, authenticationViewModel, actions)
+                    splashScreen(
+                        authViewModel = authenticationViewModel,
+                        apiViewModel = apiViewModel,
+                        actions = actions
+                    )
+                    intro(
+                        navController,
+                        introViewModel,
+                        authenticationViewModel,
+                        apiViewModel,
+                        actions
+                    )
                     signIn(
                         authViewModel = authenticationViewModel,
                         apiViewModel = apiViewModel,
                         actions = actions
                     )
-                    screen2(
+                    enrolled(
+                        navController = navController,
                         authViewModel = authenticationViewModel,
-                        apiViewModel = apiViewModel,
+                        viewModel = enrolledViewModel,
                         actions = actions
                     )
-                    //   testing(navController)
-                    // testing(navController)
-                    //   testingText()
-                    // previews(navController,introViewModel)
                 }
             )
         }

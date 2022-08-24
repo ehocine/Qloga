@@ -16,6 +16,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
+const val APPLE_IDP = "0oagorxs5veZBGY2d357"
+const val GOOGLE_IDP = "0oagp0zy551uOhvs4357"
+
 @Singleton
 class OktaManager @Inject constructor() {
 
@@ -42,6 +45,54 @@ class OktaManager @Inject constructor() {
         val result = CredentialBootstrap.oidcClient.createWebAuthenticationClient().login(
             context = context,
             redirectUrl = BuildConfig.SIGN_IN_REDIRECT_URI,
+        )
+        return when (result) {
+            is OidcClientResult.Error -> {
+                Log.d("Error", "${result.exception}:  Failed to login.")
+                _oktaState.value = BrowserState.currentCredentialState("Failed to login.")
+                loggedIn.value = false
+                false
+            }
+            is OidcClientResult.Success -> {
+                val credential = CredentialBootstrap.defaultCredential()
+                credential.storeToken(token = result.result)
+                _oktaState.value = BrowserState.LoggedIn.create()
+                loggedIn.value = true
+                true
+            }
+        }
+    }
+
+    suspend fun appleSignIn(context: Context): Boolean {
+        _oktaState.value = BrowserState.Loading
+        val result = CredentialBootstrap.oidcClient.createWebAuthenticationClient().login(
+            context = context,
+            redirectUrl = BuildConfig.SIGN_IN_REDIRECT_URI,
+            extraRequestParameters = mapOf("idp" to APPLE_IDP)
+        )
+        return when (result) {
+            is OidcClientResult.Error -> {
+                Log.d("Error", "${result.exception}:  Failed to login.")
+                _oktaState.value = BrowserState.currentCredentialState("Failed to login.")
+                loggedIn.value = false
+                false
+            }
+            is OidcClientResult.Success -> {
+                val credential = CredentialBootstrap.defaultCredential()
+                credential.storeToken(token = result.result)
+                _oktaState.value = BrowserState.LoggedIn.create()
+                loggedIn.value = true
+                true
+            }
+        }
+    }
+
+    suspend fun googleSignIn(context: Context): Boolean {
+        _oktaState.value = BrowserState.Loading
+        val result = CredentialBootstrap.oidcClient.createWebAuthenticationClient().login(
+            context = context,
+            redirectUrl = BuildConfig.SIGN_IN_REDIRECT_URI,
+            extraRequestParameters = mapOf("idp" to GOOGLE_IDP)
         )
         return when (result) {
             is OidcClientResult.Error -> {
