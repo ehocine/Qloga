@@ -9,7 +9,7 @@ import com.okta.authfoundation.client.OidcClientResult
 import com.okta.authfoundationbootstrap.CredentialBootstrap
 import com.okta.webauthenticationui.WebAuthenticationClient.Companion.createWebAuthenticationClient
 import eac.qloga.android.BuildConfig
-import eac.qloga.android.data.model.User
+import eac.qloga.android.data.shared.models.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,6 +25,10 @@ class OktaManager @Inject constructor() {
     private val _oktaState = MutableStateFlow<BrowserState>(BrowserState.Loading)
     val oktaState: Flow<BrowserState> = _oktaState
     var loggedIn = MutableStateFlow(false)
+
+    companion object {
+        const val TAG = "OktaManager"
+    }
 
     suspend fun checkToken(): Boolean {
         return if (CredentialBootstrap.defaultCredential()
@@ -148,7 +152,7 @@ class OktaManager @Inject constructor() {
         if (CredentialBootstrap.defaultCredential().token != null && CredentialBootstrap.defaultCredential()
                 .getAccessTokenIfValid() == null
         ) {
-            Log.d("Tag", "Called the refreshToken function")
+            Log.d(TAG, "Called the refreshToken function")
             _oktaState.value = BrowserState.Loading
             // The access_token expired, refresh the token.
             return when (val result = CredentialBootstrap.defaultCredential().refreshToken()) {
