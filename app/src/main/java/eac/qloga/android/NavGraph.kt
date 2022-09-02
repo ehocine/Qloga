@@ -10,13 +10,9 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.google.accompanist.navigation.animation.composable
 import eac.qloga.android.core.scenes.CoreScreens
-import eac.qloga.android.core.shared.viewmodels.ApiViewModel
-import eac.qloga.android.core.shared.viewmodels.AuthenticationViewModel
 import eac.qloga.android.features.p4p.showroom.scenes.notEnrolled.NotEnrolledScreen
-import eac.qloga.android.features.p4p.showroom.scenes.notEnrolled.NotEnrolledViewModel
 import eac.qloga.android.features.p4p.showroom.scenes.enrolled.EnrolledScreen
-import eac.qloga.android.features.p4p.showroom.scenes.enrolled.EnrolledViewModel
-import eac.qloga.android.features.platform.landing.signIn.SignIn
+import eac.qloga.android.features.platform.landing.scenes.signIn.SignIn
 import eac.qloga.android.core.scenes.splash.SplashScreen
 import eac.qloga.android.core.shared.utils.ID_KEY
 import eac.qloga.android.core.shared.utils.PARENT_ROUTE_KEY
@@ -26,6 +22,8 @@ import eac.qloga.android.features.p4p.showroom.scenes.addAddress.AddAddressScree
 import eac.qloga.android.features.p4p.showroom.scenes.serviceContract.ServiceContractScreen
 import eac.qloga.android.features.p4p.showroom.scenes.serviceInfo.ServiceInfoScreen
 import eac.qloga.android.features.platform.landing.scenes.LandingScreens
+import eac.qloga.android.features.platform.landing.scenes.postSignup.PostSignupScreen
+import eac.qloga.android.features.platform.landing.scenes.signUp.SignupScreen
 
 private fun enterTransition(): EnterTransition {
     return slideInHorizontally(
@@ -105,7 +103,7 @@ fun NavGraphBuilder.notEnrolled(
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.signIn(
-    actions: NavigationActions
+    navController: NavController,
 ) {
     composable(
         LandingScreens.SignIn.route,
@@ -113,9 +111,7 @@ fun NavGraphBuilder.signIn(
         popEnterTransition = { popEnterTransition() },
         exitTransition = { exitTransition() }
     ) {
-        SignIn(
-            actions = actions
-        )
+        SignIn(navController)
     }
 }
 
@@ -246,6 +242,41 @@ fun NavGraphBuilder.serviceContract(
         exitTransition = { exitTransition() }
     ){
         ServiceContractScreen(
+            navController = navController
+        )
+    }
+}
+
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.signup(
+    navController: NavController,
+){
+    composable(
+        route = LandingScreens.Signup.route,
+        enterTransition = { enterTransition()},
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){
+        SignupScreen(
+            navController = navController
+        )
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.postSignup(
+    navController: NavController
+){
+    composable(
+        route = LandingScreens.PostSignup.route,
+        enterTransition = { enterTransition()},
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){
+        PostSignupScreen(
             navController = navController
         )
     }
