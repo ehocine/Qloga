@@ -1,0 +1,30 @@
+package eac.qloga.android.core.shared.theme
+
+import androidx.compose.ui.graphics.Color
+
+val Purple80 = Color(0xFFD0BCFF)
+val PurpleGrey80 = Color(0xFFCCC2DC)
+val Pink80 = Color(0xFFEFB8C8)
+
+val green1 = Color(0xFF27AE61)
+val gray1 = Color(0xFFC4C4C4)
+val gray30 = Color(0xFFA8A8A8)
+val lightGrayBackground = Color(0xFFE5E5E5)
+val orange1 = Color(0xFFF59A31)
+val grayTextColor = Color(0xFFA8A8A8)
+val blueTextColor = Color(0xFF2975AA)
+val input_bottom_border = Color(0xFFF6F6F6)
+val info_sky = Color(0xFF4184B2)
+val orange2 = Color(0xFFFFA033)
+val purple_heart = Color(0xFFEE2A7B)
+val purple10 = Color(0xFF8327AE)
+val dangerRed = Color(0xFFDF3725)
+val Red10 = Color(0xFFDF3725)
+val LightGreen10 = Color(0xFFD7FFEB)
+val gradientLightRed1 = Color(0xFFFFF0F0)
+val gradientLightRed2 = Color(0xFFFFD9D9)
+val gradientLightGreen1 = Color(0xFFDEFDEB)
+val gradientLightGreen2 = Color(0xFF8DECB5)
+val gradientLightOrange1 = Color(0xFFFFFCEA)
+val gradientLightOrange2 = Color(0xFFFFF8C2)
+val dimGrayColor = Color(0xFFC4C4C4)

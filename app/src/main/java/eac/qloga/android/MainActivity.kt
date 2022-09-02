@@ -11,16 +11,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import dagger.hilt.android.AndroidEntryPoint
-import eac.qloga.android.core.viewmodels.ApiViewModel
-import eac.qloga.android.core.viewmodels.AuthenticationViewModel
-import eac.qloga.android.features.enrolled.EnrolledViewModel
-import eac.qloga.android.features.intro.presentation.IntroViewModel
-import eac.qloga.android.features.shared.util.*
-import eac.qloga.android.ui.theme.QLOGATheme
+import eac.qloga.android.core.scenes.CoreScreens
+import eac.qloga.android.core.shared.theme.QLOGATheme
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -37,11 +32,6 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun BuildScreen() {
-    val introViewModel = hiltViewModel<IntroViewModel>()
-    val authenticationViewModel = hiltViewModel<AuthenticationViewModel>()
-    val apiViewModel = hiltViewModel<ApiViewModel>()
-    val enrolledViewModel = hiltViewModel<EnrolledViewModel>()
-
     val isDarkTheme = remember { mutableStateOf(false) }
     val isDynamicColor = remember { mutableStateOf(false) }
 
@@ -58,31 +48,14 @@ private fun BuildScreen() {
 
             AnimatedNavHost(
                 navController = navController,
-                startDestination = Screen.SplashScreen.route,
+                startDestination = CoreScreens.SplashScreen.route,
                 builder = {
-                    splashScreen(
-                        authViewModel = authenticationViewModel,
-                        apiViewModel = apiViewModel,
-                        actions = actions
-                    )
-                    intro(
-                        navController,
-                        introViewModel,
-                        authenticationViewModel,
-                        apiViewModel,
-                        actions
-                    )
-                    signIn(
-                        authViewModel = authenticationViewModel,
-                        apiViewModel = apiViewModel,
-                        actions = actions
-                    )
-                    enrolled(
-                        navController = navController,
-                        authViewModel = authenticationViewModel,
-                        viewModel = enrolledViewModel,
-                        actions = actions
-                    )
+                    splash(actions)
+                    notEnrolled(navController, actions)
+                    signIn(actions)
+                    enrolled(navController, actions)
+                    addressAdd(navController)
+                    addressOnMap(navController)
                 }
             )
         }
