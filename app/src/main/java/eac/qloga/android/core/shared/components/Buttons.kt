@@ -124,12 +124,13 @@ object Buttons{
     @Composable
     fun FullRoundedButton(
         modifier: Modifier = Modifier ,
-        buttonText: String ,
+        buttonText: String = "",
         backgroundColor: Color = MaterialTheme.colorScheme.primary,
         textColor: Color = Color.White,
         showBorder: Boolean = false,
         borderColor: Color = Color.Gray,
         enabled: Boolean = true,
+        content: ComposeFun? = null,
         onClick: () -> Unit
     ) {
         val buttonHeight = BUTTON_HEIGHT.dp
@@ -150,11 +151,15 @@ object Buttons{
             ,
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = buttonText,
-                style = MaterialTheme.typography.bodyMedium,
-                color = textColor
-            )
+            if(content != null){
+                content()
+            }else{
+                Text(
+                    text = buttonText,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = textColor
+                )
+            }
         }
     }
 }

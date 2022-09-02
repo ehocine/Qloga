@@ -4,11 +4,15 @@ sealed class LandingScreens(
     val route: String,
     val titleName: String = ""
 ) {
-    object SignIn : LandingScreens("sign_in", "Sign In")
+    object SignIn: LandingScreens("sign_in", "Sign In")
+    object Signup: LandingScreens("sign_up", "")
+    object PostSignup: LandingScreens("post_sign_up", "")
 
     companion object {
         val listOfScreen = listOf(
-            SignIn
+            SignIn,
+            Signup,
+            PostSignup
         )
     }
 }

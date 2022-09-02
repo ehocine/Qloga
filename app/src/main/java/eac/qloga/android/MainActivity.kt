@@ -52,13 +52,15 @@ private fun BuildScreen() {
                 builder = {
                     splash(actions)
                     notEnrolled(navController, actions)
-                    signIn(actions)
+                    signIn(navController)
                     enrolled(navController, actions)
                     addressAdd(navController)
                     addressOnMap(navController)
                     categories(navController)
                     serviceInfo(navController)
                     serviceContract(navController)
+                    signup(navController)
+                    postSignup(navController)
                 }
             )
         }
