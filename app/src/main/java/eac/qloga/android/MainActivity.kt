@@ -56,6 +56,9 @@ private fun BuildScreen() {
                     enrolled(navController, actions)
                     addressAdd(navController)
                     addressOnMap(navController)
+                    categories(navController)
+                    serviceInfo(navController)
+                    serviceContract(navController)
                 }
             )
         }

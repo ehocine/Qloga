@@ -6,6 +6,8 @@ import androidx.compose.animation.core.tween
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.google.accompanist.navigation.animation.composable
 import eac.qloga.android.core.scenes.CoreScreens
 import eac.qloga.android.core.shared.viewmodels.ApiViewModel
@@ -16,8 +18,13 @@ import eac.qloga.android.features.p4p.showroom.scenes.enrolled.EnrolledScreen
 import eac.qloga.android.features.p4p.showroom.scenes.enrolled.EnrolledViewModel
 import eac.qloga.android.features.platform.landing.signIn.SignIn
 import eac.qloga.android.core.scenes.splash.SplashScreen
+import eac.qloga.android.core.shared.utils.ID_KEY
+import eac.qloga.android.core.shared.utils.PARENT_ROUTE_KEY
+import eac.qloga.android.features.intro.presentation.CategoriesScreen
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import eac.qloga.android.features.p4p.showroom.scenes.addAddress.AddAddressScreen
+import eac.qloga.android.features.p4p.showroom.scenes.serviceContract.ServiceContractScreen
+import eac.qloga.android.features.p4p.showroom.scenes.serviceInfo.ServiceInfoScreen
 import eac.qloga.android.features.platform.landing.scenes.LandingScreens
 
 private fun enterTransition(): EnterTransition {
@@ -159,6 +166,87 @@ fun NavGraphBuilder.addressOnMap(
     ){
         AddAddressScreen(
             navController = navController,
+        )
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.categories(
+    navController: NavController,
+){
+    composable(
+        P4pShowroomScreens.Categories.route+"?$PARENT_ROUTE_KEY={$PARENT_ROUTE_KEY}",
+        arguments = listOf(
+            navArgument(
+                name = PARENT_ROUTE_KEY
+            ){
+                type = NavType.StringType
+                defaultValue = ""
+            }
+        ),
+        enterTransition = { enterTransition()},
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){ backStackEntry ->
+        val parentRoute = backStackEntry.arguments?.getString(PARENT_ROUTE_KEY)
+        CategoriesScreen(
+            navController = navController,
+            parentRoute = parentRoute
+        )
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.serviceInfo(
+    navController: NavController,
+){
+    composable(
+        P4pShowroomScreens.ServiceInfo.route+"?$PARENT_ROUTE_KEY={$PARENT_ROUTE_KEY}" +
+                "&$ID_KEY={$ID_KEY}",
+        arguments = listOf(
+            navArgument(
+                name = PARENT_ROUTE_KEY
+            ){
+                type = NavType.StringType
+                defaultValue = ""
+            },
+            navArgument(
+                name = ID_KEY
+            ){
+                type = NavType.IntType
+                defaultValue = 0
+            }
+        ),
+        enterTransition = { enterTransition()},
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){ stackEntry ->
+        val parentRoute = stackEntry.arguments?.getString(PARENT_ROUTE_KEY)
+        val id = stackEntry.arguments?.getInt(ID_KEY)
+
+        ServiceInfoScreen(
+            navController = navController,
+            parentRoute = parentRoute,
+            id = id
+        )
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.serviceContract(
+    navController: NavController
+){
+    composable(
+        route = P4pShowroomScreens.ServiceContract.route,
+        enterTransition = { enterTransition()},
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){
+        ServiceContractScreen(
+            navController = navController
         )
     }
 }

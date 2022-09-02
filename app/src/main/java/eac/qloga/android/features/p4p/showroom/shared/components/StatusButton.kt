@@ -2,6 +2,7 @@ package eac.qloga.android.features.p4p.showroom.shared.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -27,6 +28,8 @@ fun StatusButton(
     trailingIcon: ImageVector? = null,
     label: String ,
     count: String,
+    clickable: Boolean = false,
+    onClick: () -> Unit = {}
 ) {
     val height = 52.dp
 
@@ -34,6 +37,7 @@ fun StatusButton(
         .clip(RoundedCornerShape(12.dp))
         .advancedShadow(color = gray1, .8f, 16.dp, 12.dp)
         .padding(1.5.dp)
+        .clickable(enabled = clickable) { onClick() }
     ) {
         Row(
             modifier = Modifier

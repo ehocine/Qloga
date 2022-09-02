@@ -85,8 +85,8 @@ fun NotEnrolledScreen(
                                     }
                                 }else{
                                     scope.launch {
-                                      //  navController.navigate(Screen.ServiceCategories.route)
-                                        //viewModel.onTriggerEvent(NotEnrolledEvent.NavItemClick(it))
+                                      navController.navigate(P4pShowroomScreens.Categories.route)
+                                      viewModel.onTriggerEvent(NotEnrolledEvent.NavItemClick(it))
                                     }
                                 }
                             }
@@ -118,7 +118,7 @@ fun NotEnrolledScreen(
                             },
                             onClickProviderSearch = {
                                 scope.launch {
-                                   // navController.navigate(Screen.ServiceCategories.route)
+                                   navController.navigate(P4pShowroomScreens.Categories.route)
                                 }
                             }
                         )
