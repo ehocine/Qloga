@@ -9,6 +9,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import eac.qloga.android.data.ApiInterceptor
+import eac.qloga.android.data.get_address.GetAddressApi
 import eac.qloga.android.data.landing.LandingApi
 import eac.qloga.android.data.p4p.P4pApi
 import eac.qloga.android.data.p4p.customer.P4pCustomerApi
@@ -16,10 +17,13 @@ import eac.qloga.android.data.p4p.provider.P4pProviderApi
 import eac.qloga.android.data.qbe.*
 import eac.qloga.android.data.qmp.ChatApi
 import eac.qloga.android.data.qmp.MsgApi
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 
@@ -27,7 +31,8 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    private const val BASE_URL = "https://api.qloga.com/"
+    private const val GET_ADDRESS_BASE_URL = "https://api.getAddress.io/"
+    private const val QLOGA_BASE_URL = "https://api.qloga.com/"
 
     private val interceptor = run {
         val httpLoggingInterceptor = HttpLoggingInterceptor()
@@ -38,7 +43,7 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideOkHTTPClient(appInterceptor: ApiInterceptor): OkHttpClient {
+    fun provideQLOGAOkHTTPClient(appInterceptor: ApiInterceptor): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(interceptor)
             .apply { addInterceptor(appInterceptor) }
@@ -56,23 +61,52 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideRetrofitInstance(
+    @GetAddressApiService
+    fun provideGetAddressRetrofitInstance(
+        objectMapper: ObjectMapper
+    ): Retrofit {
+        val client: OkHttpClient = OkHttpClient.Builder().addInterceptor(interceptor)
+            .addInterceptor(Interceptor { chain ->
+                val newRequest: Request = chain.request().newBuilder()
+                    .build()
+                chain.proceed(newRequest)
+            }).build()
+        return Retrofit.Builder()
+            .client(client)
+            .baseUrl(GET_ADDRESS_BASE_URL)
+            .addConverterFactory(JacksonConverterFactory.create(objectMapper))
+            .build()
+    }
+
+    @Singleton
+    @Provides
+    @QLOGAApiService
+    fun provideQLOGARetrofitInstance(
         client: OkHttpClient,
         objectMapper: ObjectMapper
     ): Retrofit {
         return Retrofit.Builder()
             .client(client)
-            .baseUrl(BASE_URL)
+            .baseUrl(QLOGA_BASE_URL)
             .addConverterFactory(JacksonConverterFactory.create(objectMapper))
             .build()
     }
 
     /// API providers
 
+    //GetAddress
+    @Singleton
+    @Provides
+    @GetAddressApiService
+    fun provideGetAddressApiService(@GetAddressApiService retrofit: Retrofit): GetAddressApi {
+        return retrofit.create(GetAddressApi::class.java)
+    }
+
     /// Landing
     @Singleton
     @Provides
-    fun provideLandingApi(retrofit: Retrofit): LandingApi {
+    @QLOGAApiService
+    fun provideLandingApi(@QLOGAApiService retrofit: Retrofit): LandingApi {
         return retrofit.create(LandingApi::class.java)
     }
 
@@ -80,76 +114,105 @@ object NetworkModule {
     /// P4P
     @Singleton
     @Provides
-    fun provideP4pApi(retrofit: Retrofit): P4pApi {
+    @QLOGAApiService
+    fun provideP4pApi(@QLOGAApiService retrofit: Retrofit): P4pApi {
         return retrofit.create(P4pApi::class.java)
     }
 
     @Singleton
     @Provides
-    fun provideP4pProviderApi(retrofit: Retrofit): P4pProviderApi {
+    @QLOGAApiService
+    fun provideP4pProviderApi(@QLOGAApiService retrofit: Retrofit): P4pProviderApi {
         return retrofit.create(P4pProviderApi::class.java)
     }
 
     @Singleton
     @Provides
-    fun provideP4pCustomerApi(retrofit: Retrofit): P4pCustomerApi {
+    @QLOGAApiService
+    fun provideP4pCustomerApi(@QLOGAApiService retrofit: Retrofit): P4pCustomerApi {
         return retrofit.create(P4pCustomerApi::class.java)
     }
 
     /// QBE
     @Singleton
     @Provides
-    fun provideAlbumsApi(retrofit: Retrofit): AlbumsApi {
+    @QLOGAApiService
+    fun provideAlbumsApi(@QLOGAApiService retrofit: Retrofit): AlbumsApi {
         return retrofit.create(AlbumsApi::class.java)
     }
 
     @Singleton
     @Provides
-    fun provideEventsApi(retrofit: Retrofit): EventsApi {
+    @QLOGAApiService
+    fun provideEventsApi(@QLOGAApiService retrofit: Retrofit): EventsApi {
         return retrofit.create(EventsApi::class.java)
     }
 
     @Singleton
     @Provides
-    fun provideFamiliesApi(retrofit: Retrofit): FamiliesApi {
+    @QLOGAApiService
+    fun provideFamiliesApi(@QLOGAApiService retrofit: Retrofit): FamiliesApi {
         return retrofit.create(FamiliesApi::class.java)
     }
 
     @Singleton
     @Provides
-    fun provideMailsApi(retrofit: Retrofit): MailsApi {
+    @QLOGAApiService
+    fun provideMailsApi(@QLOGAApiService retrofit: Retrofit): MailsApi {
         return retrofit.create(MailsApi::class.java)
     }
 
     @Singleton
     @Provides
-    fun provideMediaApi(retrofit: Retrofit): MediaApi {
+    @QLOGAApiService
+    fun provideMediaApi(@QLOGAApiService retrofit: Retrofit): MediaApi {
         return retrofit.create(MediaApi::class.java)
     }
 
     @Singleton
     @Provides
-    fun provideOrgsApi(retrofit: Retrofit): OrgsApi {
+    @QLOGAApiService
+    fun provideOrgsApi(@QLOGAApiService retrofit: Retrofit): OrgsApi {
         return retrofit.create(OrgsApi::class.java)
     }
 
     @Singleton
     @Provides
-    fun providePlatformApi(retrofit: Retrofit): PlatformApi {
+    @QLOGAApiService
+    fun providePlatformApi(@QLOGAApiService retrofit: Retrofit): PlatformApi {
         return retrofit.create(PlatformApi::class.java)
     }
 
     /// QMP
     @Singleton
     @Provides
-    fun provideChatApi(retrofit: Retrofit): ChatApi {
+    @QLOGAApiService
+    fun provideChatApi(@QLOGAApiService retrofit: Retrofit): ChatApi {
         return retrofit.create(ChatApi::class.java)
     }
 
     @Singleton
     @Provides
-    fun provideMsgApi(retrofit: Retrofit): MsgApi {
+    @QLOGAApiService
+    fun provideMsgApi(@QLOGAApiService retrofit: Retrofit): MsgApi {
         return retrofit.create(MsgApi::class.java)
     }
-
 }
+
+@Qualifier
+@Target(
+    AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER,
+    AnnotationTarget.PROPERTY_SETTER, AnnotationTarget.FIELD,
+    AnnotationTarget.VALUE_PARAMETER
+)
+@Retention(AnnotationRetention.BINARY)
+annotation class GetAddressApiService
+
+@Qualifier
+@Target(
+    AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER,
+    AnnotationTarget.PROPERTY_SETTER, AnnotationTarget.FIELD,
+    AnnotationTarget.VALUE_PARAMETER
+)
+@Retention(AnnotationRetention.BINARY)
+annotation class QLOGAApiService

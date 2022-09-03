@@ -28,7 +28,11 @@ fun MapViewScreen(
     navController: NavController,
     viewModel: AddressViewModel = hiltViewModel()
 ) {
-    val regues = LatLng(54.9715, -1.6123)
+//    val regues = LatLng(54.9715, -1.6123)
+    val regues = LatLng(
+        AddressViewModel.fullAddress.value.latitude,
+        AddressViewModel.fullAddress.value.longitude
+    )
     val mapLatLng = viewModel.selectedMapLatLng.value
     val markerTitle = viewModel.addressState.value.postCode + " " +
             viewModel.addressState.value.street + "," +
@@ -42,11 +46,13 @@ fun MapViewScreen(
             TitleBar(
                 label = P4pShowroomScreens.AddressOnMap.titleName,
                 iconColor = MaterialTheme.colorScheme.primary,
-                actions = { DoneButton(onClick = {
-                    scope.launch{
-                        navController.navigateUp()
-                    }
-                }) }
+                actions = {
+                    DoneButton(onClick = {
+                        scope.launch {
+                            navController.navigateUp()
+                        }
+                    })
+                }
             ) {
                 navController.navigateUp()
             }
@@ -56,8 +62,7 @@ fun MapViewScreen(
         val titleBarHeight = paddingValues.calculateTopPadding()
         Column(
             modifier = Modifier
-                .fillMaxSize()
-            ,
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(titleBarHeight))

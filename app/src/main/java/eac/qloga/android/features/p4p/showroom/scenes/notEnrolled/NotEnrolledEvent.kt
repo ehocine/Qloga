@@ -6,6 +6,7 @@ import eac.qloga.android.features.p4p.showroom.shared.utils.FilterTypes
 
 sealed class NotEnrolledEvent {
     data class EnterText(val text: String): NotEnrolledEvent()
+    data class AddressChosen(val text: String) : NotEnrolledEvent()
     object Search: NotEnrolledEvent()
     object ClearInput: NotEnrolledEvent()
     object ToggleOpenMap: NotEnrolledEvent()

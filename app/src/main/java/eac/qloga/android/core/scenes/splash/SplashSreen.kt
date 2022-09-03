@@ -1,5 +1,6 @@
 package eac.qloga.android.core.scenes.splash
 
+import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -14,13 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import eac.qloga.android.NavigationActions
 import eac.qloga.android.R
 import eac.qloga.android.core.services.BrowserState
+import eac.qloga.android.core.shared.theme.green1
 import eac.qloga.android.core.shared.utils.LoadingState
 import eac.qloga.android.core.shared.viewmodels.ApiViewModel
 import eac.qloga.android.core.shared.viewmodels.AuthenticationViewModel
-import eac.qloga.android.NavigationActions
-import eac.qloga.android.core.shared.theme.green1
 import kotlinx.coroutines.delay
 
 @Composable
@@ -28,10 +29,15 @@ fun SplashScreen(
     actions: NavigationActions,
     authViewModel: AuthenticationViewModel = hiltViewModel(),
     apiViewModel: ApiViewModel = hiltViewModel()
-    ) {
+) {
     val oktaState by authViewModel.oktaState.collectAsState(BrowserState.Loading)
     val getEnrollsState by apiViewModel.getEnrollsLoadingState.collectAsState()
     val responseEnrollsModel by apiViewModel.responseEnrollsModel
+
+    val getSettingsLoadingState by apiViewModel.settingsLoadingState.collectAsState()
+
+    val getUserProfileLoadingState by apiViewModel.userProfileLoadingState.collectAsState()
+    val userProfile = ApiViewModel.userProfile
 
     var startAnimation by remember { mutableStateOf(false) }
     val alphaAnim = animateFloatAsState(
@@ -44,7 +50,9 @@ fun SplashScreen(
         when (oktaState) {
             is BrowserState.Loading -> Unit
             is BrowserState.LoggedIn -> {
+                apiViewModel.getUserProfile()
                 apiViewModel.getEnrolls()
+                apiViewModel.getSettings()
             }
             else -> {
                 actions.goToSignIn.invoke()
@@ -52,14 +60,33 @@ fun SplashScreen(
         }
     }
     SplashContent(alpha = alphaAnim.value)
-    when (getEnrollsState) {
+    when (getSettingsLoadingState) {
         LoadingState.LOADING -> Unit
         LoadingState.LOADED -> {
-            if (responseEnrollsModel.CUSTOMER != null || responseEnrollsModel.PROVIDER != null) {
-                actions.goToOrderLisrPrv.invoke()
+            when (getUserProfileLoadingState) {
+                LoadingState.LOADING -> Unit
+                LoadingState.LOADED -> {
+                    if (userProfile.value.contacts.address != null) {
+                        Log.d("Tag", "User has an address")
+                        when (getEnrollsState) {
+                            LoadingState.LOADING -> Unit
+                            LoadingState.LOADED -> {
+                                if (responseEnrollsModel.CUSTOMER != null || responseEnrollsModel.PROVIDER != null) {
+                                    actions.goToOrderLisrPrv.invoke()
 
-            } else {
-                actions.goToIntro.invoke()
+                                } else {
+                                    actions.goToIntro.invoke()
+                                }
+                            }
+                            else -> Unit
+                        }
+                    } else {
+                        // We go to the screen where the user enters address
+                        Log.d("Tag", "User has no address")
+
+                    }
+                }
+                else -> Unit
             }
         }
         else -> Unit

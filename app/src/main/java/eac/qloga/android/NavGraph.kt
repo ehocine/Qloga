@@ -10,19 +10,21 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.google.accompanist.navigation.animation.composable
 import eac.qloga.android.core.scenes.CoreScreens
-import eac.qloga.android.features.p4p.showroom.scenes.notEnrolled.NotEnrolledScreen
-import eac.qloga.android.features.p4p.showroom.scenes.enrolled.EnrolledScreen
-import eac.qloga.android.features.platform.landing.scenes.signIn.SignIn
 import eac.qloga.android.core.scenes.splash.SplashScreen
 import eac.qloga.android.core.shared.utils.ID_KEY
 import eac.qloga.android.core.shared.utils.PARENT_ROUTE_KEY
 import eac.qloga.android.features.intro.presentation.CategoriesScreen
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import eac.qloga.android.features.p4p.showroom.scenes.addAddress.AddAddressScreen
+import eac.qloga.android.features.p4p.showroom.scenes.addressOnMap.MapViewScreen
+import eac.qloga.android.features.p4p.showroom.scenes.enrolled.EnrolledScreen
+import eac.qloga.android.features.p4p.showroom.scenes.notEnrolled.NotEnrolledScreen
+import eac.qloga.android.features.p4p.showroom.scenes.notEnrolled.NotEnrolledViewModel
 import eac.qloga.android.features.p4p.showroom.scenes.serviceContract.ServiceContractScreen
 import eac.qloga.android.features.p4p.showroom.scenes.serviceInfo.ServiceInfoScreen
 import eac.qloga.android.features.platform.landing.scenes.LandingScreens
 import eac.qloga.android.features.platform.landing.scenes.postSignup.PostSignupScreen
+import eac.qloga.android.features.platform.landing.scenes.signIn.SignIn
 import eac.qloga.android.features.platform.landing.scenes.signUp.SignupScreen
 
 private fun enterTransition(): EnterTransition {
@@ -85,8 +87,7 @@ fun NavGraphBuilder.splash(
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.notEnrolled(
-    navController: NavController,
-    actions: NavigationActions
+    navController: NavController
 ) {
     composable(
         P4pShowroomScreens.NotEnrolled.route,
@@ -95,8 +96,7 @@ fun NavGraphBuilder.notEnrolled(
         exitTransition = { exitTransition() }
     ) {
         NotEnrolledScreen(
-            navController = navController,
-            actions = actions
+            navController = navController
         )
     }
 }
@@ -136,15 +136,15 @@ fun NavGraphBuilder.enrolled(
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.addressAdd(
-    navController: NavController,
-){
+    navController: NavController
+) {
     composable(
         P4pShowroomScreens.AddAddress.route,
-        enterTransition = { enterTransition()},
+        enterTransition = { enterTransition() },
         popEnterTransition = { popEnterTransition() },
         popExitTransition = { popExitTransition() },
         exitTransition = { exitTransition() }
-    ){
+    ) {
         AddAddressScreen(navController)
     }
 }
@@ -152,15 +152,15 @@ fun NavGraphBuilder.addressAdd(
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.addressOnMap(
     navController: NavController
-){
+) {
     composable(
         P4pShowroomScreens.AddressOnMap.route,
-        enterTransition = { enterTransition()},
+        enterTransition = { enterTransition() },
         popEnterTransition = { popEnterTransition() },
         popExitTransition = { popExitTransition() },
         exitTransition = { exitTransition() }
-    ){
-        AddAddressScreen(
+    ) {
+        MapViewScreen(
             navController = navController,
         )
     }
@@ -169,22 +169,22 @@ fun NavGraphBuilder.addressOnMap(
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.categories(
     navController: NavController,
-){
+) {
     composable(
-        P4pShowroomScreens.Categories.route+"?$PARENT_ROUTE_KEY={$PARENT_ROUTE_KEY}",
+        P4pShowroomScreens.Categories.route + "?$PARENT_ROUTE_KEY={$PARENT_ROUTE_KEY}",
         arguments = listOf(
             navArgument(
                 name = PARENT_ROUTE_KEY
-            ){
+            ) {
                 type = NavType.StringType
                 defaultValue = ""
             }
         ),
-        enterTransition = { enterTransition()},
+        enterTransition = { enterTransition() },
         popEnterTransition = { popEnterTransition() },
         popExitTransition = { popExitTransition() },
         exitTransition = { exitTransition() }
-    ){ backStackEntry ->
+    ) { backStackEntry ->
         val parentRoute = backStackEntry.arguments?.getString(PARENT_ROUTE_KEY)
         CategoriesScreen(
             navController = navController,
@@ -196,29 +196,29 @@ fun NavGraphBuilder.categories(
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.serviceInfo(
     navController: NavController,
-){
+) {
     composable(
-        P4pShowroomScreens.ServiceInfo.route+"?$PARENT_ROUTE_KEY={$PARENT_ROUTE_KEY}" +
+        P4pShowroomScreens.ServiceInfo.route + "?$PARENT_ROUTE_KEY={$PARENT_ROUTE_KEY}" +
                 "&$ID_KEY={$ID_KEY}",
         arguments = listOf(
             navArgument(
                 name = PARENT_ROUTE_KEY
-            ){
+            ) {
                 type = NavType.StringType
                 defaultValue = ""
             },
             navArgument(
                 name = ID_KEY
-            ){
+            ) {
                 type = NavType.IntType
                 defaultValue = 0
             }
         ),
-        enterTransition = { enterTransition()},
+        enterTransition = { enterTransition() },
         popEnterTransition = { popEnterTransition() },
         popExitTransition = { popExitTransition() },
         exitTransition = { exitTransition() }
-    ){ stackEntry ->
+    ) { stackEntry ->
         val parentRoute = stackEntry.arguments?.getString(PARENT_ROUTE_KEY)
         val id = stackEntry.arguments?.getInt(ID_KEY)
 
@@ -233,14 +233,14 @@ fun NavGraphBuilder.serviceInfo(
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.serviceContract(
     navController: NavController
-){
+) {
     composable(
         route = P4pShowroomScreens.ServiceContract.route,
-        enterTransition = { enterTransition()},
+        enterTransition = { enterTransition() },
         popEnterTransition = { popEnterTransition() },
         popExitTransition = { popExitTransition() },
         exitTransition = { exitTransition() }
-    ){
+    ) {
         ServiceContractScreen(
             navController = navController
         )
@@ -251,14 +251,14 @@ fun NavGraphBuilder.serviceContract(
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.signup(
     navController: NavController,
-){
+) {
     composable(
         route = LandingScreens.Signup.route,
-        enterTransition = { enterTransition()},
+        enterTransition = { enterTransition() },
         popEnterTransition = { popEnterTransition() },
         popExitTransition = { popExitTransition() },
         exitTransition = { exitTransition() }
-    ){
+    ) {
         SignupScreen(
             navController = navController
         )
@@ -268,14 +268,14 @@ fun NavGraphBuilder.signup(
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.postSignup(
     navController: NavController
-){
+) {
     composable(
         route = LandingScreens.PostSignup.route,
-        enterTransition = { enterTransition()},
+        enterTransition = { enterTransition() },
         popEnterTransition = { popEnterTransition() },
         popExitTransition = { popExitTransition() },
         exitTransition = { exitTransition() }
-    ){
+    ) {
         PostSignupScreen(
             navController = navController
         )
