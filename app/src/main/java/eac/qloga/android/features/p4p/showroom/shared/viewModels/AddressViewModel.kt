@@ -1,6 +1,8 @@
 package eac.qloga.android.features.p4p.showroom.shared.viewModels
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -14,10 +16,11 @@ import eac.qloga.android.core.shared.utils.LoadingState
 import eac.qloga.android.core.shared.utils.ParkingType
 import eac.qloga.android.core.shared.viewmodels.SettingsViewModel
 import eac.qloga.android.data.get_address.GetAddressRepository
+import eac.qloga.android.data.qbe.FamiliesRepository
 import eac.qloga.android.data.shared.models.FullAddress
 import eac.qloga.android.data.shared.models.address_suggestions.Suggestion
 import eac.qloga.android.features.p4p.showroom.scenes.addAddress.AddressEvent
-import eac.qloga.bare.dto.person.Person
+import eac.qloga.bare.dto.person.Address
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,7 +29,8 @@ import javax.inject.Inject
 @HiltViewModel
 class AddressViewModel @Inject constructor(
     private val getAddressRepository: GetAddressRepository,
-    private val settingsViewModel: SettingsViewModel
+    private val settingsViewModel: SettingsViewModel,
+    private val familiesRepository: FamiliesRepository
 ) : ViewModel() {
 
     companion object {
@@ -150,6 +154,7 @@ class AddressViewModel @Inject constructor(
             e.printStackTrace()
         }
     }
+
     fun onTriggerEvent(event: AddressEvent) {
         try {
             viewModelScope.launch {
@@ -227,7 +232,29 @@ class AddressViewModel @Inject constructor(
         }
     }
 
-    fun onSaveNewAddress() {
+    var saveFamilyAddressLoadingState = MutableStateFlow(LoadingState.IDLE)
+    val saveAddressResponse: MutableState<Address> = mutableStateOf(Address())
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun onSaveNewAddress(newAddress: Address) {
+        viewModelScope.launch {
+            try {
+                saveFamilyAddressLoadingState.emit(LoadingState.LOADING)
+                val response = familiesRepository.addAddress(newAddress)
+                if (response.isSuccessful) {
+                    saveAddressResponse.value = response.body()!!
+                    saveFamilyAddressLoadingState.emit(LoadingState.LOADED)
+                } else {
+                    saveFamilyAddressLoadingState.emit(LoadingState.ERROR)
+                }
+            } catch (e: Exception) {
+                saveFamilyAddressLoadingState.emit(LoadingState.ERROR)
+                e.printStackTrace()
+            }
+        }
+
+
+
         val addrList = ArrayList<String>(_listOfAddress.value)
         Log.d(TAG, "onSaveNewAddress: ${_addressInputFieldState.value.text}")
         addrList.add(_addressInputFieldState.value.text)

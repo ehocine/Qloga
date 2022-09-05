@@ -40,7 +40,7 @@ interface PlatformApi {
     @PUT("qbe/user")
     suspend fun updateUser(
         @Body person: Person
-    ): Person
+    ): Response<Person>
 
     @GET("qbe/user/{pid}")
     suspend fun getPublicProfile(

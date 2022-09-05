@@ -1,7 +1,6 @@
 package eac.qloga.android.features.p4p.showroom.scenes.notEnrolled
 
 import android.app.Activity
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -21,6 +20,7 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import eac.qloga.android.core.shared.utils.LoadingState
+import eac.qloga.android.core.shared.viewmodels.ApiViewModel
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import eac.qloga.android.features.p4p.showroom.shared.components.LeftNavBar
 import eac.qloga.android.features.p4p.showroom.shared.components.MainContent
@@ -80,11 +80,15 @@ fun NotEnrolledScreen(
                         },
                         onSubmit = {
                             if (viewModel.inputFieldState.value.text.isNotEmpty()) {
-                                scope.launch {
-                                    navController.navigate(P4pShowroomScreens.AddressOnMap.route)
-                                }
+//                                viewModel.onTriggerEvent(NotEnrolledEvent.Search)
+//                                AddressViewModel.selectedAddressSuggestion.value =
+//                                    addressSuggestion
+//                                navController.navigate(P4pShowroomScreens.AddAddress.route)
+//                                scope.launch {
+//                                    navController.navigate(P4pShowroomScreens.AddressOnMap.route)
+//                                }
                             }
-                            viewModel.onTriggerEvent(NotEnrolledEvent.Search)
+
                         },
                         onClear = { viewModel.onTriggerEvent(NotEnrolledEvent.ClearInput) },
                         onFocusedChanged = { viewModel.onTriggerEvent(NotEnrolledEvent.FocusInput(it)) }
@@ -142,6 +146,7 @@ fun NotEnrolledScreen(
                     Box {
                         LeftNavBar(
                             selectedNav = viewModel.selectedNav.value,
+                            navList = ApiViewModel.categories.value,
                             enableClick = searchBarValue.isNotEmpty(),
                             onClickItem = {
                                 if (searchBarValue.isEmpty()) {
@@ -150,8 +155,8 @@ fun NotEnrolledScreen(
                                     }
                                 } else {
                                     scope.launch {
-                                        //  navController.navigate(Screen.ServiceCategories.route)
-                                        //viewModel.onTriggerEvent(NotEnrolledEvent.NavItemClick(it))
+                                        navController.navigate(P4pShowroomScreens.Categories.route)
+                                        viewModel.onTriggerEvent(NotEnrolledEvent.NavItemClick(it))
                                     }
                                 }
                             }

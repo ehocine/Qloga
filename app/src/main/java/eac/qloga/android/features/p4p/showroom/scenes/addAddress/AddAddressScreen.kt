@@ -1,5 +1,7 @@
 package eac.qloga.android.features.p4p.showroom.scenes.addAddress
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -29,16 +31,21 @@ import eac.qloga.android.core.shared.components.address.AddressSearchBar
 import eac.qloga.android.core.shared.utils.CONTAINER_TOP_PADDING
 import eac.qloga.android.core.shared.utils.InputFieldState
 import eac.qloga.android.core.shared.utils.LoadingState
+import eac.qloga.android.core.shared.viewmodels.ApiViewModel
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import eac.qloga.android.features.p4p.showroom.shared.components.ParkingSelection
 import eac.qloga.android.features.p4p.showroom.shared.viewModels.AddressViewModel
+import eac.qloga.bare.dto.person.Address
+import eac.qloga.bare.enums.Parking
 import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun AddAddressScreen(
     navController: NavController,
-    viewModel: AddressViewModel = hiltViewModel()
+    viewModel: AddressViewModel = hiltViewModel(),
+    apiViewModel: ApiViewModel = hiltViewModel()
 ) {
     val containerTopPadding = CONTAINER_TOP_PADDING.dp
     val containerHorizontalPadding = 24.dp
@@ -82,6 +89,7 @@ fun AddAddressScreen(
         apartmentsState =
             InputFieldState(text = AddressViewModel.fullAddress.value.subBuildingNumber)
     }
+    var newAddress by remember { mutableStateOf(Address()) }
 
     ModalBottomSheetLayout(
         sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
@@ -100,9 +108,28 @@ fun AddAddressScreen(
                     iconColor = MaterialTheme.colorScheme.primary,
                     actions = {
                         SaveButton(onClick = {
-                            viewModel.onSaveNewAddress()
+                            newAddress = Address(
+                                0L,
+                                "GB",
+                                AddressViewModel.fullAddress.value.line1,
+                                AddressViewModel.fullAddress.value.line2,
+                                AddressViewModel.fullAddress.value.line3,
+                                AddressViewModel.fullAddress.value.line4,
+                                AddressViewModel.fullAddress.value.townOrCity,
+                                AddressViewModel.fullAddress.value.postcode,
+                                AddressViewModel.fullAddress.value.latitude,
+                                AddressViewModel.fullAddress.value.longitude,
+                                Parking.FREE,
+                                "",
+                                0L,
+                                listOf(),
+                                true
+                            )
+                            viewModel.onSaveNewAddress(newAddress = newAddress)
+                            apiViewModel.getUserProfile()
                             coroutineScope.launch {
                                 navController.navigateUp()
+
                             }
                         })
                     }

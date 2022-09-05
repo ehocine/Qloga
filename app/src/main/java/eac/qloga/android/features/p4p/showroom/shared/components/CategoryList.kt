@@ -36,7 +36,7 @@ fun CategoryList(
     title: String,
     showDivider: Boolean = true,
     summery: String,
-    onClickI: () -> Unit,
+    onClick: () -> Unit,
     onShowProviders : () -> Unit,
 ){
     val buttonHeight = 40.dp
@@ -116,7 +116,7 @@ fun CategoryList(
 
                     Spacer(modifier = Modifier.width(16.dp))
 
-                    Box(modifier = Modifier.clip(CircleShape).clickable { onClickI() }){
+                    Box(modifier = Modifier.clip(CircleShape).clickable { onClick() }){
                         Icon(
                             modifier = Modifier.size(infoHeight),
                             painter = painterResource(id = R.drawable.ic_info),
@@ -137,5 +137,5 @@ fun CategoryList(
 @Preview(showBackground = true)
 @Composable
 fun PreviewList() {
-    CategoryList(title="Complete Home Cleaning ", summery = "", onShowProviders = {}, onClickI = {})
+    CategoryList(title="Complete Home Cleaning ", summery = "", onShowProviders = {}, onClick = {})
 }

@@ -51,7 +51,7 @@ interface FamiliesApi {
     @POST("qbe/families/addresses")
     suspend fun addAddress(
         @Body address: Address
-    ): Address
+    ): Response<Address>
 
     //0
     @PATCH("qbe/families/addresses/{aid}")

@@ -11,13 +11,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import dagger.hilt.android.AndroidEntryPoint
 import eac.qloga.android.core.scenes.CoreScreens
 import eac.qloga.android.core.shared.theme.QLOGATheme
-import eac.qloga.android.features.p4p.showroom.scenes.notEnrolled.NotEnrolledViewModel
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {

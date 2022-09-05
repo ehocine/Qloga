@@ -53,6 +53,8 @@ fun SplashScreen(
                 apiViewModel.getUserProfile()
                 apiViewModel.getEnrolls()
                 apiViewModel.getSettings()
+                apiViewModel.getCategories()
+                apiViewModel.getConditions()
             }
             else -> {
                 actions.goToSignIn.invoke()

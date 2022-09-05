@@ -1,35 +1,39 @@
 package eac.qloga.android.features.p4p.showroom.scenes.categories
 
 import android.util.Log
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import eac.qloga.android.core.shared.utils.CustomMarkerState
-import eac.qloga.android.features.p4p.showroom.shared.utils.*
 import eac.qloga.android.core.shared.utils.InputFieldState
+import eac.qloga.android.data.shared.models.categories.CategoriesResponseItem
+import eac.qloga.android.features.p4p.showroom.shared.utils.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class CategoriesViewModel @Inject constructor(): ViewModel(){
+class CategoriesViewModel @Inject constructor() : ViewModel() {
 
     companion object {
         const val TAG = "CategoriesViewModel"
+        val selectedNav: MutableState<CategoriesResponseItem?> =
+            mutableStateOf(null)
     }
 
     private val _inputFieldState = mutableStateOf(InputFieldState(hint = "Enter new address"))
     val inputFieldState: State<InputFieldState> = _inputFieldState
 
-    private val _selectedNav = mutableStateOf<ServiceCategory?>(null)
-    val selectedNav: State<ServiceCategory?> = _selectedNav
+//    private val _selectedNav = mutableStateOf<CategoriesResponseItem?>(null)
+//    val selectedNav: State<CategoriesResponseItem?> = _selectedNav
 
     private val _providersList = mutableStateOf<List<Providers>>(emptyList())
-    val providersList: State<List<Providers>> =_providersList
+    val providersList: State<List<Providers>> = _providersList
 
     private val _isShownMap = mutableStateOf(false)
-    val isShownMap: State<Boolean> =_isShownMap
+    val isShownMap: State<Boolean> = _isShownMap
 
     private val _providersCoordinates = mutableStateOf<List<CustomMarkerState>>(emptyList())
     val providersCoordinates: State<List<CustomMarkerState>> = _providersCoordinates
@@ -37,12 +41,12 @@ class CategoriesViewModel @Inject constructor(): ViewModel(){
     private val _searchFilterState = mutableStateOf(SearchFilterState())
     val searchFilterState: State<SearchFilterState> = _searchFilterState
 
-/*    private val _providersScreenType = mutableStateOf(ProvidersScreenType.PROVIDERS)
-    val providersScreenType: State<ProvidersScreenType> = _providersScreenType
+    /*    private val _providersScreenType = mutableStateOf(ProvidersScreenType.PROVIDERS)
+        val providersScreenType: State<ProvidersScreenType> = _providersScreenType
 
-    private val _selectedProvidersTab = mutableStateOf(ProvidersTabItems.MATCH_REQUEST)
-    val selectedProvidersTab: State<ProvidersTabItems> = _selectedProvidersTab
-*/
+        private val _selectedProvidersTab = mutableStateOf(ProvidersTabItems.MATCH_REQUEST)
+        val selectedProvidersTab: State<ProvidersTabItems> = _selectedProvidersTab
+    */
     private val _selectedServiceRadioOption = mutableStateOf(1)
     val selectedServiceRadioOption: State<Int> = _selectedServiceRadioOption
 
@@ -51,10 +55,10 @@ class CategoriesViewModel @Inject constructor(): ViewModel(){
         getProvidersCoordinates()
     }
 
-    fun onTriggerEvent(event: CategoriesEvent){
+    fun onTriggerEvent(event: CategoriesEvent) {
         try {
             viewModelScope.launch {
-                when(event){
+                when (event) {
                     is CategoriesEvent.EnterText -> {
                         _inputFieldState.value = inputFieldState.value.copy(
                             text = event.text
@@ -83,35 +87,42 @@ class CategoriesViewModel @Inject constructor(): ViewModel(){
 
                          */
                     }
-                    is CategoriesEvent.Search -> { onSearch() }
-                    is CategoriesEvent.NavItemClick -> { onNavClick(event.navItem) }
-                    is CategoriesEvent.OnChangeSliderFilterState -> { onChangeSliderFilter(event.type, event.value) }
+                    is CategoriesEvent.Search -> {
+                        onSearch()
+                    }
+                    is CategoriesEvent.NavItemClick -> {
+                        onNavClick(event.navItem)
+                    }
+                    is CategoriesEvent.OnChangeSliderFilterState -> {
+                        onChangeSliderFilter(event.type, event.value)
+                    }
                 }
             }
 
-        }catch (e: Exception){
+        } catch (e: Exception) {
             Log.e(TAG, "onTriggerEvent: ${e.printStackTrace()}")
         }
     }
 
-    fun onSelectServiceRadioOption(index: Int){
+    fun onSelectServiceRadioOption(index: Int) {
         _selectedServiceRadioOption.value = index
     }
-/*
-    fun onSelectProvidersTab(item: ProvidersTabItems){
-        _selectedProvidersTab.value = item
-    }
-*/
+
+    /*
+        fun onSelectProvidersTab(item: ProvidersTabItems){
+            _selectedProvidersTab.value = item
+        }
+    */
     private fun onSearch() {
         _inputFieldState.value = inputFieldState.value.copy(text = "")
     }
 
-    fun onNavClick(navItem: ServiceCategory?){
-        _selectedNav.value = navItem
+    fun onNavClick(navItem: CategoriesResponseItem?) {
+        selectedNav.value = navItem
     }
 
-    private fun onChangeSliderFilter(type: FilterTypes, value: Int){
-        when(type){
+    private fun onChangeSliderFilter(type: FilterTypes, value: Int) {
+        when (type) {
             is FilterTypes.Distance -> {
                 _searchFilterState.value = searchFilterState.value.copy(
                     distance = Distance(value = value)
@@ -145,29 +156,43 @@ class CategoriesViewModel @Inject constructor(): ViewModel(){
      * **/
     fun getFilterSliderState(filterTypes: FilterTypes): Array<Int> {
 
-        return when(filterTypes){
+        return when (filterTypes) {
 
             is FilterTypes.Distance -> {
-                arrayOf(searchFilterState.value.distance.value, searchFilterState.value.distance.max)
+                arrayOf(
+                    searchFilterState.value.distance.value,
+                    searchFilterState.value.distance.max
+                )
             }
 
             is FilterTypes.ReturnRate -> {
-                arrayOf(searchFilterState.value.returnRate.value, searchFilterState.value.returnRate.max)
+                arrayOf(
+                    searchFilterState.value.returnRate.value,
+                    searchFilterState.value.returnRate.max
+                )
             }
 
             is FilterTypes.MinStartRating -> {
-                arrayOf(searchFilterState.value.minStartRating.value, searchFilterState.value.minStartRating.max)
+                arrayOf(
+                    searchFilterState.value.minStartRating.value,
+                    searchFilterState.value.minStartRating.max
+                )
             }
 
             is FilterTypes.OrdersDelivered -> {
-                arrayOf(searchFilterState.value.ordersDelivered.value, searchFilterState.value.ordersDelivered.max)
+                arrayOf(
+                    searchFilterState.value.ordersDelivered.value,
+                    searchFilterState.value.ordersDelivered.max
+                )
             }
 
-            else -> { arrayOf(0,0)}
+            else -> {
+                arrayOf(0, 0)
+            }
         }
     }
 
-    fun onSelectProvidersType(index: Int){
+    fun onSelectProvidersType(index: Int) {
         /*
         val selectedIndexes = ArrayList(_searchFilterState.value.providersType)
 
@@ -183,7 +208,7 @@ class CategoriesViewModel @Inject constructor(): ViewModel(){
          */
     }
 
-    fun onSelectProvidersVerification(index: Int){
+    fun onSelectProvidersVerification(index: Int) {
         /*
         val selectedIndexes = ArrayList(_searchFilterState.value.providersVerifications)
 
@@ -199,7 +224,7 @@ class CategoriesViewModel @Inject constructor(): ViewModel(){
          */
     }
 
-    fun onSelectProvidersAdminVerification(index: Int){
+    fun onSelectProvidersAdminVerification(index: Int) {
         /*
         val selectedIndexes = ArrayList(_searchFilterState.value.providersAdminVerifications)
 
@@ -215,7 +240,7 @@ class CategoriesViewModel @Inject constructor(): ViewModel(){
          */
     }
 
-    fun onSelectClearanceCertificates(index: Int){
+    fun onSelectClearanceCertificates(index: Int) {
         /*
         val selectedIndexes = ArrayList(_searchFilterState.value.clearanceCertifications)
 
@@ -231,7 +256,7 @@ class CategoriesViewModel @Inject constructor(): ViewModel(){
          */
     }
 
-    private fun getProvidersList(){
+    private fun getProvidersList() {
         _providersList.value = listOf(
             Providers("name 1", "others"),
             Providers("name 1", "others"),
@@ -254,7 +279,7 @@ class CategoriesViewModel @Inject constructor(): ViewModel(){
         )
     }
 
-    private fun getProvidersCoordinates(){
+    private fun getProvidersCoordinates() {
         _providersCoordinates.value = listOf(
             CustomMarkerState(54.9715, -1.6123, "Kathmandu, Nepal Street 3340"),
             CustomMarkerState(54.9745, -1.6423, "Kathmandu, Nepal Street 3340"),

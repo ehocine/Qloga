@@ -1,4 +1,4 @@
-package eac.qloga.android.features.intro.presentation
+package eac.qloga.android.features.p4p.showroom.scenes.categories
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -7,7 +7,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,13 +19,13 @@ import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.utils.CONTAINER_TOP_PADDING
 import eac.qloga.android.core.shared.utils.PARENT_ROUTE_KEY
 import eac.qloga.android.core.shared.utils.SCREEN_HORIZONTAL_PADDING
+import eac.qloga.android.core.shared.viewmodels.ApiViewModel
+import eac.qloga.android.data.shared.models.categories.Service
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
-import eac.qloga.android.features.p4p.showroom.scenes.categories.CategoriesEvent
-import eac.qloga.android.features.p4p.showroom.scenes.categories.CategoriesViewModel
+import eac.qloga.android.features.p4p.showroom.scenes.serviceInfo.ServiceInfoViewModel
 import eac.qloga.android.features.p4p.showroom.shared.components.CategoryList
 import eac.qloga.android.features.p4p.showroom.shared.components.DescriptionText
 import eac.qloga.android.features.p4p.showroom.shared.components.TopNavBar
-import eac.qloga.android.features.p4p.showroom.shared.utils.ServiceCategory
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,16 +35,17 @@ fun CategoriesScreen(
     parentRoute: String? = null,
     viewModel: CategoriesViewModel = hiltViewModel(),
 ) {
+
+    val selectedCategory by CategoriesViewModel.selectedNav
+
     val containerTopPadding = CONTAINER_TOP_PADDING.dp
     val horizontalContentPadding = SCREEN_HORIZONTAL_PADDING.dp
-    val detailText = "Residential cleaning services for all parts of your home. With " +
-        "tasks covering dishwashing, cleaning bathrooms, waste removal," +
-        "furniture cleaning, window cleaning ".trimMargin().repeat(2)
+    val detailText = selectedCategory?.descr?.trimMargin()?.repeat(2)
     val scrollState = rememberScrollState()
 
-    LaunchedEffect(Unit){
-        viewModel.onNavClick(ServiceCategory.Cleaning)
-    }
+//    LaunchedEffect(Unit) {
+//        viewModel.onNavClick(ServiceCategory.Cleaning)
+//    }
 
     Scaffold(
         topBar = {
@@ -70,26 +71,35 @@ fun CategoriesScreen(
 
             TopNavBar(
                 onClickItem = { viewModel.onTriggerEvent(CategoriesEvent.NavItemClick(it)) },
-                selectedNav = viewModel.selectedNav.value,
-                navList = ServiceCategory.listOfItems
+                selectedNav = CategoriesViewModel.selectedNav.value,
+                navList = ApiViewModel.categories.value
             )
 
             Column(
                 modifier = Modifier.verticalScroll(scrollState)
             ) {
                 Column(
-                    modifier = Modifier.padding(start = horizontalContentPadding, top = 24.dp, end = horizontalContentPadding),
+                    modifier = Modifier.padding(
+                        start = horizontalContentPadding,
+                        top = 24.dp,
+                        end = horizontalContentPadding
+                    ),
                     verticalArrangement = Arrangement.Center
                 ) {
                     //expandable description text
-                    DescriptionText(text = detailText)
+                    if (detailText != null) {
+                        DescriptionText(text = detailText)
+                    }
                 }
 
                 //list card
-                ServicesListCard(
-                    navController = navController,
-                    parentRoute = parentRoute ?: ""
-                )
+                selectedCategory?.let {
+                    ServicesListCard(
+                        navController = navController,
+                        listOfServices = it.services,
+                        parentRoute = parentRoute ?: ""
+                    )
+                }
             }
         }
     }
@@ -99,219 +109,49 @@ fun CategoriesScreen(
 private fun ServicesListCard(
     modifier: Modifier = Modifier,
     navController: NavController,
+    listOfServices: List<Service>,
     parentRoute: String?
 ) {
-    val categoryList = listOf(
-        "Complete home cleaning",
-        "Bathroom and toilet cleaning",
-        "Kitchen cleaning",
-        "Bedroom or living room cleaning",
-        "Clothes laundry and ironing",
-        "Garrage cleaning",
-        "Swimming pool cleaning",
-        "Owen cleaning"
-    )
-    val summery = "Cleaning and disinfecting surfaces and floors, dusting, vacuuming," +
-            " mopping including cupboards, skirting boards , " +
-            "mirrors, pictures and ornaments, cleaning and tidying every"
     val coroutineScope = rememberCoroutineScope()
-    val paddingHorizontal  = 24.dp
+    val paddingHorizontal = 24.dp
 
-    Box(modifier = modifier
-        .fillMaxWidth()
-        .padding(horizontal = paddingHorizontal, vertical = 28.dp)
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = paddingHorizontal, vertical = 28.dp)
     ) {
         ContainerBorderedCard {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                CategoryList(
-                    title = "Complete home cleaning",
-                    summery = summery,
-                    onClickI = { coroutineScope.launch {
-                        navController.navigate(
-                            P4pShowroomScreens.ServiceInfo.route +"?$PARENT_ROUTE_KEY=${P4pShowroomScreens.Categories.route}"
-                        )
-                    }},
-                    onShowProviders = {
-                        /*
-                        if(parentRoute == Screen.CustomerNavContainer.route){
-                            navController.navigateUp()
-                        }else{
+
+                listOfServices.forEach { service ->
+                    CategoryList(
+                        title = service.name,
+                        summery = service.descr,
+                        onClick = {
+                            ServiceInfoViewModel.selectedService.value = service
                             coroutineScope.launch {
-                                // navController.navigate(Screen.Providers.route+"?$PARENT_ROUTE_KEY=$parentRoute")
+                                navController.navigate(
+                                    P4pShowroomScreens.ServiceInfo.route + "?$PARENT_ROUTE_KEY=${P4pShowroomScreens.Categories.route}"
+                                )
                             }
-                        }
-
-                         */
-                    }
-                )
-
-                CategoryList(
-                    title = "Bathroom and toilet cleaning",
-                    summery = summery,
-                    onClickI = { coroutineScope.launch {
-                        navController.navigate(
-                            P4pShowroomScreens.ServiceInfo.route +"?$PARENT_ROUTE_KEY=${P4pShowroomScreens.Categories.route}"
-                        )
-                    }},
-                    onShowProviders = {
-                        coroutineScope.launch {
+                        },
+                        onShowProviders = {
                             /*
                             if(parentRoute == Screen.CustomerNavContainer.route){
                                 navController.navigateUp()
                             }else{
                                 coroutineScope.launch {
-                                //    navController.navigate(Screen.Providers.route+"?$PARENT_ROUTE_KEY=$parentRoute")
+                                    // navController.navigate(Screen.Providers.route+"?$PARENT_ROUTE_KEY=$parentRoute")
                                 }
                             }
 
                              */
                         }
-                    }
-                )
-
-                CategoryList(
-                    title = "Kitchen cleaning",
-                    summery = summery,
-                    onClickI = { coroutineScope.launch {
-                        navController.navigate(
-                            P4pShowroomScreens.ServiceInfo.route +"?$PARENT_ROUTE_KEY=${P4pShowroomScreens.Categories.route}"
-                        )
-                    }},
-                    onShowProviders = {
-                        coroutineScope.launch {
-                            /*
-                            if(parentRoute == Screen.CustomerNavContainer.route){
-                                navController.navigateUp()
-                            }else{
-                                coroutineScope.launch {
-                                //    navController.navigate(Screen.Providers.route+"?$PARENT_ROUTE_KEY=$parentRoute")
-                                }
-                            }
-
-                             */
-                        }
-                    }
-                )
-
-                CategoryList(
-                    title = "Bedroom or living room cleaning",
-                    summery = summery ,
-                    onClickI = { coroutineScope.launch {
-                        navController.navigate(
-                            P4pShowroomScreens.ServiceInfo.route +"?$PARENT_ROUTE_KEY=${P4pShowroomScreens.Categories.route}"
-                        )
-                    }},
-                    onShowProviders = {
-                        coroutineScope.launch {
-                            /*
-                            if(parentRoute == Screen.CustomerNavContainer.route){
-                                navController.navigateUp()
-                            }else{
-                                coroutineScope.launch {
-                                    navController.navigate(Screen.Providers.route+"?$PARENT_ROUTE_KEY=$parentRoute")
-                                }
-                            }
-                             */
-                        }
-                    }
-                )
-
-                CategoryList(
-                    title = "Clothes laundry and ironing",
-                    summery = summery ,
-                    onClickI = { coroutineScope.launch {
-                        navController.navigate(
-                            P4pShowroomScreens.ServiceInfo.route +"?$PARENT_ROUTE_KEY=${P4pShowroomScreens.Categories.route}"
-                        )
-                    }},
-                    onShowProviders = {
-                        coroutineScope.launch {
-                            /*
-                            if(parentRoute == Screen.CustomerNavContainer.route){
-                                navController.navigateUp()
-                            }else{
-                                coroutineScope.launch {
-                                    navController.navigate(Screen.Providers.route+"?$PARENT_ROUTE_KEY=$parentRoute")
-                                }
-                            }
-
-                             */
-                        }
-                    }
-                )
-
-                CategoryList(
-                    title = "Garrage cleaning",
-                    summery = summery ,
-                    onClickI = { coroutineScope.launch {
-                        navController.navigate(
-                            P4pShowroomScreens.ServiceInfo.route +"?$PARENT_ROUTE_KEY=${P4pShowroomScreens.Categories.route}"
-                        )
-                    }},
-                    onShowProviders = {
-                        coroutineScope.launch {
-                            /*
-                            if(parentRoute == Screen.CustomerNavContainer.route){
-                                navController.navigateUp()
-                            }else{
-                                coroutineScope.launch {
-                                    navController.navigate(Screen.Providers.route+"?$PARENT_ROUTE_KEY=$parentRoute")
-                                }
-                            }
-                             */
-                        }
-                    }
-                )
-
-                CategoryList(
-                    title = "Swimming pool cleaning",
-                    summery = summery ,
-                    onClickI = { coroutineScope.launch {
-                        navController.navigate(
-                            P4pShowroomScreens.ServiceInfo.route +"?$PARENT_ROUTE_KEY=${P4pShowroomScreens.Categories.route}"
-                        )
-                    }},
-                    onShowProviders = {
-                        coroutineScope.launch {
-                            /*
-                            if(parentRoute == Screen.CustomerNavContainer.route){
-                                navController.navigateUp()
-                            }else{
-                                coroutineScope.launch {
-                                    navController.navigate(Screen.Providers.route+"?$PARENT_ROUTE_KEY=$parentRoute")
-                                }
-                            }
-                             */
-                        }
-                    }
-                )
-
-                CategoryList(
-                    title = "Owen cleaning",
-                    showDivider = false,
-                    summery = summery ,
-                    onClickI = { coroutineScope.launch {
-                        navController.navigate(
-                            P4pShowroomScreens.ServiceInfo.route +"?$PARENT_ROUTE_KEY=${P4pShowroomScreens.Categories.route}"
-                        )
-                    }},
-                    onShowProviders = {
-                        coroutineScope.launch {
-                            /*
-                            if(parentRoute == Screen.CustomerNavContainer.route){
-                                navController.navigateUp()
-                            }else{
-                                coroutineScope.launch {
-                                    navController.navigate(Screen.Providers.route+"?$PARENT_ROUTE_KEY=$parentRoute")
-                                }
-                            }
-                             */
-                        }
-                    }
-                )
+                    )
+                }
             }
         }
     }

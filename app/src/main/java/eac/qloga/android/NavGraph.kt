@@ -13,13 +13,12 @@ import eac.qloga.android.core.scenes.CoreScreens
 import eac.qloga.android.core.scenes.splash.SplashScreen
 import eac.qloga.android.core.shared.utils.ID_KEY
 import eac.qloga.android.core.shared.utils.PARENT_ROUTE_KEY
-import eac.qloga.android.features.intro.presentation.CategoriesScreen
+import eac.qloga.android.features.p4p.showroom.scenes.categories.CategoriesScreen
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import eac.qloga.android.features.p4p.showroom.scenes.addAddress.AddAddressScreen
 import eac.qloga.android.features.p4p.showroom.scenes.addressOnMap.MapViewScreen
 import eac.qloga.android.features.p4p.showroom.scenes.enrolled.EnrolledScreen
 import eac.qloga.android.features.p4p.showroom.scenes.notEnrolled.NotEnrolledScreen
-import eac.qloga.android.features.p4p.showroom.scenes.notEnrolled.NotEnrolledViewModel
 import eac.qloga.android.features.p4p.showroom.scenes.serviceContract.ServiceContractScreen
 import eac.qloga.android.features.p4p.showroom.scenes.serviceInfo.ServiceInfoScreen
 import eac.qloga.android.features.platform.landing.scenes.LandingScreens

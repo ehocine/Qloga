@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,15 +17,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import eac.qloga.android.R
-import eac.qloga.android.core.shared.theme.QLOGATheme
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.SvgDecoder
+import coil.request.ImageRequest
+import coil.size.Size
 import eac.qloga.android.core.shared.theme.gray1
 
 @Composable
@@ -32,10 +33,11 @@ fun NavItem(
     modifier: Modifier = Modifier,
     size: Dp = 64.dp,
     iconSize: Dp = 38.dp,
-    iconId: Int,
+    iconUrl: String,
     label: String,
     isSelected: Boolean = false,
-    backgroundColor: Color = MaterialTheme.colorScheme.background,
+    strokeColor: Color,
+    BGColor: Color,
     onClick: () -> Unit
 ) {
     val labelFontSize = 13.sp
@@ -51,19 +53,25 @@ fun NavItem(
                 .clip(RoundedCornerShape(12.dp))
                 .border(
                     width = if (isSelected) 2.dp else 1.5.dp,
-                    color = if (isSelected) MaterialTheme.colorScheme.primary else gray1.copy(alpha = .6f),
+                    color = if (isSelected) strokeColor else gray1.copy(alpha = .6f),
                     shape = RoundedCornerShape(12.dp)
                 )
                 .clickable { onClick() }
-                .background(backgroundColor)
-            ,
+                .background(BGColor),
             contentAlignment = Alignment.Center
-        ){
+        ) {
+            val painter = rememberAsyncImagePainter(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .decoderFactory(SvgDecoder.Factory())
+                    .data(iconUrl)
+                    .size(Size.ORIGINAL) // Set the target size to load the image at.
+                    .build()
+            )
             Image(
                 modifier = Modifier.size(iconSize),
-                painter = painterResource(id = iconId),
-                contentDescription = "",
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
+                painter = painter,
+                contentDescription = null,
+//                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
             )
         }
 
@@ -74,13 +82,5 @@ fun NavItem(
                 fontWeight = FontWeight.W600
             )
         )
-    }
-}
-
-@Preview
-@Composable
-fun PreviewNav(){
-    QLOGATheme(darkTheme = false) {
-        NavItem(iconId = R.drawable.ic_clean, label = "Handyman"){}
     }
 }

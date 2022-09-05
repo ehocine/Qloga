@@ -12,6 +12,7 @@ import eac.qloga.android.data.ApiInterceptor
 import eac.qloga.android.data.get_address.GetAddressApi
 import eac.qloga.android.data.landing.LandingApi
 import eac.qloga.android.data.p4p.P4pApi
+import eac.qloga.android.data.p4p.lookups.LookupsApi
 import eac.qloga.android.data.p4p.customer.P4pCustomerApi
 import eac.qloga.android.data.p4p.provider.P4pProviderApi
 import eac.qloga.android.data.qbe.*
@@ -33,6 +34,7 @@ object NetworkModule {
 
     private const val GET_ADDRESS_BASE_URL = "https://api.getAddress.io/"
     private const val QLOGA_BASE_URL = "https://api.qloga.com/"
+    private const val PRIVATE_QLOGA_BASE_URL = "https://prt.qloga.com/"
 
     private val interceptor = run {
         val httpLoggingInterceptor = HttpLoggingInterceptor()
@@ -88,6 +90,21 @@ object NetworkModule {
         return Retrofit.Builder()
             .client(client)
             .baseUrl(QLOGA_BASE_URL)
+            .addConverterFactory(JacksonConverterFactory.create(objectMapper))
+            .build()
+    }
+
+
+    @Singleton
+    @Provides
+    @PrivateQLOGAApiService
+    fun providePrivateQLOGARetrofitInstance(
+        client: OkHttpClient,
+        objectMapper: ObjectMapper
+    ): Retrofit {
+        return Retrofit.Builder()
+            .client(client)
+            .baseUrl(PRIVATE_QLOGA_BASE_URL)
             .addConverterFactory(JacksonConverterFactory.create(objectMapper))
             .build()
     }
@@ -197,6 +214,14 @@ object NetworkModule {
     fun provideMsgApi(@QLOGAApiService retrofit: Retrofit): MsgApi {
         return retrofit.create(MsgApi::class.java)
     }
+
+    // Get categories
+    @Singleton
+    @Provides
+    @PrivateQLOGAApiService
+    fun provideCategoriesApi(@PrivateQLOGAApiService retrofit: Retrofit): LookupsApi {
+        return retrofit.create(LookupsApi::class.java)
+    }
 }
 
 @Qualifier
@@ -216,3 +241,13 @@ annotation class GetAddressApiService
 )
 @Retention(AnnotationRetention.BINARY)
 annotation class QLOGAApiService
+
+
+@Qualifier
+@Target(
+    AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER,
+    AnnotationTarget.PROPERTY_SETTER, AnnotationTarget.FIELD,
+    AnnotationTarget.VALUE_PARAMETER
+)
+@Retention(AnnotationRetention.BINARY)
+annotation class PrivateQLOGAApiService

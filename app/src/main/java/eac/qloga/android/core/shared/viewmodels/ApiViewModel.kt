@@ -1,5 +1,6 @@
 package eac.qloga.android.core.shared.viewmodels
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.MutableState
@@ -11,8 +12,11 @@ import eac.qloga.android.core.services.OktaManager
 import eac.qloga.android.core.shared.utils.LoadingState
 import eac.qloga.android.data.ApiInterceptor
 import eac.qloga.android.data.p4p.P4pRepository
+import eac.qloga.android.data.p4p.lookups.LookupsRepository
 import eac.qloga.android.data.qbe.PlatformRepository
 import eac.qloga.android.data.shared.models.ResponseEnrollsModel
+import eac.qloga.android.data.shared.models.categories.CategoriesResponse
+import eac.qloga.android.data.shared.models.conditions.ConditionsResponse
 import eac.qloga.bare.dto.person.Person
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,12 +30,19 @@ class ApiViewModel @Inject constructor(
     private val oktaManager: OktaManager,
     private val interceptor: ApiInterceptor,
     private val settingsViewModel: SettingsViewModel,
-    private val platformRepository: PlatformRepository
+    private val platformRepository: PlatformRepository,
+    private val lookupsRepository: LookupsRepository
 
 ) : AndroidViewModel(application) {
 
     companion object {
         val userProfile: MutableState<Person> = mutableStateOf(Person())
+
+        @SuppressLint("MutableCollectionMutableState")
+        val categories: MutableState<CategoriesResponse> = mutableStateOf(CategoriesResponse())
+
+        @SuppressLint("MutableCollectionMutableState")
+        val conditions: MutableState<ConditionsResponse> = mutableStateOf(ConditionsResponse())
     }
 
     var getEnrollsLoadingState = MutableStateFlow(LoadingState.IDLE)
@@ -42,6 +53,10 @@ class ApiViewModel @Inject constructor(
     var settingsLoadingState = MutableStateFlow(LoadingState.IDLE)
 
     var userProfileLoadingState = MutableStateFlow(LoadingState.IDLE)
+
+    var categoriesLoadingState = MutableStateFlow(LoadingState.IDLE)
+
+    var conditionsLoadingState = MutableStateFlow(LoadingState.IDLE)
 
 
     fun getEnrolls() {
@@ -96,4 +111,43 @@ class ApiViewModel @Inject constructor(
         }
     }
 
+    fun getCategories() {
+        viewModelScope.launch {
+            interceptor.setAccessToken(oktaManager.gettingOktaToken())
+            categoriesLoadingState.emit(LoadingState.LOADING)
+            try {
+                val response = lookupsRepository.getCategories()
+                if (response.isSuccessful) {
+                    categories.value = response.body()!!
+                    categoriesLoadingState.emit(LoadingState.LOADED)
+                } else {
+                    categoriesLoadingState.emit(LoadingState.ERROR)
+                    Log.d("Error", "Code: ${response.code()}, message: ${response.errorBody()}")
+                }
+            } catch (e: Exception) {
+                categoriesLoadingState.emit(LoadingState.ERROR)
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun getConditions() {
+        viewModelScope.launch {
+            interceptor.setAccessToken(oktaManager.gettingOktaToken())
+            conditionsLoadingState.emit(LoadingState.LOADING)
+            try {
+                val response = lookupsRepository.getConditions()
+                if (response.isSuccessful) {
+                    conditions.value = response.body()!!
+                    conditionsLoadingState.emit(LoadingState.LOADED)
+                } else {
+                    conditionsLoadingState.emit(LoadingState.ERROR)
+                    Log.d("Error", "Code: ${response.code()}, message: ${response.errorBody()}")
+                }
+            } catch (e: Exception) {
+                conditionsLoadingState.emit(LoadingState.ERROR)
+                e.printStackTrace()
+            }
+        }
+    }
 }

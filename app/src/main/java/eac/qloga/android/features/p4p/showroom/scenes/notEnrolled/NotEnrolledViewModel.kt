@@ -11,6 +11,8 @@ import eac.qloga.android.core.shared.utils.InputFieldState
 import eac.qloga.android.core.shared.viewmodels.ApiViewModel
 import eac.qloga.android.core.shared.viewmodels.SettingsViewModel
 import eac.qloga.android.data.get_address.GetAddressRepository
+import eac.qloga.android.data.shared.models.categories.CategoriesResponseItem
+import eac.qloga.android.features.p4p.showroom.scenes.categories.CategoriesViewModel
 import eac.qloga.android.features.p4p.showroom.shared.utils.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -33,8 +35,8 @@ class NotEnrolledViewModel @Inject constructor(
     )
     val inputFieldState: State<InputFieldState> = _inputFieldState
 
-    private val _selectedNav = mutableStateOf<ServiceCategory?>(null)
-    val selectedNav: State<ServiceCategory?> = _selectedNav
+    private val _selectedNav = mutableStateOf<CategoriesResponseItem?>(null)
+    val selectedNav: State<CategoriesResponseItem?> = _selectedNav
 
     private val _providersList = mutableStateOf<List<Providers>>(emptyList())
     val providersList: State<List<Providers>> = _providersList
@@ -154,8 +156,9 @@ class NotEnrolledViewModel @Inject constructor(
         _inputFieldState.value = inputFieldState.value.copy(text = "")
     }
 
-    fun onNavClick(navItem: ServiceCategory?) {
+    fun onNavClick(navItem: CategoriesResponseItem?) {
         _selectedNav.value = navItem
+        CategoriesViewModel.selectedNav.value = navItem
     }
 
     private fun onChangeSliderFilter(type: FilterTypes, value: Int) {

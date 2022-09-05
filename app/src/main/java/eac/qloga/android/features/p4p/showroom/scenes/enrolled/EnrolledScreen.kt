@@ -12,15 +12,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import eac.qloga.android.NavigationActions
 import eac.qloga.android.R
 import eac.qloga.android.core.services.BrowserState
-import eac.qloga.android.core.shared.viewmodels.AuthenticationViewModel
-import eac.qloga.android.features.p4p.showroom.shared.components.ItemCard
-import eac.qloga.android.features.p4p.showroom.shared.components.LeftNavBar
-import eac.qloga.android.features.p4p.showroom.shared.utils.ServiceCategory
-import eac.qloga.android.NavigationActions
 import eac.qloga.android.core.shared.theme.LightGreen10
 import eac.qloga.android.core.shared.theme.green1
+import eac.qloga.android.core.shared.viewmodels.ApiViewModel
+import eac.qloga.android.core.shared.viewmodels.AuthenticationViewModel
+import eac.qloga.android.data.shared.models.categories.CategoriesResponseItem
+import eac.qloga.android.features.p4p.showroom.shared.components.ItemCard
+import eac.qloga.android.features.p4p.showroom.shared.components.LeftNavBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,7 +33,7 @@ fun EnrolledScreen(
 ) {
     val context = LocalContext.current
     val selectedNavItemIndex = remember { mutableStateOf(0) }
-    val selectedNavItem = remember { mutableStateOf<ServiceCategory?>(null) }
+    val selectedNavItem = remember { mutableStateOf<CategoriesResponseItem?>(null) }
     val containerHorizontalPadding = 24.dp
     val oktaState by authViewModel.oktaState.collectAsState(BrowserState.Loading)
 
@@ -57,6 +58,7 @@ fun EnrolledScreen(
                     .padding(horizontal = 8.dp),
                 topSpace = 0.dp,
                 selectedNav = selectedNavItem.value,
+                navList = ApiViewModel.categories.value,
                 onClickItem = { selectedNavItem.value = it }
             )
             Column(

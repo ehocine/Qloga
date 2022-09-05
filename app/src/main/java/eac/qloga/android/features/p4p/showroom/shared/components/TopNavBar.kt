@@ -8,24 +8,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import eac.qloga.android.features.p4p.showroom.shared.utils.ServiceCategory
-import eac.qloga.android.core.shared.theme.QLOGATheme
+import eac.qloga.android.core.shared.utils.Extensions.color
+import eac.qloga.android.data.shared.models.categories.CategoriesResponseItem
 import kotlinx.coroutines.launch
 
 @Composable
 fun TopNavBar(
-    modifier: Modifier= Modifier,
-    selectedNav: ServiceCategory? = null,
+    modifier: Modifier = Modifier,
+    selectedNav: CategoriesResponseItem? = null,
     scrollable: Boolean = true,
-    navList: List<ServiceCategory>,
-    onClickItem: (ServiceCategory) -> Unit
-){
+    navList: List<CategoriesResponseItem>,
+    onClickItem: (CategoriesResponseItem) -> Unit
+) {
     val scope = rememberCoroutineScope()
     val lazyScrollState = rememberLazyListState()
 
-    LaunchedEffect(Unit){
+    LaunchedEffect(Unit) {
         scope.launch {
             selectedNav?.let {
                 lazyScrollState.animateScrollToItem(navList.indexOf(it))
@@ -42,12 +41,14 @@ fun TopNavBar(
             userScrollEnabled = scrollable,
             state = lazyScrollState,
             contentPadding = PaddingValues(start = 24.dp, end = 16.dp, bottom = 8.dp)
-        ){
-            items(navList, key = {it.label}){ navItems ->
+        ) {
+            items(navList, key = { it.name }) { navItems ->
                 NavItem(
-                    iconId = navItems.iconId,
-                    label = navItems.label,
-                    isSelected = selectedNav == navItems
+                    iconUrl = navItems.avatarUrl,
+                    label = navItems.name,
+                    isSelected = selectedNav == navItems,
+                    strokeColor = navItems.catGroupColour.color,
+                    BGColor = navItems.catGroupBgColour.color
                 ) {
                     onClickItem(navItems)
                     scope.launch {
@@ -58,13 +59,5 @@ fun TopNavBar(
             }
         }
         Spacer(modifier = Modifier.width(16.dp))
-    }
-}
-
-@Preview
-@Composable
-fun PreviewTopNav(){
-    QLOGATheme(darkTheme = false) {
-        TopNavBar(navList = ServiceCategory.listOfItems){}
     }
 }
