@@ -46,6 +46,8 @@ fun SignIn(
     val getEnrollsState by apiViewModel.getEnrollsLoadingState.collectAsState()
     val responseEnrollsModel by apiViewModel.responseEnrollsModel
     val getSettingsLoadingState by apiViewModel.settingsLoadingState.collectAsState()
+    val getCategoriesLoadingState by apiViewModel.categoriesLoadingState.collectAsState()
+    val getConditionsLoadingState by apiViewModel.conditionsLoadingState.collectAsState()
 
     val getUserProfileLoadingState by apiViewModel.userProfileLoadingState.collectAsState()
     val userProfile = ApiViewModel.userProfile
@@ -122,6 +124,8 @@ fun SignIn(
                         LaunchedEffect(key1 = true) {
                             apiViewModel.getUserProfile()
                             apiViewModel.getSettings()
+                            apiViewModel.getCategories()
+                            apiViewModel.getConditions()
                         }
                         when (getSettingsLoadingState) {
                             LoadingState.LOADING -> {
@@ -133,7 +137,8 @@ fun SignIn(
                                 }
                             }
                             LoadingState.LOADED -> {
-                                when (getUserProfileLoadingState) {
+
+                                when (getCategoriesLoadingState) {
                                     LoadingState.LOADING -> {
                                         Box(
                                             modifier = Modifier.fillMaxWidth(),
@@ -143,38 +148,71 @@ fun SignIn(
                                         }
                                     }
                                     LoadingState.LOADED -> {
-                                        if (userProfile.value.contacts.address != null) {
-                                            Log.d("Tag", "User has an address")
-                                            when (getEnrollsState) {
-                                                LoadingState.LOADING -> {
-                                                    Box(
-                                                        modifier = Modifier.fillMaxWidth(),
-                                                        contentAlignment = Alignment.Center
-                                                    ) {
-                                                        CircularProgressIndicator(color = green1)
-                                                    }
+                                        when (getConditionsLoadingState) {
+                                            LoadingState.LOADING -> {
+                                                Box(
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    CircularProgressIndicator(color = green1)
                                                 }
-                                                LoadingState.LOADED -> {
-                                                    if (responseEnrollsModel.CUSTOMER != null || responseEnrollsModel.PROVIDER != null) {
-//                                    actions.goToOrderLisrPrv.invoke()
-                                                        navController.navigate(P4pShowroomScreens.Enrolled.route) {
-                                                            popUpTo(navController.graph.findStartDestination().id)
-                                                            launchSingleTop = true
-                                                        }
-
-                                                    } else {
-//                                    actions.goToIntro.invoke()
-                                                        navController.navigate(P4pShowroomScreens.NotEnrolled.route) {
-                                                            popUpTo(navController.graph.findStartDestination().id)
-                                                            launchSingleTop = true
-                                                        }
-                                                    }
-                                                }
-                                                else -> Unit
                                             }
-                                        }else{
-                                            // We go to the screen where the user enters address
-                                            Log.d("Tag", "User has no address")
+                                            LoadingState.LOADED -> {
+
+                                                when (getUserProfileLoadingState) {
+                                                    LoadingState.LOADING -> {
+                                                        Box(
+                                                            modifier = Modifier.fillMaxWidth(),
+                                                            contentAlignment = Alignment.Center
+                                                        ) {
+                                                            CircularProgressIndicator(color = green1)
+                                                        }
+                                                    }
+                                                    LoadingState.LOADED -> {
+                                                        if (userProfile.value.contacts.address != null) {
+                                                            Log.d("Tag", "User has an address")
+                                                            when (getEnrollsState) {
+                                                                LoadingState.LOADING -> {
+                                                                    Box(
+                                                                        modifier = Modifier.fillMaxWidth(),
+                                                                        contentAlignment = Alignment.Center
+                                                                    ) {
+                                                                        CircularProgressIndicator(
+                                                                            color = green1
+                                                                        )
+                                                                    }
+                                                                }
+                                                                LoadingState.LOADED -> {
+                                                                    if (responseEnrollsModel.CUSTOMER != null || responseEnrollsModel.PROVIDER != null) {
+//                                    actions.goToOrderLisrPrv.invoke()
+                                                                        navController.navigate(
+                                                                            P4pShowroomScreens.Enrolled.route
+                                                                        ) {
+                                                                            popUpTo(navController.graph.findStartDestination().id)
+                                                                            launchSingleTop = true
+                                                                        }
+
+                                                                    } else {
+//                                    actions.goToIntro.invoke()
+                                                                        navController.navigate(
+                                                                            P4pShowroomScreens.NotEnrolled.route
+                                                                        ) {
+                                                                            popUpTo(navController.graph.findStartDestination().id)
+                                                                            launchSingleTop = true
+                                                                        }
+                                                                    }
+                                                                }
+                                                                else -> Unit
+                                                            }
+                                                        } else {
+                                                            // We go to the screen where the user enters address
+                                                            Log.d("Tag", "User has no address")
+                                                        }
+                                                    }
+                                                    else -> Unit
+                                                }
+                                            }
+                                            else -> Unit
                                         }
                                     }
                                     else -> Unit

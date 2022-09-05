@@ -43,6 +43,12 @@ fun CategoriesScreen(
     val detailText = selectedCategory?.descr?.trimMargin()?.repeat(2)
     val scrollState = rememberScrollState()
 
+    val categoriesList = ApiViewModel.categories.value.sortedBy {
+        it.sortOrder
+    }.sortedBy {
+        it.catGroupOrder
+    }
+
 //    LaunchedEffect(Unit) {
 //        viewModel.onNavClick(ServiceCategory.Cleaning)
 //    }
@@ -72,7 +78,7 @@ fun CategoriesScreen(
             TopNavBar(
                 onClickItem = { viewModel.onTriggerEvent(CategoriesEvent.NavItemClick(it)) },
                 selectedNav = CategoriesViewModel.selectedNav.value,
-                navList = ApiViewModel.categories.value
+                navList = categoriesList
             )
 
             Column(

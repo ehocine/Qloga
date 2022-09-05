@@ -35,6 +35,8 @@ fun SplashScreen(
     val responseEnrollsModel by apiViewModel.responseEnrollsModel
 
     val getSettingsLoadingState by apiViewModel.settingsLoadingState.collectAsState()
+    val getCategoriesLoadingState by apiViewModel.categoriesLoadingState.collectAsState()
+    val getConditionsLoadingState by apiViewModel.conditionsLoadingState.collectAsState()
 
     val getUserProfileLoadingState by apiViewModel.userProfileLoadingState.collectAsState()
     val userProfile = ApiViewModel.userProfile
@@ -65,27 +67,38 @@ fun SplashScreen(
     when (getSettingsLoadingState) {
         LoadingState.LOADING -> Unit
         LoadingState.LOADED -> {
-            when (getUserProfileLoadingState) {
+            when (getCategoriesLoadingState) {
                 LoadingState.LOADING -> Unit
                 LoadingState.LOADED -> {
-                    if (userProfile.value.contacts.address != null) {
-                        Log.d("Tag", "User has an address")
-                        when (getEnrollsState) {
-                            LoadingState.LOADING -> Unit
-                            LoadingState.LOADED -> {
-                                if (responseEnrollsModel.CUSTOMER != null || responseEnrollsModel.PROVIDER != null) {
-                                    actions.goToOrderLisrPrv.invoke()
+                    when (getConditionsLoadingState) {
+                        LoadingState.LOADING -> Unit
+                        LoadingState.LOADED -> {
+                            when (getUserProfileLoadingState) {
+                                LoadingState.LOADING -> Unit
+                                LoadingState.LOADED -> {
+                                    if (userProfile.value.contacts.address != null) {
+                                        Log.d("Tag", "User has an address")
+                                        when (getEnrollsState) {
+                                            LoadingState.LOADING -> Unit
+                                            LoadingState.LOADED -> {
+                                                if (responseEnrollsModel.CUSTOMER != null || responseEnrollsModel.PROVIDER != null) {
+                                                    actions.goToOrderLisrPrv.invoke()
 
-                                } else {
-                                    actions.goToIntro.invoke()
+                                                } else {
+                                                    actions.goToIntro.invoke()
+                                                }
+                                            }
+                                            else -> Unit
+                                        }
+                                    } else {
+                                        // We go to the screen where the user enters address
+                                        Log.d("Tag", "User has no address")
+                                    }
                                 }
+                                else -> Unit
                             }
-                            else -> Unit
                         }
-                    } else {
-                        // We go to the screen where the user enters address
-                        Log.d("Tag", "User has no address")
-
+                        else -> Unit
                     }
                 }
                 else -> Unit

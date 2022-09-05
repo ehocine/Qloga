@@ -37,6 +37,12 @@ fun EnrolledScreen(
     val containerHorizontalPadding = 24.dp
     val oktaState by authViewModel.oktaState.collectAsState(BrowserState.Loading)
 
+    val categoriesList = ApiViewModel.categories.value.sortedBy {
+        it.sortOrder
+    }.sortedBy {
+        it.catGroupOrder
+    }
+
     Scaffold { paddingValues ->
 
         val titleBarHeight = paddingValues.calculateTopPadding()
@@ -58,7 +64,7 @@ fun EnrolledScreen(
                     .padding(horizontal = 8.dp),
                 topSpace = 0.dp,
                 selectedNav = selectedNavItem.value,
-                navList = ApiViewModel.categories.value,
+                navList = categoriesList,
                 onClickItem = { selectedNavItem.value = it }
             )
             Column(

@@ -41,6 +41,12 @@ fun NotEnrolledScreen(
     val activity = LocalContext.current as Activity
     val scope = rememberCoroutineScope()
 
+    val categoriesList = ApiViewModel.categories.value.sortedBy {
+        it.sortOrder
+    }.sortedBy {
+        it.catGroupOrder
+    }
+
     val addressSuggestionsLoadingState by addressViewModel.getAddressSuggestionsLoadingState.collectAsState()
     val addressSuggestions by addressViewModel.addressSuggestionsList
 
@@ -146,7 +152,7 @@ fun NotEnrolledScreen(
                     Box {
                         LeftNavBar(
                             selectedNav = viewModel.selectedNav.value,
-                            navList = ApiViewModel.categories.value,
+                            navList = categoriesList,
                             enableClick = searchBarValue.isNotEmpty(),
                             onClickItem = {
                                 if (searchBarValue.isEmpty()) {

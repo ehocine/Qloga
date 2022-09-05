@@ -14,7 +14,7 @@ import eac.qloga.android.data.shared.models.categories.CategoriesResponseItem
 fun LeftNavBar(
     modifier: Modifier = Modifier,
     selectedNav: CategoriesResponseItem? = null,
-    navList: ArrayList<CategoriesResponseItem>,
+    navList: List<CategoriesResponseItem>,
     enableClick: Boolean = true,
     topSpace: Dp = 8.dp,
     onClickItem: (CategoriesResponseItem) -> Unit
