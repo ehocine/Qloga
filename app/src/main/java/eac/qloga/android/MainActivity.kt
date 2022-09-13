@@ -50,8 +50,8 @@ private fun BuildScreen() {
                 navController = navController,
                 startDestination = CoreScreens.SplashScreen.route,
                 builder = {
-                    splash(actions)
-                    notEnrolled(navController, actions)
+                    splash(navController, actions)
+                    notEnrolled(navController)
                     signIn(navController)
                     enrolled(navController, actions)
                     addressAdd(navController)
@@ -61,6 +61,7 @@ private fun BuildScreen() {
                     serviceContract(navController)
                     signup(navController)
                     postSignup(navController)
+                    noAddress(navController)
                 }
             )
         }

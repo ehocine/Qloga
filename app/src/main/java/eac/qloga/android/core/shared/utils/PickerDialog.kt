@@ -3,8 +3,10 @@ package eac.qloga.android.core.shared.utils
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import eac.qloga.android.R
-import eac.qloga.android.core.shared.utils.DateConverter
+import java.time.LocalDate
 import java.util.*
 
 object PickerDialog {
@@ -31,28 +33,33 @@ object PickerDialog {
             context,
             R.style.DateTimePickerDialogTheme,
             { _, hour: Int, minute: Int ->
-                onSetTime("${if(hour<10) "0$hour" else hour }:${if(minute < 10) "0$minute" else minute}")
-            },initialHour?: hourTime, initialMin?: minuteTime, is24HourView,
+                onSetTime("${if (hour < 10) "0$hour" else hour}:${if (minute < 10) "0$minute" else minute}")
+            },
+            initialHour ?: hourTime, initialMin ?: minuteTime, is24HourView,
         ).show()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun showDatePickerDialog(
         context: Context,
         onSetDate: (date: String) -> Unit,
+        getDate: (lDate: LocalDate) -> Unit
     ) {
         val newCalendar = Calendar.getInstance()
         DatePickerDialog(
             context,
             R.style.DateTimePickerDialogTheme,
-            {_, year: Int, month: Int, day: Int ->
-                val m = month+1
+            { _, year: Int, month: Int, day: Int ->
+                val m = month + 1
                 // date format is 23 Feb 2022
                 val date = DateConverter.dayMonthYear(
                     year = year.toString(),
                     month = m.toString(),
                     day = day.toString()
                 )
+                val lDate = LocalDate.of(year, m, day)
                 onSetDate(date)
+                getDate(lDate)
             },
             newCalendar.get(Calendar.YEAR),
             newCalendar.get(Calendar.MONTH),

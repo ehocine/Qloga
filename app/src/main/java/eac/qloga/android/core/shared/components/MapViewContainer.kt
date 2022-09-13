@@ -2,7 +2,6 @@ package eac.qloga.android.core.shared.components
 
 import android.content.Context
 import android.graphics.Bitmap
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -21,7 +20,6 @@ import eac.qloga.android.core.shared.utils.CustomMarkerState
 /**
  *  Google Map View
  * */
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun MapViewContainer(
     cameraPositionState: CameraPositionState,
@@ -30,14 +28,14 @@ fun MapViewContainer(
     onMapClick: (LatLng) -> Unit = {}
 ) {
 
-    val uiSettings = remember{
+    val uiSettings = remember {
         MapUiSettings(zoomControlsEnabled = false)
     }
     val context = LocalContext.current
 
-    val animateMarkerVisible = remember{ mutableStateOf(false)}
+    val animateMarkerVisible = remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit){
+    LaunchedEffect(Unit) {
         animateMarkerVisible.value = true
     }
 
@@ -46,19 +44,29 @@ fun MapViewContainer(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
             uiSettings = uiSettings,
-            onMapClick = {onMapClick(it)},
+            onMapClick = { onMapClick(it) },
         ) {
-            if(listOfMarkers.isNotEmpty()){
+            if (listOfMarkers.isNotEmpty()) {
                 listOfMarkers.forEach { marker ->
-                    if(customMarkerIcon == null){
+                    if (customMarkerIcon == null) {
                         Marker(
-                            state = MarkerState(position = LatLng(marker.latitude, marker.longitude)),
+                            state = MarkerState(
+                                position = LatLng(
+                                    marker.latitude,
+                                    marker.longitude
+                                )
+                            ),
                             title = marker.title,
                             snippet = marker.description,
                         )
-                    }else{
+                    } else {
                         Marker(
-                            state = MarkerState(position = LatLng(marker.latitude, marker.longitude)),
+                            state = MarkerState(
+                                position = LatLng(
+                                    marker.latitude,
+                                    marker.longitude
+                                )
+                            ),
                             title = marker.title,
                             snippet = marker.description,
                             icon = bitmapDescriptorFromVector(context, customMarkerIcon)

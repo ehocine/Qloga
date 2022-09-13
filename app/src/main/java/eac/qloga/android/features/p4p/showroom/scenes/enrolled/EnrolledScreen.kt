@@ -4,7 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -12,15 +15,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import eac.qloga.android.NavigationActions
 import eac.qloga.android.R
 import eac.qloga.android.core.services.BrowserState
-import eac.qloga.android.core.shared.viewmodels.AuthenticationViewModel
-import eac.qloga.android.features.p4p.showroom.shared.components.ItemCard
-import eac.qloga.android.features.p4p.showroom.shared.components.LeftNavBar
-import eac.qloga.android.features.p4p.showroom.shared.utils.ServiceCategory
-import eac.qloga.android.NavigationActions
 import eac.qloga.android.core.shared.theme.LightGreen10
 import eac.qloga.android.core.shared.theme.green1
+import eac.qloga.android.core.shared.viewmodels.ApiViewModel
+import eac.qloga.android.core.shared.viewmodels.AuthenticationViewModel
+import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
+import eac.qloga.android.features.p4p.showroom.shared.components.ItemCard
+import eac.qloga.android.features.p4p.showroom.shared.components.LeftNavBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,10 +35,14 @@ fun EnrolledScreen(
     viewModel: EnrolledViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
-    val selectedNavItemIndex = remember { mutableStateOf(0) }
-    val selectedNavItem = remember { mutableStateOf<ServiceCategory?>(null) }
     val containerHorizontalPadding = 24.dp
-    val oktaState by authViewModel.oktaState.collectAsState(BrowserState.Loading)
+    val oktaState by authViewModel.oktaState.collectAsState(BrowserState.LoggedIn)
+
+    val categoriesList = ApiViewModel.categories.value.sortedBy {
+        it.sortOrder
+    }.sortedBy {
+        it.catGroupOrder
+    }
 
     Scaffold { paddingValues ->
 
@@ -56,8 +64,12 @@ fun EnrolledScreen(
                     .background(LightGreen10)
                     .padding(horizontal = 8.dp),
                 topSpace = 0.dp,
-                selectedNav = selectedNavItem.value,
-                onClickItem = { selectedNavItem.value = it }
+                selectedNav = viewModel.selectedNav.value,
+                navList = categoriesList,
+                onClickItem = {
+                    navController.navigate(P4pShowroomScreens.Categories.route)
+                    viewModel.onTriggerEvent(EnrolledEvent.NavItemClick(it))
+                }
             )
             Column(
                 modifier = Modifier

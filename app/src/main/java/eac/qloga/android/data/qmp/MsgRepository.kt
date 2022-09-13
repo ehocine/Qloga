@@ -1,6 +1,8 @@
 package eac.qloga.android.data.qmp
 
-class MsgRepository(private val apiService: MsgApi) {
+import eac.qloga.android.di.QLOGAApiService
+
+class MsgRepository(@QLOGAApiService private val apiService: MsgApi) {
 
     suspend fun getOnlineAll() = apiService.getOnlineAll()
     suspend fun getOnlineRelatives() = apiService.getOnlineRelatives()

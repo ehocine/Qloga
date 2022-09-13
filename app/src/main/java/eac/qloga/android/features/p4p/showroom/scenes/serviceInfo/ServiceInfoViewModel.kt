@@ -1,46 +1,23 @@
 package eac.qloga.android.features.p4p.showroom.scenes.serviceInfo
 
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import eac.qloga.android.features.p4p.showroom.shared.utils.CleaningServiceCategory
-import kotlinx.coroutines.launch
+import eac.qloga.p4p.lookups.dto.QService
 import javax.inject.Inject
 
 
 @HiltViewModel
-class ServiceInfoViewModel @Inject constructor(): ViewModel(){
+class ServiceInfoViewModel @Inject constructor() : ViewModel() {
 
     companion object {
         const val TAG = "ServiceInfoViewModel"
+        val selectedService: MutableState<QService?> = mutableStateOf(null)
     }
 
-    /*
-    val timeTabContains = mutableStateOf(listOf("30 min", "1 hr"))
-
-    private val timeSlots1 = listOf(
-        "00:30-01:30","01:30-02:30","02:30-03:30","03:30-04:30",
-        "04:30-05:30","05:30-06:30","06:30-07:30","07:30-08:30",
-        "08:30-09:30","09:30-10:30","10:30-11:30","11:30-12:30",
-        "12:30-13:30","13:30-14:30","14:30-15:30","15:30-16:30",
-        "16:300-17:30","17:30-18:30","18:30-19:30","19:30-20:30",
-        "20:30-21:30","21:30-22:30","22:30-23:30","23:30-00:30"
-    )
-
-    private val timeSlots2 = listOf(
-        "00:00-01:00","01:00-02:00","02:00-03:00","03:00-04:00",
-        "04:00-05:00","05:00-06:00","06:00-07:00","07:00-08:00",
-        "08:00-09:00","09:00-10:00","10:00-11:00","11:00-12:00",
-        "12:00-13:00","13:00-14:00","14:00-15:00","15:00-16:00",
-        "16:00-17:00","17:00-18:00","18:00-19:00","19:00-20:00",
-        "20:00-21:00","21:00-22:00","22:00-23:00","23:00-00:00"
-    )
-
-     */
 
     private val _checked = mutableStateOf(false)
     val checked: State<Boolean> = _checked
@@ -65,44 +42,57 @@ class ServiceInfoViewModel @Inject constructor(): ViewModel(){
     private val _selectedTimeSlotList = mutableStateOf<List<String>>(emptyList())
     val selectedTimeSlotList: State<List<String>> = _selectedTimeSlotList
 
-    private val _windowCleanCount = mutableStateOf(CleaningServiceCategory(title="Window Cleaning"))
+    private val _windowCleanCount =
+        mutableStateOf(CleaningServiceCategory(title = "Window Cleaning"))
     val windowCleanCount: State<CleaningServiceCategory> = _windowCleanCount
 
-    private val _kitchenCleanCount = mutableStateOf(CleaningServiceCategory(title="Kitchen Cleaning"))
+    private val _kitchenCleanCount =
+        mutableStateOf(CleaningServiceCategory(title = "Kitchen Cleaning"))
     val kitchenCleanCount: State<CleaningServiceCategory> = _kitchenCleanCount
 
-    private val _bedRoomCleanCount = mutableStateOf(CleaningServiceCategory(title="Bed or living room Cleaning"))
+    private val _bedRoomCleanCount =
+        mutableStateOf(CleaningServiceCategory(title = "Bed or living room Cleaning"))
     val bedRoomCleanCount: State<CleaningServiceCategory> = _bedRoomCleanCount
 
-    private val _completeHomeCleanCount = mutableStateOf(CleaningServiceCategory(title="Complete home Cleaning"))
+    private val _completeHomeCleanCount =
+        mutableStateOf(CleaningServiceCategory(title = "Complete home Cleaning"))
     val completeHomeCleanCount: State<CleaningServiceCategory> = _completeHomeCleanCount
 
-    private val _completeCleanCount = mutableStateOf(CleaningServiceCategory(title="Complete Cleaning"))
+    private val _completeCleanCount =
+        mutableStateOf(CleaningServiceCategory(title = "Complete Cleaning"))
     val completeCleanCount: State<CleaningServiceCategory> = _completeCleanCount
 
     private val _selectedTimeTabRowIndex = mutableStateOf(1)
     val selectedTimeTabRowIndex: State<Int> = _selectedTimeTabRowIndex
 
     private val _selectedCleaningCategories = mutableStateOf(
-        listOf(_windowCleanCount, _kitchenCleanCount, _bedRoomCleanCount,_completeHomeCleanCount,_completeCleanCount)
+        listOf(
+            _windowCleanCount,
+            _kitchenCleanCount,
+            _bedRoomCleanCount,
+            _completeHomeCleanCount,
+            _completeCleanCount
+        )
     )
-    val selectedCleaningCategories: State<List<MutableState<CleaningServiceCategory>>> = _selectedCleaningCategories
+    val selectedCleaningCategories: State<List<MutableState<CleaningServiceCategory>>> =
+        _selectedCleaningCategories
 
     // selected services are stored with integer of its order
     private val _selectedServiceId = mutableStateOf<Int?>(null)
     val selectedServiceId: State<Int?> = _selectedServiceId
-/*
-    private val _quoteBottomBtnState = mutableStateOf(QuoteBottomBtnState.EMPTY_SERVICE)
-    val quoteBottomBtnState: State<QuoteBottomBtnState> = _quoteBottomBtnState
-*/
-    init {
-    /*
-        getThisWeekVisitedData()
-        getTwoWeekVisitedData()
-        getListOfTimeSlots()
-        getAvailableTimeSlots()
 
-     */
+    /*
+        private val _quoteBottomBtnState = mutableStateOf(QuoteBottomBtnState.EMPTY_SERVICE)
+        val quoteBottomBtnState: State<QuoteBottomBtnState> = _quoteBottomBtnState
+    */
+    init {
+        /*
+            getThisWeekVisitedData()
+            getTwoWeekVisitedData()
+            getListOfTimeSlots()
+            getAvailableTimeSlots()
+
+         */
     }
 /*
     fun onTriggerEvent(event: ServiceInfoEvent){
@@ -199,30 +189,31 @@ class ServiceInfoViewModel @Inject constructor(): ViewModel(){
 
      */
 
-    fun removeCleaningCategory(index: Int){
-        _selectedCleaningCategories.value = _selectedCleaningCategories.value.mapIndexed { i, service ->
-            if(index == i){
-                service.value = service.value.copy(count = 0)
+    fun removeCleaningCategory(index: Int) {
+        _selectedCleaningCategories.value =
+            _selectedCleaningCategories.value.mapIndexed { i, service ->
+                if (index == i) {
+                    service.value = service.value.copy(count = 0)
+                }
+                service
             }
-            service
-        }
     }
 
-    fun setSelectedServiceId(id: Int){
+    fun setSelectedServiceId(id: Int) {
         _selectedServiceId.value = id
     }
 
     private fun onChangeTabRow(index: Int) {
         _selectedTimeTabRowIndex.value = index
-   //     getListOfTimeSlots()
-   //     getAvailableTimeSlots()
+        //     getListOfTimeSlots()
+        //     getAvailableTimeSlots()
     }
 
-    private fun onToggleSwitch(){
+    private fun onToggleSwitch() {
         _checked.value = !checked.value
     }
 
-    fun resetCleaningServices(){
+    fun resetCleaningServices() {
         _windowCleanCount.value = _windowCleanCount.value.copy(count = 0)
         _kitchenCleanCount.value = _kitchenCleanCount.value.copy(count = 0)
         _completeCleanCount.value = _completeCleanCount.value.copy(count = 0)

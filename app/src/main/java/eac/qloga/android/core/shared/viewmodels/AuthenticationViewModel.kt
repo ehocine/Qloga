@@ -20,6 +20,7 @@ class AuthenticationViewModel @Inject constructor(
     application: Application,
     private val oktaManager: OktaManager,
 ) : AndroidViewModel(application) {
+
     val oktaState: Flow<BrowserState> = oktaManager.oktaState
     var signedInUser: MutableState<User> = mutableStateOf(User())
 

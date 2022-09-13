@@ -12,9 +12,7 @@ import androidx.compose.material.icons.rounded.ArrowForwardIos
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,7 +20,6 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import eac.qloga.android.R
@@ -36,13 +33,16 @@ fun CategoryList(
     title: String,
     showDivider: Boolean = true,
     summery: String,
-    onClickI: () -> Unit,
-    onShowProviders : () -> Unit,
-){
+    onClick: () -> Unit,
+    onShowProviders: () -> Unit,
+    catChanged: Boolean
+) {
     val buttonHeight = 40.dp
     val infoHeight = 32.dp
-    val expanded = remember { mutableStateOf(false) }
-    val animatedFloat = animateFloatAsState(targetValue = if(expanded.value) 90f else 0f)
+    var expanded by remember { mutableStateOf(false) }
+    if (catChanged) expanded = false
+//    expanded = t
+    val animatedFloat = animateFloatAsState(targetValue = if (expanded) 90f else 0f)
 
     Column(
         modifier = modifier
@@ -51,34 +51,36 @@ fun CategoryList(
                     durationMillis = 600
                 )
             )
-            .clickable { expanded.value = !expanded.value }
+            .clickable { expanded = !expanded }
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
-            ,
+                .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
+                modifier = Modifier.weight(9f),
                 text = title,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1
             )
             Icon(
                 modifier = Modifier
                     .rotate(animatedFloat.value)
                     .size(17.dp)
                     .clip(CircleShape)
-                ,
+                    .weight(1f),
                 imageVector = Icons.Rounded.ArrowForwardIos,
                 contentDescription = "forward arrow",
                 tint = MaterialTheme.colorScheme.primary
             )
         }
 
-        if(expanded.value){
-            Column(modifier = Modifier.padding(start  = 16.dp, end = 16.dp)) {
+        if (expanded) {
+            Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp)) {
                 Text(
                     text = summery,
                     overflow = TextOverflow.Ellipsis,
@@ -90,11 +92,10 @@ fun CategoryList(
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
-                    ,
+                        .fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(
@@ -103,10 +104,9 @@ fun CategoryList(
                             .height(buttonHeight)
                             .clip(CircleShape)
                             .clickable { onShowProviders() }
-                            .background(MaterialTheme.colorScheme.primary)
-                        ,
+                            .background(MaterialTheme.colorScheme.primary),
                         contentAlignment = Alignment.Center
-                    ){
+                    ) {
                         Text(
                             text = "Show providers",
                             style = MaterialTheme.typography.titleMedium,
@@ -116,7 +116,9 @@ fun CategoryList(
 
                     Spacer(modifier = Modifier.width(16.dp))
 
-                    Box(modifier = Modifier.clip(CircleShape).clickable { onClickI() }){
+                    Box(modifier = Modifier
+                        .clip(CircleShape)
+                        .clickable { onClick() }) {
                         Icon(
                             modifier = Modifier.size(infoHeight),
                             painter = painterResource(id = R.drawable.ic_info),
@@ -128,14 +130,8 @@ fun CategoryList(
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }
-        if(showDivider){
+        if (showDivider) {
             DividerLine(Modifier.padding(start = 64.dp))
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewList() {
-    CategoryList(title="Complete Home Cleaning ", summery = "", onShowProviders = {}, onClickI = {})
 }

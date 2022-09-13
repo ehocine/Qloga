@@ -1,5 +1,6 @@
 package eac.qloga.android.core.shared.utils
 
+import android.graphics.Color.parseColor
 import android.graphics.Rect
 import android.view.View
 import android.view.ViewTreeObserver
@@ -18,6 +19,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 object Extensions {
+
+
+    val String.color
+        get() = Color(parseColor(this))
 
     fun Modifier.advancedShadow(
         color: Color = Color.Black,
@@ -66,7 +71,7 @@ object Extensions {
             val viewTreeObserver = view.viewTreeObserver
             val listener = ViewTreeObserver.OnGlobalLayoutListener { value = view.isKeyboardOpen() }
             viewTreeObserver.addOnGlobalLayoutListener(listener)
-            awaitDispose { viewTreeObserver.removeOnGlobalLayoutListener(listener)  }
+            awaitDispose { viewTreeObserver.removeOnGlobalLayoutListener(listener) }
         }
     }
 

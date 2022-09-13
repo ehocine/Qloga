@@ -1,5 +1,8 @@
 package eac.qloga.android.features.platform.landing.scenes.signUp
 
+import android.os.Build
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -11,10 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowForwardIos
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,12 +39,15 @@ import eac.qloga.android.core.shared.components.Buttons
 import eac.qloga.android.core.shared.components.InputFields
 import eac.qloga.android.core.shared.theme.Red10
 import eac.qloga.android.core.shared.theme.gray30
+import eac.qloga.android.core.shared.theme.green1
 import eac.qloga.android.core.shared.utils.BUTTON_HEIGHT
+import eac.qloga.android.core.shared.utils.LoadingState
 import eac.qloga.android.core.shared.utils.PickerDialog
 import eac.qloga.android.features.platform.landing.scenes.LandingScreens
 import eac.qloga.bare.enums.Gender
 import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignupScreen(
@@ -56,17 +59,20 @@ fun SignupScreen(
     val familyName = viewModel.familyName.value
     val emailAddress = viewModel.emailAddress.value
     val birthday = viewModel.birthday.value
-    val gender =viewModel.gender.value
-    val isAgreeChecked = remember{ mutableStateOf(false)}
+    val gender = viewModel.gender.value
+    val isAgreeChecked = remember { mutableStateOf(false) }
     val buttonHeight = BUTTON_HEIGHT.dp
-    val interactionSource = remember{ MutableInteractionSource() }
+    val interactionSource = remember { MutableInteractionSource() }
     val clickedApply = remember { mutableStateOf(false) }
-    val showGenderOptions = remember{ mutableStateOf(false) }
+    val showGenderOptions = remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
-    val screenHeightDp = remember{ mutableStateOf(0)}
+    val screenHeightDp = remember { mutableStateOf(0) }
 
-    with(LocalDensity.current){
+    val scope = rememberCoroutineScope()
+    val signUpLoadingState by viewModel.signUpLoadingState.collectAsState()
+
+    with(LocalDensity.current) {
         screenHeightDp.value = LocalConfiguration.current.screenHeightDp - 240
     }
 
@@ -74,11 +80,10 @@ fun SignupScreen(
         val topPadding = paddingValues.calculateTopPadding()
 
         Box(modifier = Modifier.fillMaxSize()) {
-            Column{
+            Column {
                 Image(
                     modifier = Modifier
-                        .fillMaxWidth()
-                    ,
+                        .fillMaxWidth(),
                     painter = painterResource(id = R.drawable.curvy_wave_back_1),
                     contentDescription = null,
                     contentScale = ContentScale.FillWidth
@@ -86,8 +91,7 @@ fun SignupScreen(
                 Spacer(modifier = Modifier.height(screenHeightDp.value.dp))
                 Image(
                     modifier = Modifier
-                        .fillMaxWidth()
-                    ,
+                        .fillMaxWidth(),
                     painter = painterResource(id = R.drawable.curvy_wave_back_2),
                     contentDescription = null,
                     contentScale = ContentScale.FillWidth
@@ -103,7 +107,7 @@ fun SignupScreen(
                 Box(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
-                ){
+                ) {
                     Image(
                         modifier = Modifier.size(64.dp),
                         painter = painterResource(R.drawable.qloga_small_logo),
@@ -114,20 +118,31 @@ fun SignupScreen(
                 Spacer(modifier = Modifier.padding(top = 48.dp))
                 Buttons.FullRoundedButton(
                     showBorder = true,
-                    borderColor = if(clickedApply.value && name.text.isEmpty()) {
+                    borderColor = if (clickedApply.value && name.text.isEmpty()) {
                         Red10.copy(alpha = .2f)
-                    }else gray30.copy(alpha = .2f),
+                    } else gray30.copy(alpha = .2f),
                     backgroundColor = MaterialTheme.colorScheme.background,
                     content = {
                         InputFields.TextInputField(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 16.dp)
-                            ,
+                                .padding(horizontal = 16.dp),
                             singleLine = true,
-                            onValueChange = { viewModel.onTriggerEvent(SignupEvents.EnterFirstName(it)) },
+                            onValueChange = {
+                                viewModel.onTriggerEvent(
+                                    SignupEvents.EnterFirstName(
+                                        it
+                                    )
+                                )
+                            },
                             value = name.text,
-                            onFocusedChanged = { viewModel.onTriggerEvent(SignupEvents.FocusFirstName(it))},
+                            onFocusedChanged = {
+                                viewModel.onTriggerEvent(
+                                    SignupEvents.FocusFirstName(
+                                        it
+                                    )
+                                )
+                            },
                             hint = name.hint
                         )
                     },
@@ -136,20 +151,31 @@ fun SignupScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 Buttons.FullRoundedButton(
                     showBorder = true,
-                    borderColor = if(clickedApply.value && familyName.text.isEmpty()) {
+                    borderColor = if (clickedApply.value && familyName.text.isEmpty()) {
                         Red10.copy(alpha = .2f)
-                    }else gray30.copy(alpha = .2f),
+                    } else gray30.copy(alpha = .2f),
                     backgroundColor = MaterialTheme.colorScheme.background,
                     content = {
                         InputFields.TextInputField(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 16.dp)
-                            ,
+                                .padding(horizontal = 16.dp),
                             singleLine = true,
-                            onValueChange = { viewModel.onTriggerEvent(SignupEvents.EnterFamilyName(it))},
+                            onValueChange = {
+                                viewModel.onTriggerEvent(
+                                    SignupEvents.EnterFamilyName(
+                                        it
+                                    )
+                                )
+                            },
                             value = familyName.text,
-                            onFocusedChanged = { viewModel.onTriggerEvent(SignupEvents.FocusFamilyName(it))},
+                            onFocusedChanged = {
+                                viewModel.onTriggerEvent(
+                                    SignupEvents.FocusFamilyName(
+                                        it
+                                    )
+                                )
+                            },
                             hint = familyName.hint
                         )
                     },
@@ -158,20 +184,31 @@ fun SignupScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 Buttons.FullRoundedButton(
                     showBorder = true,
-                    borderColor = if(clickedApply.value && emailAddress.text.isEmpty()) {
+                    borderColor = if (clickedApply.value && emailAddress.text.isEmpty()) {
                         Red10.copy(alpha = .2f)
-                    }else gray30.copy(alpha = .2f),
+                    } else gray30.copy(alpha = .2f),
                     backgroundColor = MaterialTheme.colorScheme.background,
                     content = {
                         InputFields.TextInputField(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 16.dp)
-                            ,
+                                .padding(horizontal = 16.dp),
                             singleLine = true,
-                            onValueChange = { viewModel.onTriggerEvent(SignupEvents.EnterEmailAddress(it))},
+                            onValueChange = {
+                                viewModel.onTriggerEvent(
+                                    SignupEvents.EnterEmailAddress(
+                                        it
+                                    )
+                                )
+                            },
                             value = emailAddress.text,
-                            onFocusedChanged = { viewModel.onTriggerEvent(SignupEvents.FocusEmailAddress(it))},
+                            onFocusedChanged = {
+                                viewModel.onTriggerEvent(
+                                    SignupEvents.FocusEmailAddress(
+                                        it
+                                    )
+                                )
+                            },
                             hint = emailAddress.hint
                         )
                     },
@@ -190,6 +227,8 @@ fun SignupScreen(
                                 coroutineScope.launch {
                                     PickerDialog.showDatePickerDialog(context, onSetDate = {
                                         viewModel.onTriggerEvent(SignupEvents.EnterBirthday(it))
+                                    }, getDate = {
+                                        viewModel.onTriggerEvent(SignupEvents.EnterLocalDateBirthday(it))
                                     })
                                 }
                             }
@@ -200,17 +239,16 @@ fun SignupScreen(
                                     Red10.copy(alpha = .2f)
                                 } else gray30.copy(alpha = .2f),
                                 shape = CircleShape
-                            )
-                        ,
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
-                        if(birthday.isNullOrEmpty()){
+                        if (birthday.isNullOrEmpty()) {
                             Text(
                                 text = "Birthday",
                                 color = gray30,
                                 style = MaterialTheme.typography.titleMedium
                             )
-                        }else{
+                        } else {
                             Text(
                                 text = birthday,
                                 style = MaterialTheme.typography.titleMedium
@@ -231,16 +269,15 @@ fun SignupScreen(
                                 } else gray30.copy(alpha = .2f),
                                 shape = CircleShape
                             )
-                            .padding(horizontal = 16.dp)
-                        ,
+                            .padding(horizontal = 16.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        if(showGenderOptions.value){
+                        if (showGenderOptions.value) {
                             Popup(
                                 alignment = Alignment.BottomEnd,
                                 properties = PopupProperties(),
-                                offset = IntOffset(y = 0,x = 0),
+                                offset = IntOffset(y = 0, x = 0),
                                 onDismissRequest = { showGenderOptions.value = false }
                             ) {
                                 Box(
@@ -272,15 +309,18 @@ fun SignupScreen(
                                                     end = 20.dp,
                                                     top = 12.dp,
                                                     bottom = 12.dp
-                                                )){
-                                                Text(text = gender.toString(), style = MaterialTheme.typography.titleSmall)
+                                                )) {
+                                                Text(
+                                                    text = gender.toString(),
+                                                    style = MaterialTheme.typography.titleSmall
+                                                )
                                             }
                                         }
                                     }
                                 }
                             }
                         }
-                        if(gender == null){
+                        if (gender == null) {
                             Text(
                                 text = "Gender",
                                 color = gray30,
@@ -294,7 +334,7 @@ fun SignupScreen(
                                 contentDescription = null,
                                 tint = gray30.copy(alpha = .6f)
                             )
-                        }else{
+                        } else {
                             Text(
                                 modifier = Modifier.fillMaxWidth(),
                                 text = gender.toString(),
@@ -314,7 +354,7 @@ fun SignupScreen(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
-                    ){
+                    ) {
                         Checkbox(
                             checked = isAgreeChecked.value,
                             onCheckedChange = { isAgreeChecked.value = !isAgreeChecked.value },
@@ -336,8 +376,7 @@ fun SignupScreen(
                                     indication = null
                                 ) {
                                     //navController.navigate(Screen.SignupTermsConditions.route)
-                                }
-                                ,
+                                },
                                 text = "terms and conditions",
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.primary,
@@ -346,15 +385,38 @@ fun SignupScreen(
                         }
                     }
                     Spacer(modifier = Modifier.height(16.dp))
-                    Buttons.FullRoundedButton(
-                        buttonText = "Apply"
-                    ) {
-                        val areFieldEmpty = viewModel.signUpApply()
-                        if(areFieldEmpty && isAgreeChecked.value){
+                    when (signUpLoadingState) {
+                        LoadingState.LOADING -> {
+                            Box(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(color = green1)
+                            }
+                        }
+                        LoadingState.LOADED -> {
                             navController.navigate(LandingScreens.PostSignup.route)
                         }
-                        clickedApply.value = true
+                        else -> {
+                            Buttons.FullRoundedButton(
+                                buttonText = "Apply"
+                            ) {
+                                if (isAgreeChecked.value) {
+                                    scope.launch {
+                                        viewModel.signUpApply()
+                                    }
+                                }else{
+                                    Toast.makeText(
+                                        context,
+                                        "Must agree to terms and conditions first",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                                clickedApply.value = true
+                            }
+                        }
                     }
+
                     Spacer(modifier = Modifier.height(20.dp))
                     Text(
                         modifier = Modifier
@@ -364,8 +426,7 @@ fun SignupScreen(
                                 indication = null
                             ) {
                                 //navController.navigate(Screen.DataPrivacy.route)
-                            }
-                        ,
+                            },
                         text = "Data privacy",
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary,

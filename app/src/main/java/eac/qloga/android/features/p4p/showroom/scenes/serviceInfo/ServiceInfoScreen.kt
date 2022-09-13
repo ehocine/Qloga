@@ -1,10 +1,10 @@
 package eac.qloga.android.features.p4p.showroom.scenes.serviceInfo
 
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowForwardIos
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -15,21 +15,28 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import eac.qloga.android.R
+import coil.compose.AsyncImagePainter
+import coil.compose.SubcomposeAsyncImage
+import coil.compose.SubcomposeAsyncImageContent
+import coil.request.ImageRequest
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.components.TitleBarDelete
 import eac.qloga.android.core.shared.theme.gray30
 import eac.qloga.android.core.shared.theme.grayTextColor
+import eac.qloga.android.core.shared.theme.green1
 import eac.qloga.android.core.shared.utils.CONTAINER_TOP_PADDING
+import eac.qloga.android.core.shared.viewmodels.ApiViewModel
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
+import eac.qloga.android.features.p4p.showroom.scenes.categories.CategoriesViewModel
 import eac.qloga.android.features.p4p.showroom.shared.components.ExpandableConditionsListItem
 import eac.qloga.android.features.p4p.showroom.shared.components.SelectedListItem
 import eac.qloga.android.features.p4p.showroom.shared.components.StatusButton
@@ -43,9 +50,11 @@ fun ServiceInfoScreen(
     id: Int? = null,
     viewModel: ServiceInfoViewModel = hiltViewModel(),
 ) {
+    val selectedService by ServiceInfoViewModel.selectedService
+
     val containerTopPadding = CONTAINER_TOP_PADDING.dp
     val scrollState = rememberScrollState()
-    val headerText  = "Deep upholstery and carpet cleaning"
+    val headerText = selectedService?.name
     val imageWidth = 120.dp
     val showCountingBtn = remember { mutableStateOf(false) }
     val showDeleteBtn = remember { mutableStateOf(false) }
@@ -53,17 +62,21 @@ fun ServiceInfoScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(Unit){
-        when(parentRoute){
+//    val conditionsList = ApiViewModel.conditions.value.filter { condition ->
+//        condition.serviceCatId == CategoriesViewModel.selectedNav.value!!.id
+//    }
+
+    LaunchedEffect(Unit) {
+        when (parentRoute) {
             P4pShowroomScreens.Categories.route
-            //Screen.ServicesList.route,
-            //Screen.OpenRequest.route,
-            //Screen.ProviderDetails.route,
-            //Screen.CustomerOrder.route,
-            //Screen.CustomerDetails.route,
-            //Screen.Services.route,
-            //Screen.ProviderOrder.route
-                -> {
+                //Screen.ServicesList.route,
+                //Screen.OpenRequest.route,
+                //Screen.ProviderDetails.route,
+                //Screen.CustomerOrder.route,
+                //Screen.CustomerDetails.route,
+                //Screen.Services.route,
+                //Screen.ProviderOrder.route
+            -> {
                 showCountingBtn.value = false
                 showDeleteBtn.value = false
             }
@@ -77,7 +90,7 @@ fun ServiceInfoScreen(
                 label = P4pShowroomScreens.ServiceInfo.titleName,
                 iconColor = MaterialTheme.colorScheme.primary,
                 actions = {
-                    if(showDeleteBtn.value){
+                    if (showDeleteBtn.value) {
                         TitleBarDelete {
                             scope.launch {
                                 Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
@@ -98,30 +111,31 @@ fun ServiceInfoScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState)
-                .padding(horizontal = 24.dp)
-            ,
+                .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(topPadding))
             Spacer(modifier = Modifier.height(containerTopPadding))
 
             //title text bar
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = headerText,
-                style = MaterialTheme.typography.titleMedium
-            )
+            if (headerText != null) {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = headerText,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(IntrinsicSize.Min)
+//                    .height(IntrinsicSize.Min),
                 ,
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
-            ){
+            ) {
                 Column {
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween
@@ -134,14 +148,14 @@ fun ServiceInfoScreen(
                         Text(
                             modifier = Modifier
                                 .padding(start = 8.dp),
-                            text = "window(sq.feet)",
+                            text = "${selectedService!!.unit}(${selectedService!!.unitDescr})",
                             style = MaterialTheme.typography.titleMedium,
                             color = gray30,
                         )
                     }
 
                     Spacer(Modifier.height(8.dp))
-                    if(showCountingBtn.value){
+                    if (showCountingBtn.value) {
                         viewModel.selectedServiceId.value?.let {
                             /*
                             CountingButton(
@@ -151,31 +165,31 @@ fun ServiceInfoScreen(
                             )
                              */
                         }
-                    }else{
+                    } else {
                         Spacer(modifier = Modifier.height(24.dp))
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "Price:",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
-
-                        Text(
-                            modifier = Modifier
-                                .alpha(.75f)
-                                .padding(start = 8.dp),
-                            text = "100.00 $",
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontSize = 16.sp
-                            ),
-                            color = grayTextColor,
-                        )
-                    }
+//                    Spacer(modifier = Modifier.height(16.dp))
+//                    Row(
+//                        horizontalArrangement = Arrangement.SpaceBetween
+//                    ) {
+//                        Text(
+//                            text = "Price:",
+//                            style = MaterialTheme.typography.titleMedium,
+//                            color = MaterialTheme.colorScheme.onBackground
+//                        )
+//
+//                        Text(
+//                            modifier = Modifier
+//                                .alpha(.75f)
+//                                .padding(start = 8.dp),
+//                            text = "100.00 $",
+//                            style = MaterialTheme.typography.bodyMedium.copy(
+//                                fontSize = 16.sp
+//                            ),
+//                            color = grayTextColor,
+//                        )
+//                    }
 
                     Spacer(Modifier.height(8.dp))
                     Row(
@@ -191,7 +205,7 @@ fun ServiceInfoScreen(
                             modifier = Modifier
                                 .alpha(.75f)
                                 .padding(start = 8.dp),
-                            text = "60 min",
+                            text = "${selectedService?.timeNorm} min",
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 fontSize = 16.sp
                             ),
@@ -201,64 +215,69 @@ fun ServiceInfoScreen(
                 }
 
                 //image
-                Image(
+                SubcomposeAsyncImage(
                     modifier = Modifier
                         .fillMaxHeight()
                         .width(imageWidth)
-                        .padding(start = 8.dp, top = 8.dp, bottom = 8.dp)
-                    ,
-                    painter = painterResource(id = R.drawable.washing_lady),
-                    contentDescription = "",
-                    contentScale = ContentScale.Crop,
-                    alignment = Alignment.TopCenter
-                )
+                        .padding(start = 8.dp, top = 8.dp, bottom = 8.dp),
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(selectedService?.avatarUrl)
+                        .crossfade(true)
+//                        .error(R.drawable.account)
+                        .build(),
+                    contentDescription = null
+                ) {
+                    when (painter.state) {
+                        is AsyncImagePainter.State.Loading -> {
+                            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator(color = green1)
+                            }
+                        }
+                        else -> {
+                            SubcomposeAsyncImageContent(
+                                modifier = Modifier
+                                    .clip(RectangleShape),
+                                contentScale = ContentScale.Crop,
+                                alignment = Alignment.TopCenter
+                            )
+                        }
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-            SelectedListItem(
-                title = "Description:",
-                label = "Internal and external drains and sewers " +
-                        "repairs including blockage removals, pipe " +
-                        "replacements, etc. \n\nInternal and external " +
-                        "drains and sewers repairs including blockage " +
-                        "removals, pipe replacements, etc."
-            )
+            selectedService?.let {
+                SelectedListItem(
+                    title = "Description:",
+                    label = it.descr
+                )
+            }
 
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = "Conditions: ",
-                style = MaterialTheme.typography.titleMedium
-            )
-
+//            Text(
+//                modifier = Modifier.fillMaxWidth(),
+//                text = "Conditions: ",
+//                style = MaterialTheme.typography.titleMedium
+//            )
+//
+//            Spacer(Modifier.height(8.dp))
+//
+//            conditionsList.forEach {
+//                ExpandableConditionsListItem(
+//                    label = it.name,
+//                    description = it.descr
+//                )
+//                Spacer(Modifier.height(8.dp))
+//            }
             Spacer(Modifier.height(8.dp))
-            ExpandableConditionsListItem(
-                label = "No carpet cleaning",
-                description = "Service person will not use anything like a ladder " +
-                        "to reach surfaces that cannot be reached when standing on the floor. \n" +
-                        "Service person will not use anything like a ladder to reach " +
-                        "surfaces that cannot be reached when standing on the floor." +
-                        " Service person will not use anything like not use anything"
-            )
-            Spacer(Modifier.height(8.dp))
-            ExpandableConditionsListItem(
-                label = "No climbing",
-                description = "Service person will not use anything like a ladder " +
-                        "to reach surfaces that cannot be reached when standing on the floor. \n" +
-                        "Service person will not use anything like a ladder to reach " +
-                        "surfaces that cannot be reached when standing on the floor." +
-                        " Service person will not use anything like not use anything"
-            )
-
-            Spacer(Modifier.height(16.dp))
             StatusButton(
                 label = "Full service contract",
                 count = "",
                 trailingIcon = Icons.Rounded.ArrowForwardIos,
                 clickable = true,
                 onClick = {
-                   navController.navigate(P4pShowroomScreens.ServiceContract.route){
+                    navController.navigate(P4pShowroomScreens.ServiceContract.route) {
                         launchSingleTop = true
-                   }
+                    }
                 }
             )
             Spacer(Modifier.height(16.dp))

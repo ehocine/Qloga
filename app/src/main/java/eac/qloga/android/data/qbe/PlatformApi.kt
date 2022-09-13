@@ -1,6 +1,5 @@
 package eac.qloga.android.data.qbe
 
-import eac.qloga.android.data.shared.models.FullAddress
 import eac.qloga.bare.dto.Verification
 import eac.qloga.bare.dto.person.Family
 import eac.qloga.bare.dto.person.Person
@@ -11,23 +10,24 @@ import retrofit2.http.*
 
 interface PlatformApi {
 
+
     @GET("qbe/settings")
     suspend fun getSettings(
         @Query("scope") scope: SettingsScope,
         @Query("orgId") orgId: Long?,
         @Query("set") set: Boolean?
-    ): HashMap<String, String>
+    ): Response<HashMap<String, String>>
 
     @PUT("qbe/settings")
     suspend fun setSettings(
         @Body settings: HashMap<String, String>,
         @Query("scope") scope: SettingsScope,
         @Query("orgId") orgId: Long?
-    ):Response<Unit>
+    ): Response<Unit>
 
     @GET("qbe/user")
     suspend fun getUserProfile(
-    ): Person
+    ): Response<Person>
 
     @DELETE("qbe/user")
     suspend fun deleteUser(
@@ -40,7 +40,7 @@ interface PlatformApi {
     @PUT("qbe/user")
     suspend fun updateUser(
         @Body person: Person
-    ): Person
+    ): Response<Person>
 
     @GET("qbe/user/{pid}")
     suspend fun getPublicProfile(
@@ -68,17 +68,5 @@ interface PlatformApi {
     suspend fun verifyPhone(
         @Body code: Long
     ): Object
-
-    @GET("https://api.getAddress.io/autocomplete/{term}")
-    suspend fun aacGetSuggestions(
-        @Query("api-key") apikey: String,
-        @Path("term") term: String
-    ): Int
-
-    @GET("https://api.getAddress.io/get/{id}")
-    suspend fun aacGetFullAddress(
-        @Path("api-key") apikey: String,
-        @Path("id") id: String
-    ): FullAddress
 
 }
