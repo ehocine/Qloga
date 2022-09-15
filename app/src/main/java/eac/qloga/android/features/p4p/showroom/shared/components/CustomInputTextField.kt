@@ -32,9 +32,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import eac.qloga.android.business.util.Extensions.clearFocusOnKeyboardDismiss
 import eac.qloga.android.core.shared.theme.QLOGATheme
 import eac.qloga.android.core.shared.theme.gray1
-import eac.qloga.android.core.shared.utils.Extensions.clearFocusOnKeyboardDismiss
 
 @Composable
 fun CustomInputTextField(

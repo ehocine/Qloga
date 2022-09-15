@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
-import eac.qloga.android.features.p4p.showroom.shared.utils.ProvidersTypeOptions
+import eac.qloga.android.features.p4p.shared.utils.ProvidersTypeOptions
 import eac.qloga.android.core.shared.components.Cards.ContainerBorderedCard
 import eac.qloga.android.core.shared.theme.grayTextColor
 

@@ -15,19 +15,29 @@ import eac.qloga.android.core.scenes.CoreScreens
 import eac.qloga.android.core.scenes.splash.SplashScreen
 import eac.qloga.android.core.shared.utils.ID_KEY
 import eac.qloga.android.core.shared.utils.PARENT_ROUTE_KEY
+import eac.qloga.android.features.p4p.provider.scenes.P4pProviderScreens
+import eac.qloga.android.features.p4p.provider.scenes.customers.CustomersScreen
+import eac.qloga.android.features.p4p.provider.scenes.dashboard.ProviderDashboardScreen
+import eac.qloga.android.features.p4p.provider.scenes.favouriteCustomer.FavouriteCustomerScreen
+import eac.qloga.android.features.p4p.provider.scenes.favouriteCustomers.FavouriteCustomersScreen
+import eac.qloga.android.features.p4p.provider.scenes.orders.ProviderOrdersScreen
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import eac.qloga.android.features.p4p.showroom.scenes.addAddress.AddAddressScreen
 import eac.qloga.android.features.p4p.showroom.scenes.addressOnMap.MapViewScreen
 import eac.qloga.android.features.p4p.showroom.scenes.categories.CategoriesScreen
 import eac.qloga.android.features.p4p.showroom.scenes.enrolled.EnrolledScreen
 import eac.qloga.android.features.p4p.showroom.scenes.notEnrolled.NotEnrolledScreen
+import eac.qloga.android.features.p4p.showroom.scenes.portfolioAlbums.PortfolioAlbumsScreen
+import eac.qloga.android.features.p4p.showroom.scenes.preoviderDetails.ProviderDetailsScreen
+import eac.qloga.android.features.p4p.showroom.scenes.providerSearch.ProviderSearchScreen
 import eac.qloga.android.features.p4p.showroom.scenes.serviceContract.ServiceContractScreen
 import eac.qloga.android.features.p4p.showroom.scenes.serviceInfo.ServiceInfoScreen
 import eac.qloga.android.features.platform.landing.scenes.LandingScreens
-import eac.qloga.android.features.platform.landing.scenes.no_address.NoAddressScreen
+import eac.qloga.android.features.platform.landing.scenes.noAddress.NoAddressScreen
 import eac.qloga.android.features.platform.landing.scenes.postSignup.PostSignupScreen
 import eac.qloga.android.features.platform.landing.scenes.signIn.SignIn
 import eac.qloga.android.features.platform.landing.scenes.signUp.SignupScreen
+import eac.qloga.android.features.platform.landing.scenes.termsConds.SignupTermsCondsScreen
 
 private fun enterTransition(): EnterTransition {
     return slideInHorizontally(
@@ -283,6 +293,183 @@ fun NavGraphBuilder.postSignup(
         exitTransition = { exitTransition() }
     ) {
         PostSignupScreen(
+            navController = navController
+        )
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.signupTermsConds(
+    navController: NavController
+){
+    composable(
+        route = LandingScreens.SignupTermsConds.route,
+        enterTransition = { enterTransition()},
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){
+        SignupTermsCondsScreen(
+            navController = navController
+        )
+    }
+}
+
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.providers(
+    navController: NavController,
+){
+    composable(
+        P4pShowroomScreens.ProviderSearch.route+"?$PARENT_ROUTE_KEY={$PARENT_ROUTE_KEY}",
+        arguments = listOf(
+            navArgument(
+                name = PARENT_ROUTE_KEY
+            ){
+                type = NavType.StringType
+                defaultValue = ""
+            }
+        ),
+        enterTransition = { enterTransition()},
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){ backStackEntry ->
+        val parentRoute = backStackEntry.arguments?.getString(PARENT_ROUTE_KEY)
+        ProviderSearchScreen(
+            navController = navController,
+            parentRoute =  parentRoute
+        )
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.providersDetails(
+    navController: NavController
+){
+    composable(
+        P4pShowroomScreens.ProviderDetails.route,
+        enterTransition = { enterTransition()},
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){
+        ProviderDetailsScreen(
+            navController = navController
+        )
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.albums(
+    navController: NavController
+){
+    composable(
+        route = P4pShowroomScreens.PortfolioAlbums.route+"?$PARENT_ROUTE_KEY={$PARENT_ROUTE_KEY}",
+        arguments = listOf(
+            navArgument(
+                name = PARENT_ROUTE_KEY
+            ){
+                type = NavType.StringType
+                defaultValue = ""
+            }
+        ),
+        enterTransition = { enterTransition()},
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){ navBackStackEntry ->
+        val parentRoute = navBackStackEntry.arguments?.getString(PARENT_ROUTE_KEY)
+
+        PortfolioAlbumsScreen(
+            navController = navController,
+            parentRouteParam = parentRoute
+        )
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.providerDashboard(
+    navController: NavController
+){
+    composable(
+        route = P4pProviderScreens.ProviderDashboard.route,
+        enterTransition = { enterTransition()},
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){
+        ProviderDashboardScreen(navController = navController )
+    }
+}
+
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.providerOrders(
+    navController: NavController
+){
+    composable(
+        route = P4pProviderScreens.ProviderOrders.route,
+        enterTransition = { enterTransition()},
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){
+        ProviderOrdersScreen(
+            navController = navController
+        )
+    }
+}
+
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.favouriteCustomers(
+    navController: NavController
+){
+    composable(
+        route = P4pProviderScreens.FavouriteCustomers.route,
+        enterTransition = { enterTransition()},
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){
+        FavouriteCustomersScreen(
+            navController = navController
+        )
+    }
+}
+
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.customers(
+    navController: NavController,
+){
+    composable(
+        route = P4pProviderScreens.Customers.route,
+        enterTransition = { enterTransition()},
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){
+        CustomersScreen(
+            navController = navController
+        )
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.favouriteCustomer(
+    navController: NavController
+){
+    composable(
+        route = P4pProviderScreens.FavouriteCustomer.route,
+        enterTransition = { enterTransition()},
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){
+        FavouriteCustomerScreen(
             navController = navController
         )
     }

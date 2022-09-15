@@ -1,4 +1,4 @@
-package eac.qloga.android.features.platform.landing.scenes.no_address
+package eac.qloga.android.features.platform.landing.scenes.noAddress
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.DropdownMenu

@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import eac.qloga.android.core.shared.utils.CustomMarkerState
 import eac.qloga.android.core.shared.utils.InputFieldState
-import eac.qloga.android.features.p4p.showroom.shared.utils.*
+import eac.qloga.android.features.p4p.shared.utils.*
 import eac.qloga.p4p.lookups.dto.ServiceCategory
 import kotlinx.coroutines.launch
 import javax.inject.Inject

@@ -43,7 +43,7 @@ object PickerDialog {
     fun showDatePickerDialog(
         context: Context,
         onSetDate: (date: String) -> Unit,
-        getDate: (lDate: LocalDate) -> Unit
+        numberFormat: Boolean = false,
     ) {
         val newCalendar = Calendar.getInstance()
         DatePickerDialog(
@@ -52,14 +52,16 @@ object PickerDialog {
             { _, year: Int, month: Int, day: Int ->
                 val m = month + 1
                 // date format is 23 Feb 2022
-                val date = DateConverter.dayMonthYear(
-                    year = year.toString(),
-                    month = m.toString(),
-                    day = day.toString()
-                )
-                val lDate = LocalDate.of(year, m, day)
+                val date: String = if(numberFormat){
+                    "$day/$m/$year"
+                }else {
+                    DateConverter.dayMonthYear(
+                        year = year.toString(),
+                        month = m.toString(),
+                        day = day.toString()
+                    )
+                }
                 onSetDate(date)
-                getDate(lDate)
             },
             newCalendar.get(Calendar.YEAR),
             newCalendar.get(Calendar.MONTH),

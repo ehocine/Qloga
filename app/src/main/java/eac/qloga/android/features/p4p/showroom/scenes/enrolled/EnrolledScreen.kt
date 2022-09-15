@@ -4,10 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,9 +19,11 @@ import eac.qloga.android.core.shared.theme.LightGreen10
 import eac.qloga.android.core.shared.theme.green1
 import eac.qloga.android.core.shared.viewmodels.ApiViewModel
 import eac.qloga.android.core.shared.viewmodels.AuthenticationViewModel
+import eac.qloga.android.features.p4p.provider.scenes.P4pProviderScreens
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import eac.qloga.android.features.p4p.showroom.shared.components.ItemCard
 import eac.qloga.android.features.p4p.showroom.shared.components.LeftNavBar
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,6 +35,7 @@ fun EnrolledScreen(
 ) {
     val context = LocalContext.current
     val containerHorizontalPadding = 24.dp
+    val scope = rememberCoroutineScope()
     val oktaState by authViewModel.oktaState.collectAsState(BrowserState.LoggedIn)
 
     val categoriesList = ApiViewModel.categories.value.sortedBy {
@@ -87,12 +87,12 @@ fun EnrolledScreen(
                 )
                 ProviderCard(
                     onClickCard = {
-                        //             scope.launch {
-                        //               navController.navigate(Screen.ProviderNavContainer.route){
-                        //                 launchSingleTop = true
-                        //           }
-                        //     }
-                    }
+                                   scope.launch {
+                                       navController.navigate(P4pProviderScreens.ProviderDashboard.route) {
+                                           launchSingleTop = true
+                                       }
+                                   }
+                             }
                 )
                 when (oktaState) {
                     is BrowserState.Loading -> {

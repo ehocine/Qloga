@@ -1,7 +1,7 @@
 package eac.qloga.android.features.p4p.showroom.scenes.notEnrolled
 
 import androidx.compose.ui.focus.FocusState
-import eac.qloga.android.features.p4p.showroom.shared.utils.FilterTypes
+import eac.qloga.android.features.p4p.shared.utils.FilterTypes
 import eac.qloga.p4p.lookups.dto.ServiceCategory
 
 sealed class NotEnrolledEvent {

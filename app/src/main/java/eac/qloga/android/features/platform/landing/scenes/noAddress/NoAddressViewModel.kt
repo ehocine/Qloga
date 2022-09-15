@@ -1,4 +1,4 @@
-package eac.qloga.android.features.platform.landing.scenes.no_address
+package eac.qloga.android.features.platform.landing.scenes.noAddress
 
 import android.util.Log
 import androidx.compose.runtime.MutableState
@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import eac.qloga.android.core.shared.utils.InputFieldState
-import eac.qloga.android.features.p4p.showroom.scenes.notEnrolled.NotEnrolledEvent
 import eac.qloga.android.features.p4p.showroom.scenes.notEnrolled.NotEnrolledViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

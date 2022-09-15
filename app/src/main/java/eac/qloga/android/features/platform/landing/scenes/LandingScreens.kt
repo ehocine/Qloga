@@ -7,13 +7,15 @@ sealed class LandingScreens(
     object SignIn: LandingScreens("sign_in", "Sign In")
     object Signup: LandingScreens("sign_up", "")
     object PostSignup: LandingScreens("post_sign_up", "")
+    object SignupTermsConds: LandingScreens("signup_terms_conditions", "Terms & Conditions")
     object NoAddress: LandingScreens("no_address", "")
 
     companion object {
         val listOfScreen = listOf(
             SignIn,
             Signup,
-            PostSignup
+            PostSignup,
+            SignupTermsConds
         )
     }
 }

@@ -1,4 +1,4 @@
-package eac.qloga.android.features.p4p.showroom.shared.utils
+package eac.qloga.android.features.p4p.shared.utils
 
 sealed class FilterTypes(
     val label: String

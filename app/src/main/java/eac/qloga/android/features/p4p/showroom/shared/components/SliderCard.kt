@@ -1,4 +1,4 @@
-package eac.qloga.android.features.p4p.showroom.shared.components
+package eac.qloga.android.features.intro.presentation.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,15 +10,16 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
 import eac.qloga.android.core.shared.components.Cards.ContainerBorderedCard
-import eac.qloga.android.core.shared.theme.grayTextColor
+import eac.qloga.android.core.shared.theme.gray30
 
 @Composable
 fun SliderCard(
     label: String,
     value : Float,
+    valueRange: ClosedFloatingPointRange<Float> = 1f..100f,
+    steps: Int = 0,
     onValueChange: (Float) -> Unit
 ){
     Column(
@@ -27,18 +28,16 @@ fun SliderCard(
     ) {
         Text(
             modifier = Modifier
-                .alpha(.5f)
                 .padding(start = 8.dp, bottom = 4.dp)
             ,
             text = label,
             style = MaterialTheme.typography.titleMedium,
-            color = grayTextColor
+            color = gray30
         )
 
         ContainerBorderedCard(
             modifier = Modifier.fillMaxWidth()
-                .height(44.dp)
-                .padding(horizontal = 8.dp),
+                .height(44.dp),
             cornerRadius = 12.dp
         ) {
             Slider(
@@ -46,24 +45,13 @@ fun SliderCard(
                 value = value,
                 onValueChange = { onValueChange(it) },
                 enabled = true,
-                valueRange = 1f..100f,
-                steps = 0,
+                valueRange = valueRange,
+                steps = steps,
                 colors = SliderDefaults.colors(
                     thumbColor = MaterialTheme.colorScheme.primary,
                     activeTickColor = MaterialTheme.colorScheme.primary
                 ),
             )
         }
-//        Box(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height(44.dp)
-//                .clip(RoundedCornerShape(12.dp))
-//                .border(2.dp, gray1, RoundedCornerShape(12.dp))
-//                .background(MaterialTheme.colorScheme.background)
-//                .padding(horizontal = 8.dp)
-//        ) {
-//
-//        }
     }
 }

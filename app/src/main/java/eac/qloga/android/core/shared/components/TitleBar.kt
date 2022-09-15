@@ -18,7 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import eac.qloga.android.core.shared.utils.Extensions.advancedShadow
+import eac.qloga.android.business.util.Extensions.advancedShadow
 import eac.qloga.android.core.shared.components.Buttons.SortButton
 
 @Composable

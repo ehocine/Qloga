@@ -23,8 +23,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import eac.qloga.android.business.util.Extensions.clearFocusOnKeyboardDismiss
 import eac.qloga.android.core.shared.theme.gray30
-import eac.qloga.android.core.shared.utils.Extensions.clearFocusOnKeyboardDismiss
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable

@@ -1,8 +1,11 @@
 package eac.qloga.android
 
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -17,9 +20,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import eac.qloga.android.core.scenes.CoreScreens
 import eac.qloga.android.core.shared.theme.QLOGATheme
 
+private val TAG = "MainActivity"
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -29,6 +35,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun BuildScreen() {
@@ -44,6 +51,10 @@ private fun BuildScreen() {
             color = MaterialTheme.colorScheme.background
         ) {
             val navController = rememberAnimatedNavController()
+            navController.addOnDestinationChangedListener { controller, destination, arguments ->
+                Log.d(TAG, "Nav controller new destination. Arguments: $arguments")
+            }
+
             val actions = remember(navController) { NavigationActions(navController) }
 
             AnimatedNavHost(
@@ -61,6 +72,15 @@ private fun BuildScreen() {
                     serviceContract(navController)
                     signup(navController)
                     postSignup(navController)
+                    signupTermsConds(navController)
+                    providers(navController)
+                    providersDetails(navController)
+                    albums(navController)
+                    providerDashboard(navController)
+                    providerOrders(navController)
+                    favouriteCustomers(navController)
+                    customers(navController)
+                    favouriteCustomer(navController)
                     noAddress(navController)
                 }
             )

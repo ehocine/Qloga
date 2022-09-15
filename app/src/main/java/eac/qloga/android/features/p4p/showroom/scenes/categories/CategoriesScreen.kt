@@ -142,7 +142,6 @@ private fun ServicesListCard(
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-
                 listOfServices.forEach { service ->
                     CategoryList(
                         title = service.name,

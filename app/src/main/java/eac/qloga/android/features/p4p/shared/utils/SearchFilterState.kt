@@ -1,4 +1,4 @@
-package eac.qloga.android.features.p4p.showroom.shared.utils
+package eac.qloga.android.features.p4p.shared.utils
 
 
 data class SearchFilterState(
@@ -6,31 +6,16 @@ data class SearchFilterState(
     val returnRate: ReturnRate = ReturnRate(),
     val minStartRating: MinStartRating = MinStartRating(),
     val ordersDelivered: OrdersDelivered = OrdersDelivered(),
-    val providersType: ProvidersType = ProvidersType(),
-    val providersAdminVerifications: ProvidersAdminVerifications = ProvidersAdminVerifications(),
-    val providersVerifications: ProvidersVerifications = ProvidersVerifications(),
-    val clearanceCertifications: ClearanceCertifications = ClearanceCertifications()
+    val providersType: List<Int> = emptyList(),
+    val providersAdminVerifications: List<Int> = emptyList(),
+    val providersVerifications: List<Int> = emptyList(),
+    val clearanceCertifications: List<Int> = emptyList()
 )
 
 data class Distance(val value: Int = 0, val max:Int = 100)
 data class ReturnRate(val value: Int = 0, val max: Int = 100)
-data class MinStartRating( val value: Int = 0, val max:Int = 10)
+data class MinStartRating( val value: Int = 1, val max:Int = 5)
 data class OrdersDelivered( val value: Int = 0, val max:Int = 250)
-
-data class ProvidersType( val value: ProvidersTypeOptions = ProvidersTypeOptions.All)
-
-data class ProvidersAdminVerifications(
-    val value: ProvidersAdminVerificationsOptions = ProvidersAdminVerificationsOptions.Id
-)
-
-data class ProvidersVerifications(
-    val value: ProvidersVerificationOptions = ProvidersVerificationOptions.First
-)
-
-data class ClearanceCertifications(
-    val value: ClearanceCertificationsOptions = ClearanceCertificationsOptions.First
-)
-
 
 sealed class ProvidersTypeOptions(val label: String){
     object All: ProvidersTypeOptions("All")

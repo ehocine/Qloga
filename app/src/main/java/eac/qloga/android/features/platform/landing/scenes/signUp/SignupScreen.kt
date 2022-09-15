@@ -227,8 +227,6 @@ fun SignupScreen(
                                 coroutineScope.launch {
                                     PickerDialog.showDatePickerDialog(context, onSetDate = {
                                         viewModel.onTriggerEvent(SignupEvents.EnterBirthday(it))
-                                    }, getDate = {
-                                        viewModel.onTriggerEvent(SignupEvents.EnterLocalDateBirthday(it))
                                     })
                                 }
                             }
@@ -375,8 +373,9 @@ fun SignupScreen(
                                     interactionSource = interactionSource,
                                     indication = null
                                 ) {
-                                    //navController.navigate(Screen.SignupTermsConditions.route)
-                                },
+                                    navController.navigate(LandingScreens.SignupTermsConds.route)
+                                }
+                                ,
                                 text = "terms and conditions",
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.primary,

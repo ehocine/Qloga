@@ -1,4 +1,4 @@
-package eac.qloga.android.core.shared.utils
+package eac.qloga.android.business.util
 
 import android.graphics.Color.parseColor
 import android.graphics.Rect
@@ -97,6 +97,21 @@ object Extensions {
                     keyboardAppearedSinceLastFocused = false
                 }
             }
+        }
+    }
+
+    fun Float.roundToRating( ): Float{
+        return when(this){
+            in 1f..1.2f -> 1f
+            in 1.3f..1.6f -> 1.5f
+            in 1.7f..2.2f -> 2f
+            in 2.3f..2.6f -> 2.5f
+            in 2.7f..3.3f -> 3f
+            in 3.4f..3.7f -> 3.5f
+            in 3.6f..4.3f -> 4f
+            in 4.4f..4.7f -> 4.5f
+            in 4.8f..5.3f -> 5f
+            else -> 0f
         }
     }
 }
