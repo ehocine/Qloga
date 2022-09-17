@@ -10,10 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
-import eac.qloga.android.core.shared.utils.AddressState
-import eac.qloga.android.core.shared.utils.InputFieldState
-import eac.qloga.android.core.shared.utils.LoadingState
-import eac.qloga.android.core.shared.utils.ParkingType
+import eac.qloga.android.core.shared.utils.*
 import eac.qloga.android.core.shared.viewmodels.ApiViewModel
 import eac.qloga.android.core.shared.viewmodels.SettingsViewModel
 import eac.qloga.android.data.get_address.GetAddressRepository
@@ -36,7 +33,7 @@ class AddressViewModel @Inject constructor(
 ) : ViewModel() {
 
     companion object {
-        const val TAG = "AddAddressViewModel"
+        const val TAG = "${QTAG}-AddAddressViewModel"
         val selectedAddressSuggestion: MutableState<Suggestion> = mutableStateOf(Suggestion())
         val fullAddress: MutableState<FullAddress> =
             if (ApiViewModel.userProfile.value.contacts.address != null) mutableStateOf(

@@ -2,6 +2,8 @@ package eac.qloga.android.core.shared.utils
 
 import androidx.compose.ui.unit.dp
 
+const val QTAG = "Qloga"
+
 val CLEANING_BUTTON_HEIGHT = 54.dp
 const val STATUS_BTN_HEIGHT = 50
 const val SCREEN_HORIZONTAL_PADDING = 24

@@ -9,6 +9,7 @@ import com.okta.authfoundation.client.OidcClientResult
 import com.okta.authfoundationbootstrap.CredentialBootstrap
 import com.okta.webauthenticationui.WebAuthenticationClient.Companion.createWebAuthenticationClient
 import eac.qloga.android.BuildConfig
+import eac.qloga.android.core.shared.utils.QTAG
 import eac.qloga.android.data.shared.models.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +28,7 @@ class OktaManager @Inject constructor() {
     var loggedIn = MutableStateFlow(false)
 
     companion object {
-        const val TAG = "OktaManager"
+        const val TAG = "${QTAG}-OktaManager"
     }
 
     suspend fun checkToken(): Boolean {

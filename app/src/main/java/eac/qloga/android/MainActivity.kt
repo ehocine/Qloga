@@ -19,8 +19,9 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import dagger.hilt.android.AndroidEntryPoint
 import eac.qloga.android.core.scenes.CoreScreens
 import eac.qloga.android.core.shared.theme.QLOGATheme
+import eac.qloga.android.core.shared.utils.QTAG
 
-private val TAG = "MainActivity"
+private val TAG = "${QTAG}-MainActivity"
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -82,6 +83,13 @@ private fun BuildScreen() {
                     customers(navController)
                     favouriteCustomer(navController)
                     noAddress(navController)
+                    enrollment(navController)
+                    verifyPhone(navController)
+                    confirmAddress(navController)
+                    userLocationMapView(navController)
+                    identityVerification(navController)
+                    passport(navController)
+                    enrollmentTermsConditions(navController)
                 }
             )
         }

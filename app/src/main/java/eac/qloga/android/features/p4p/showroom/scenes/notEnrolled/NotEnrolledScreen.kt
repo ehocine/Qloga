@@ -28,6 +28,7 @@ import eac.qloga.android.core.shared.utils.LoadingState
 import eac.qloga.android.core.shared.viewmodels.ApiViewModel
 import eac.qloga.android.core.shared.viewmodels.AuthenticationViewModel
 import eac.qloga.android.data.shared.models.address_suggestions.Suggestion
+import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import eac.qloga.android.features.p4p.showroom.shared.components.LeftNavBar
 import eac.qloga.android.features.p4p.showroom.shared.components.MainContent
@@ -188,11 +189,7 @@ fun NotEnrolledScreen(
                             },
                             onClickRequest = {
                                 scope.launch {
-                                    if (isAlreadyEnrolled.value) {
-                                        // navController.navigate(Screen.OrderListPrv.route)
-                                    } else {
-                                        // navController.navigate(Screen.CustomerEnrollment.route)
-                                    }
+                                    navController.navigate(P4pScreens.Enrollment.route)
                                 }
                             },
                             onClickProviderSearch = {

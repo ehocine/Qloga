@@ -1,3 +1,8 @@
+platform/landing/SignInScreen <- object Welcome: Screen("welcome", "")
+platform/landing/SingUpScreen <- object Signup: Screen("sign_up", "")
+platform/landing/PostSignUpScreen <- object PostSignup: Screen("post_sign_up", "")
+platform/landing/SignupTermsCondScreen <- object SignupTermsConditions: Screen("signup_terms_conditions", "Terms & Conditions")
+
 p4p/showroom/NotEnrolledScreen <- object Intro: Screen("intro", "Intro") 
 p4p/showroom/EnrolledScreen <- object OrderListPrv: Screen("order_list_prv", "")
 p4p/showroom/AddAddressScreen <- object AddressAdd: Screen("address_add", "Address")
@@ -15,11 +20,20 @@ p4p/provider/FavouriteCustomersScreen <- object FavouriteCustomers: Screen("favo
 p4p/provider/CustomersScreen <- object Customers: Screen("customers", "Customers")
 p4p/provider/FavouriteCustomerScreen <- object FavouriteCustomerView: Screen("favourite_customer_view", "Customer")
 
+p4p/shared/EnrollmentScreen <- object CustomerEnrollment: Screen("customer_enrollment", "Enrollment")
+p4p/shared/VerifyPhoneSceen <- object VerifyPhone: Screen("verify_phone", "Verify phone")
+p4p/shared/ConfirmAddressScreen <- object ConfirmAddress: Screen("confirm_address", "Confirm address")
+p4p/shared/SelectLocationMap <- object SelectLocationMap: Screen("select_location_map","Your location")
+p4p/shared/IdVerificationScreen <- object IDVerification: Screen("id_verification", "Identity verification")
+p4p/shared/PassportScreen <- object Passport: Screen("passport","Passport")
+p4p/shared/EnrollmentTcScreen <- object EnrollmentTermsConditions: Screen("enrollment_terms_conditions", "Terms & Conditions")
 
-platform/landing/SignInScreen <- object Welcome: Screen("welcome", "")
-platform/landing/SingUpScreen <- object Signup: Screen("sign_up", "")
-platform/landing/PostSignUpScreen <- object PostSignup: Screen("post_sign_up", "")
-platform/landing/SignupTermsCondScreen <- object SignupTermsConditions: Screen("signup_terms_conditions", "Terms & Conditions")
+
+
+
+
+
+
 
 
 
@@ -35,15 +49,8 @@ object Portfolio: Screen("portfolio","Portfolio")
 object FullImageScreen: Screen("full_image_screen")
 object Visits: Screen("visits", "Visits")
 object VisitedDetails: Screen("visited_details", "Visits")
-object CustomerEnrollment: Screen("customer_enrollment", "Enrollment")
 object ProviderEnrollment: Screen("provider_enrollment", "Enrollment")
-object Passport: Screen("passport","Passport")
-object SelectLocationMap: Screen("select_location_map","Your location")
-object VerifyPhone: Screen("verify_phone", "Verify phone")
-object ConfirmAddress: Screen("confirm_address", "Confirm address")
-object IDVerification: Screen("id_verification", "Identity verification")
 object TermsConditions: Screen("terms_conditions", "Terms & Conditions")
-object EnrollmentTermsConditions: Screen("enrollment_terms_conditions", "Terms & Conditions")
 object GotoProfile: Screen("goto_profile", "Goto profile")
 object Account: Screen("account", "Your account")
 object WorkingSchedule: Screen("working_schedule", "Working schedule")

@@ -3,7 +3,7 @@ package eac.qloga.android.core.shared.utils
 import android.util.Log
 import java.util.*
 
-private const val TAG = "TimeConverter"
+private const val TAG = "${QTAG}-TimeConverter"
 object TimeConverter {
 
     fun formatToString(value: String): String

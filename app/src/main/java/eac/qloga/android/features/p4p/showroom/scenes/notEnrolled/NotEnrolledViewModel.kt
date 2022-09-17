@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import eac.qloga.android.core.shared.utils.CustomMarkerState
 import eac.qloga.android.core.shared.utils.InputFieldState
+import eac.qloga.android.core.shared.utils.QTAG
 import eac.qloga.android.core.shared.viewmodels.ApiViewModel
 import eac.qloga.android.features.p4p.shared.utils.*
 import eac.qloga.android.features.p4p.showroom.scenes.categories.CategoriesViewModel
@@ -21,7 +22,7 @@ class NotEnrolledViewModel @Inject constructor(
 ) : ViewModel() {
 
     companion object {
-        const val TAG = "NotEnrolledViewModel"
+        const val TAG = "${QTAG}-NotEnrolledViewModel"
     }
 
     private var _inputFieldState = mutableStateOf(

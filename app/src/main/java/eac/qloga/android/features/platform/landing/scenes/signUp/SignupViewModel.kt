@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import eac.qloga.android.core.shared.utils.InputFieldState
 import eac.qloga.android.core.shared.utils.LoadingState
+import eac.qloga.android.core.shared.utils.QTAG
 import eac.qloga.android.data.landing.LandingRepository
 import eac.qloga.bare.dto.RegistrationRequest
 import eac.qloga.bare.enums.Gender
@@ -26,7 +27,7 @@ class SignupViewModel @Inject constructor(
 ) : AndroidViewModel(application) {
 
     companion object {
-        const val TAG = "SignupViewModel"
+        const val TAG = "${QTAG}-SignupViewModel"
     }
 
     private val _firstName = mutableStateOf(InputFieldState(hint = "First Name"))

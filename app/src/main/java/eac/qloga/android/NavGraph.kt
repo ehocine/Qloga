@@ -21,6 +21,14 @@ import eac.qloga.android.features.p4p.provider.scenes.dashboard.ProviderDashboar
 import eac.qloga.android.features.p4p.provider.scenes.favouriteCustomer.FavouriteCustomerScreen
 import eac.qloga.android.features.p4p.provider.scenes.favouriteCustomers.FavouriteCustomersScreen
 import eac.qloga.android.features.p4p.provider.scenes.orders.ProviderOrdersScreen
+import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
+import eac.qloga.android.features.p4p.shared.scenes.confirmAddress.ConfirmAddressScreen
+import eac.qloga.android.features.p4p.shared.scenes.enrollment.EnrollmentScreen
+import eac.qloga.android.features.p4p.shared.scenes.idVerification.IdVerificationScreen
+import eac.qloga.android.features.p4p.shared.scenes.passport.PassportScreen
+import eac.qloga.android.features.p4p.shared.scenes.selectLocationMap.SelectLocationScreen
+import eac.qloga.android.features.p4p.shared.scenes.tc.EnrollmentTcScreen
+import eac.qloga.android.features.p4p.shared.scenes.verifyPhone.VerifyPhoneScreen
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import eac.qloga.android.features.p4p.showroom.scenes.addAddress.AddAddressScreen
 import eac.qloga.android.features.p4p.showroom.scenes.addressOnMap.MapViewScreen
@@ -487,6 +495,131 @@ fun NavGraphBuilder.noAddress(
         exitTransition = { exitTransition() }
     ) {
         NoAddressScreen(
+            navController = navController
+        )
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.enrollment(
+    navController: NavController
+){
+    composable(
+        P4pScreens.Enrollment.route,
+        enterTransition = { enterTransition()},
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){
+        EnrollmentScreen(
+            navController = navController,
+        )
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.verifyPhone(
+    navController: NavController,
+){
+    composable(
+        P4pScreens.VerifyPhone.route,
+        enterTransition = { enterTransition()},
+
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){
+        VerifyPhoneScreen(
+            navController = navController
+        )
+    }
+}
+
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.confirmAddress(
+    navController: NavController
+){
+    composable(
+        P4pScreens.ConfirmAddress.route,
+        enterTransition = { enterTransition()},
+
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){
+        ConfirmAddressScreen(
+            navController = navController
+        )
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.userLocationMapView(
+    navController: NavController
+){
+    composable(
+        P4pScreens.SelectLocationMap.route,
+        enterTransition = { enterTransition()},
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){
+        SelectLocationScreen(
+            navController = navController
+        )
+    }
+}
+
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.identityVerification(
+    navController: NavController
+){
+    composable(
+        P4pScreens.IdVerification.route,
+        enterTransition = { enterTransition()},
+
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){
+        IdVerificationScreen(
+            navController = navController
+        )
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.passport(
+    navController: NavController,
+){
+    composable(
+        P4pScreens.Passport.route,
+        enterTransition = { enterTransition()},
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){
+        PassportScreen(
+            navController = navController
+        )
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.enrollmentTermsConditions(
+    navController: NavController,
+){
+    composable(
+        P4pScreens.EnrollmentTermsConditions.route,
+        enterTransition = { enterTransition()},
+
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){
+        EnrollmentTcScreen(
             navController = navController
         )
     }

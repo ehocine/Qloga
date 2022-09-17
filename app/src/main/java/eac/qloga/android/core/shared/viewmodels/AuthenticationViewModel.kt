@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import eac.qloga.android.core.services.BrowserState
 import eac.qloga.android.core.services.OktaManager
+import eac.qloga.android.core.shared.utils.QTAG
 import eac.qloga.android.data.shared.models.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -25,7 +26,7 @@ class AuthenticationViewModel @Inject constructor(
     var signedInUser: MutableState<User> = mutableStateOf(User())
 
     companion object {
-        const val TAG = "AuthenticationViewModel"
+        const val TAG = "${QTAG}-AuthenticationViewModel"
     }
 
     init {

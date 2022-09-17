@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import eac.qloga.android.R
 import eac.qloga.android.core.shared.utils.InputFieldState
+import eac.qloga.android.core.shared.utils.QTAG
 import eac.qloga.bare.dto.media.MediaAlbum
 import eac.qloga.bare.dto.media.MediaMeta
 import eac.qloga.bare.enums.AccessLevel
@@ -18,7 +19,7 @@ import kotlinx.coroutines.launch
 import java.time.ZonedDateTime
 import javax.inject.Inject
 
-const val TAG = "AlbumViewModel"
+const val TAG = "${QTAG}-AlbumViewModel"
 
 @RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
