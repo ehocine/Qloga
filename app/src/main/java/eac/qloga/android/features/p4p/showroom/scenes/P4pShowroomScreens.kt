@@ -11,7 +11,6 @@ sealed class P4pShowroomScreens(
     object Categories: P4pShowroomScreens("service_categories", "Service categories")
     object ServiceInfo: P4pShowroomScreens("service_info", "Selected service")
     object ServiceContract: P4pShowroomScreens("service_contract", "Service contract")
-    object ProviderSearch: P4pShowroomScreens("provider_search", "Providers")
     object ProviderDetails: P4pShowroomScreens("providers_details", "Provider")
     object PortfolioAlbums: P4pShowroomScreens("portfolio_albums", "Albums")
 
@@ -24,7 +23,6 @@ sealed class P4pShowroomScreens(
             Categories,
             ServiceInfo,
             ServiceContract,
-            ProviderSearch,
             ProviderDetails,
             PortfolioAlbums
         )

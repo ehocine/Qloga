@@ -1,4 +1,4 @@
-package eac.qloga.android.features.p4p.showroom.scenes.providerSearch
+package eac.qloga.android.features.p4p.shared.scenes.providerSearch
 
 import androidx.compose.ui.focus.FocusState
 import eac.qloga.android.features.p4p.shared.utils.FilterTypes

@@ -90,6 +90,10 @@ private fun BuildScreen() {
                     identityVerification(navController)
                     passport(navController)
                     enrollmentTermsConditions(navController)
+                    customerDashboard(navController)
+                    customerOrders(navController)
+                    favouriteProviders(navController)
+                    openRequests(navController)
                 }
             )
         }

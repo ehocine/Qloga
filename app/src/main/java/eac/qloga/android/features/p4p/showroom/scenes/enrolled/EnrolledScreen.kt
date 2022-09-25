@@ -78,11 +78,11 @@ fun EnrolledScreen(
             ) {
                 CustomerCard(
                     onClickCard = {
-//                       scope.launch {
-                        //                         navController.navigate(Screen.CustomerNavContainer.route){
-                        //                           launchSingleTop = true
-                        //                     }
-                        //               }
+                       scope.launch {
+                                 navController.navigate(P4pCustomerScreens.CustomerDashboard.route){
+                                   launchSingleTop = true
+                             }
+                       }
                     }
                 )
                 ProviderCard(

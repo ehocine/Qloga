@@ -1,4 +1,4 @@
-package eac.qloga.android.features.p4p.showroom.scenes.providerSearch
+package eac.qloga.android.features.p4p.shared.scenes.providerSearch
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
@@ -34,10 +34,11 @@ import eac.qloga.android.core.shared.components.Provider
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.theme.gray1
 import eac.qloga.android.core.shared.theme.gray30
-import eac.qloga.android.core.shared.utils.PARENT_ROUTE_KEY
 import eac.qloga.android.features.p4p.shared.components.BottomSheetFilter
 import eac.qloga.android.features.p4p.shared.components.TwoSwitchTabRow
+import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
 import eac.qloga.android.features.p4p.shared.utils.FilterTypes
+import eac.qloga.android.features.p4p.shared.viewmodels.ProviderSearchViewModel
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import eac.qloga.android.features.p4p.showroom.shared.components.IconStatus
 import eac.qloga.android.features.p4p.showroom.shared.components.ProvidersMapView
@@ -83,7 +84,7 @@ fun ProviderSearchScreen(
 
     LaunchedEffect(modalBottomSheetState.isVisible){
         hideNavBar(modalBottomSheetState.isVisible)
-        // isFromCustomerNavContainer.value = parentRoute == Screen.CustomerNavContainer.route
+            isFromCustomerNavContainer.value = parentRoute == P4pCustomerScreens.CustomerDashboard.route
     }
 
     BackHandler {
@@ -118,7 +119,7 @@ fun ProviderSearchScreen(
         Scaffold(
             topBar = {
                 TitleBar(
-                    label = P4pShowroomScreens.ProviderSearch.titleName,
+                    label = P4pScreens.ProviderSearch.titleName,
                     iconColor = MaterialTheme.colorScheme.primary,
                     showBackPressButton = !isFromCustomerNavContainer.value,
                     actions = {

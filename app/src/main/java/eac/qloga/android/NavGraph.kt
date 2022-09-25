@@ -15,6 +15,10 @@ import eac.qloga.android.core.scenes.CoreScreens
 import eac.qloga.android.core.scenes.splash.SplashScreen
 import eac.qloga.android.core.shared.utils.ID_KEY
 import eac.qloga.android.core.shared.utils.PARENT_ROUTE_KEY
+import eac.qloga.android.features.p4p.customer.scenes.dashboard.CustomerDashboardScreen
+import eac.qloga.android.features.p4p.customer.scenes.favouriteProviders.FavouriteProvidersScreen
+import eac.qloga.android.features.p4p.customer.scenes.openRequests.OpenRequestsScreen
+import eac.qloga.android.features.p4p.customer.scenes.orders.CustomerOrdersScreen
 import eac.qloga.android.features.p4p.provider.scenes.P4pProviderScreens
 import eac.qloga.android.features.p4p.provider.scenes.customers.CustomersScreen
 import eac.qloga.android.features.p4p.provider.scenes.dashboard.ProviderDashboardScreen
@@ -37,7 +41,7 @@ import eac.qloga.android.features.p4p.showroom.scenes.enrolled.EnrolledScreen
 import eac.qloga.android.features.p4p.showroom.scenes.notEnrolled.NotEnrolledScreen
 import eac.qloga.android.features.p4p.showroom.scenes.portfolioAlbums.PortfolioAlbumsScreen
 import eac.qloga.android.features.p4p.showroom.scenes.preoviderDetails.ProviderDetailsScreen
-import eac.qloga.android.features.p4p.showroom.scenes.providerSearch.ProviderSearchScreen
+import eac.qloga.android.features.p4p.shared.scenes.providerSearch.ProviderSearchScreen
 import eac.qloga.android.features.p4p.showroom.scenes.serviceContract.ServiceContractScreen
 import eac.qloga.android.features.p4p.showroom.scenes.serviceInfo.ServiceInfoScreen
 import eac.qloga.android.features.platform.landing.scenes.LandingScreens
@@ -329,7 +333,7 @@ fun NavGraphBuilder.providers(
     navController: NavController,
 ){
     composable(
-        P4pShowroomScreens.ProviderSearch.route+"?$PARENT_ROUTE_KEY={$PARENT_ROUTE_KEY}",
+        P4pScreens.ProviderSearch.route+"?$PARENT_ROUTE_KEY={$PARENT_ROUTE_KEY}",
         arguments = listOf(
             navArgument(
                 name = PARENT_ROUTE_KEY
@@ -624,6 +628,79 @@ fun NavGraphBuilder.enrollmentTermsConditions(
         )
     }
 }
+
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.customerDashboard(
+    navController: NavController
+){
+    composable(
+        route = P4pCustomerScreens.CustomerDashboard.route,
+        enterTransition = { enterTransition()},
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){
+        CustomerDashboardScreen(
+            navController = navController,
+        )
+    }
+}
+
+
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.customerOrders(
+    navController: NavController,
+){
+    composable(
+        route = P4pCustomerScreens.CustomerOrders.route,
+        enterTransition = { enterTransition()},
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){
+        CustomerOrdersScreen(
+            navController = navController,
+        )
+    }
+}
+
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.favouriteProviders(
+    navController: NavController,
+){
+    composable(
+        route = P4pCustomerScreens.FavouriteProviders.route,
+        enterTransition = { enterTransition()},
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){
+        FavouriteProvidersScreen(
+            navController = navController,
+        )
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.openRequests(
+    navController: NavController,
+){
+    composable(
+        route = P4pCustomerScreens.OpenRequests.route,
+        enterTransition = { enterTransition()},
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){
+        OpenRequestsScreen(
+            navController = navController,
+        )
+    }
+}
+
 
 class NavigationActions(navController: NavController) {
     val upPress: () -> Unit = {

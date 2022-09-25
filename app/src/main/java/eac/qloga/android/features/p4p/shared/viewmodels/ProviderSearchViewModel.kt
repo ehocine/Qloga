@@ -1,4 +1,4 @@
-package eac.qloga.android.features.p4p.showroom.scenes.providerSearch
+package eac.qloga.android.features.p4p.shared.viewmodels
 
 import android.util.Log
 import androidx.compose.runtime.State
@@ -9,6 +9,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import eac.qloga.android.core.shared.utils.CustomMarkerState
 import eac.qloga.android.core.shared.utils.InputFieldState
 import eac.qloga.android.core.shared.utils.QTAG
+import eac.qloga.android.features.p4p.shared.scenes.providerSearch.ProviderSearchEvent
+import eac.qloga.android.features.p4p.shared.scenes.providerSearch.ProvidersScreenType
+import eac.qloga.android.features.p4p.shared.scenes.providerSearch.ProvidersTabItems
 import eac.qloga.android.features.p4p.shared.utils.*
 import eac.qloga.p4p.lookups.dto.ServiceCategory
 import kotlinx.coroutines.launch
