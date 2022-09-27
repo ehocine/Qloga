@@ -194,7 +194,7 @@ fun PortfolioAlbumsScreen(
                         columns = GridCells.Fixed(3),
                         contentPadding = PaddingValues(16.dp)
                     ){
-                        items(folders, key = {it}){ folder ->
+                        items(folders, /*TODO make key for id */){ folder ->
                             AlbumsFolderPreview(
                                 iconId = folder.avatarId?.toInt() ?: R.drawable.ic_ql_empty_folder,
                                 folderName = folder.name,

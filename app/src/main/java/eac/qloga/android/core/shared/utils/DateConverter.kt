@@ -1,7 +1,12 @@
 package eac.qloga.android.core.shared.utils
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 enum class Months(val month: String){
@@ -25,6 +30,19 @@ object DateConverter {
     private val simpleDateFormat = SimpleDateFormat("MMMM d, yyyy")
     private val calendar: Calendar = Calendar.getInstance()
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun stringToLocalDate(stringDate: String?): LocalDate? {
+        val formatter = DateTimeFormatter.ofPattern("d/M/yyyy")
+        var result: LocalDate? = null
+
+        try {
+            result = LocalDate.parse(stringDate, formatter)
+        }catch (e: Exception){
+            Log.e(TAG, "stringToLocalDate: ${e.printStackTrace()}")
+        }
+        return result
+    }
+
     fun longToDate(longVal: Long): Date
     {
         return Date(longVal)
@@ -46,7 +64,9 @@ object DateConverter {
     }
 
     fun stringToDate(stringVal: String): Date {
-        return simpleDateFormat.parse(stringVal)?: throw NullPointerException("Given String value can't be converted to date ")
+        return simpleDateFormat.parse(stringVal)?: throw NullPointerException(
+            "Given String value can't be converted to date "
+        )
     }
 
     fun getTimeInMillis(): Long{
@@ -242,5 +262,26 @@ object DateConverter {
         val diff = (d1.time) - (d2.time )
         val numOfDays = (diff / (1000 * 60 * 60 * 24)).toInt()
         return numOfDays
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun zonedDateTimeToStringDate(zonedDateTime: ZonedDateTime): String {
+        return DateTimeFormatter.ofPattern("dd/MM/yyyy").format(zonedDateTime)
+    }
+
+    fun getDateFormat1(data: String): String{
+        // parameter format 'yyyy-MM-dd'T'hh:0mm:ssZ'
+        // return format yyyy/MM/dd
+        var result: String = ""
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssZ")
+        val outputFormat = SimpleDateFormat("dd/MM/yyyy")
+
+        try {
+            val inputDate = inputFormat.parse(data)?.toString() ?: ""
+            result = outputFormat.format(inputDate)
+        }catch (e: Exception) {
+            Log.e(TAG, "getDateFormat1: ${e.message}")
+        }
+        return result
     }
 }

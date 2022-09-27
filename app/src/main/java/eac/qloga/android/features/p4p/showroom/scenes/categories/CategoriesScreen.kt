@@ -18,8 +18,9 @@ import eac.qloga.android.core.shared.utils.CONTAINER_TOP_PADDING
 import eac.qloga.android.core.shared.utils.PARENT_ROUTE_KEY
 import eac.qloga.android.core.shared.utils.SCREEN_HORIZONTAL_PADDING
 import eac.qloga.android.core.shared.viewmodels.ApiViewModel
+import eac.qloga.android.features.p4p.shared.scenes.P4pSharedScreens
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
-import eac.qloga.android.features.p4p.showroom.scenes.serviceInfo.ServiceInfoViewModel
+import eac.qloga.android.features.p4p.shared.scenes.serviceInfo.ServiceInfoViewModel
 import eac.qloga.android.features.p4p.showroom.shared.components.CategoryList
 import eac.qloga.android.features.p4p.showroom.shared.components.DescriptionText
 import eac.qloga.android.features.p4p.showroom.shared.components.TopNavBar
@@ -150,9 +151,7 @@ private fun ServicesListCard(
                         onClick = {
                             ServiceInfoViewModel.selectedService.value = service
                             coroutineScope.launch {
-                                navController.navigate(
-                                    P4pShowroomScreens.ServiceInfo.route + "?$PARENT_ROUTE_KEY=${P4pShowroomScreens.Categories.route}"
-                                )
+                                navController.navigate(P4pSharedScreens.ServiceInfo.route)
                             }
                         },
                         onShowProviders = {

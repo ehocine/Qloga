@@ -1,6 +1,12 @@
 package eac.qloga.android.core.shared.utils
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
+import java.text.SimpleDateFormat
+import java.time.LocalTime
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 private const val TAG = "${QTAG}-TimeConverter"
@@ -54,5 +60,15 @@ object TimeConverter {
     {
         val c = Calendar.getInstance()
         return c.get(Calendar.MINUTE)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun zonedDateTimeToStringTime(zonedDateTime: ZonedDateTime): String {
+        return DateTimeFormatter.ofPattern("hh:mm").format(zonedDateTime)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun localTimeToTimeString(localTime: LocalTime): String{
+        return DateTimeFormatter.ofPattern("hh:mm").format(localTime)
     }
 }

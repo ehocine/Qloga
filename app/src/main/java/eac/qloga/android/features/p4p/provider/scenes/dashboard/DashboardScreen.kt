@@ -1,9 +1,7 @@
 package eac.qloga.android.features.p4p.provider.scenes.dashboard
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -16,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import eac.qloga.android.NavigationActions
 import eac.qloga.android.core.shared.components.BottomNav
 import eac.qloga.android.core.shared.components.BottomNavItem
 import eac.qloga.android.features.p4p.provider.scenes.customers.CustomersScreen
@@ -25,9 +24,7 @@ import eac.qloga.android.features.p4p.provider.shared.components.ProviderInfoDia
 import eac.qloga.android.features.p4p.provider.shared.utils.ProviderBottomNavItems
 import eac.qloga.android.features.p4p.provider.shared.viewModels.ProviderNegotiationViewModel
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class,
-    ExperimentalMaterialApi::class
-)
+@OptIn(ExperimentalMaterial3Api::class,)
 @Composable
 fun ProviderDashboardScreen(
     navController: NavController,
@@ -67,7 +64,10 @@ fun ProviderDashboardScreen(
                         }
 
                         ProviderBottomNavItems.FAVOURITES -> {
-                            FavouriteCustomersScreen( navController = navController, viewModel = viewModel)
+                            FavouriteCustomersScreen(
+                                navController = navController,
+                                actions = NavigationActions(navController)
+                            )
                         }
 
                         ProviderBottomNavItems.CUSTOMERS -> {

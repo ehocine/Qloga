@@ -18,7 +18,7 @@ import eac.qloga.p4p.search_filters.OrderFilter
 import eac.qloga.p4p.search_filters.PrvRequestSearchFilter
 import javax.inject.Inject
 
-class P4pProviderRepository @Inject constructor(@QLOGAApiService private val apiService: P4pProviderApi) {
+class P4pProviderRepository(@QLOGAApiService private val apiService: P4pProviderApi) {
 
     //Provider
     suspend fun get(fields: List<PrvFields>) = apiService.get(fields.listToString())

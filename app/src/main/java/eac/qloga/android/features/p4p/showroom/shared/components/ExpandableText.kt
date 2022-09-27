@@ -33,15 +33,25 @@ fun ExpandableText(
     var cutText by remember(text) { mutableStateOf<String?>(null) }
     var expanded by remember { mutableStateOf(false) }
     val textLayoutResultState = remember { mutableStateOf<TextLayoutResult?>(null) }
+    val invisibleTextLayoutResultState = remember { mutableStateOf<TextLayoutResult?>(null) }
     val seeMoreSizeState = remember { mutableStateOf<IntSize?>(null) }
     val seeMoreOffsetState = remember { mutableStateOf<Offset?>(null) }
+    var expandBtn by remember{ mutableStateOf(true ) }
 
     // getting raw values for smart cast
     val textLayoutResult = textLayoutResultState.value
     val seeMoreSize = seeMoreSizeState.value
     val seeMoreOffset = seeMoreOffsetState.value
 
+    LaunchedEffect(invisibleTextLayoutResultState.value){
+        val lineCount = invisibleTextLayoutResultState.value?.lineCount
+        lineCount?.let {
+            expandBtn = it > minimizedMaxLines
+        }
+    }
+
     LaunchedEffect(text, expanded, textLayoutResult, seeMoreSize) {
+
         val lastLineIndex = minimizedMaxLines - 1
         if (!expanded && textLayoutResult != null && seeMoreSize != null
             && lastLineIndex + 1 == textLayoutResult.lineCount
@@ -62,6 +72,17 @@ fun ExpandableText(
 
     Column {
         Box(modifier.animateContentSize()) {
+            // invisible text to count total line of text
+            Box(modifier = Modifier.alpha(0f).height(16.dp)) {
+                Text(
+                    text = text,
+                    modifier = Modifier.alpha(0f),
+                    style = textStyle,
+                    onTextLayout = { invisibleTextLayoutResultState.value = it},
+                    maxLines = minimizedMaxLines + 1
+                )
+            }
+
             Text(
                 text = cutText ?: text,
                 maxLines = if (expanded) Int.MAX_VALUE else minimizedMaxLines,
@@ -73,7 +94,7 @@ fun ExpandableText(
 
             val density = LocalDensity.current
 
-            if (!expanded) {
+            if (!expanded && expandBtn) {
                 Text(
                     " Learn more",
                     onTextLayout = { seeMoreSizeState.value = it.size },
@@ -97,7 +118,7 @@ fun ExpandableText(
                 )
             }
         }
-        if(expanded){
+        if(expanded && expandBtn){
             Text(
                 modifier = Modifier
                     .padding(top = 4.dp)

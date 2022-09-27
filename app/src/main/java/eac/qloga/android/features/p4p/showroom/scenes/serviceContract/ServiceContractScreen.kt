@@ -18,7 +18,7 @@ import androidx.navigation.NavController
 import eac.qloga.android.core.shared.components.Cards.ContainerBorderedCard
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
-import eac.qloga.android.features.p4p.showroom.scenes.serviceInfo.ServiceInfoViewModel
+import eac.qloga.android.features.p4p.shared.scenes.serviceInfo.ServiceInfoViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

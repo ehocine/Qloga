@@ -13,11 +13,15 @@ import eac.qloga.android.core.shared.utils.LoadingState
 import eac.qloga.android.data.ApiInterceptor
 import eac.qloga.android.data.p4p.P4pRepository
 import eac.qloga.android.data.p4p.lookups.LookupsRepository
+import eac.qloga.android.data.qbe.MediaRepository
 import eac.qloga.android.data.qbe.PlatformRepository
 import eac.qloga.android.data.shared.models.ResponseEnrollsModel
 import eac.qloga.android.data.shared.models.categories.CategoriesResponse
 import eac.qloga.android.data.shared.models.conditions.ConditionsResponse
+import eac.qloga.android.data.shared.models.q_services.QServicesResponse
+import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import eac.qloga.bare.dto.person.Person
+import eac.qloga.p4p.lookups.dto.ServiceCondition
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -44,6 +48,9 @@ class ApiViewModel @Inject constructor(
 
         @SuppressLint("MutableCollectionMutableState")
         val conditions: MutableState<ConditionsResponse> = mutableStateOf(ConditionsResponse())
+
+        @SuppressLint("MutableCollectionMutableState")
+        val qServices: MutableState<QServicesResponse> = mutableStateOf(QServicesResponse())
     }
 
     var getEnrollsLoadingState = MutableStateFlow(LoadingState.IDLE)
@@ -60,6 +67,9 @@ class ApiViewModel @Inject constructor(
     var conditionsLoadingState = MutableStateFlow(LoadingState.IDLE)
 
     var updateUserProfileLoadingState = MutableStateFlow(LoadingState.IDLE)
+
+    val qServicesState = MutableStateFlow(LoadingState.IDLE)
+
     val updateUserProfileResponse: MutableState<Person> = mutableStateOf(Person())
 
     val hasAddress: MutableState<Boolean> = mutableStateOf(false)
@@ -70,6 +80,7 @@ class ApiViewModel @Inject constructor(
         getSettings()
         getCategories()
         getConditions()
+        getQServices()
     }
 
     fun getEnrolls() {
@@ -138,6 +149,25 @@ class ApiViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 categoriesLoadingState.emit(LoadingState.ERROR)
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun getQServices() {
+        viewModelScope.launch {
+            qServicesState.emit(LoadingState.LOADING)
+            try {
+                val response = lookupsRepository.getServices()
+                if (response.isSuccessful) {
+                    qServices.value = response.body()!!
+                    qServicesState.emit(LoadingState.LOADED)
+                } else {
+                    qServicesState.emit(LoadingState.ERROR)
+                    Log.d("Error", "Code: ${response.code()}, message: ${response.errorBody()}")
+                }
+            } catch (e: Exception) {
+                qServicesState.emit(LoadingState.ERROR)
                 e.printStackTrace()
             }
         }

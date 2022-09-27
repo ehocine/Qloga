@@ -63,21 +63,21 @@ fun TopNavBar(
                     BGColor = navItems.catGroupBgColour.color
                 ) {
                     onClickItem(navItems)
-                    scope.launch {
-                        val index =
-                            when (navList.indexOf(navItems)) {
-                                0 -> {
-                                    navList.indexOf(navItems)
-                                }
-                                1 -> {
-                                    navList.indexOf(navItems) - 1
-                                }
-                                else -> {
-                                    navList.indexOf(navItems) - 2
-                                }
-                            }
-                        lazyScrollState.animateScrollToItem(index)
-                    }
+//                    scope.launch {
+//                        val index =
+//                            when (navList.indexOf(navItems)) {
+//                                0 -> {
+//                                    navList.indexOf(navItems)
+//                                }
+//                                1 -> {
+//                                    navList.indexOf(navItems) - 1
+//                                }
+//                                else -> {
+//                                    navList.indexOf(navItems) - 2
+//                                }
+//                            }
+//                        lazyScrollState.animateScrollToItem(index)
+//                    }
                 }
                 Spacer(modifier = Modifier.width(16.dp))
             }

@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import eac.qloga.android.business.util.Extensions.advancedShadow
 import eac.qloga.android.core.shared.components.Buttons.SortButton
+import eac.qloga.android.data.shared.models.MediaSize
 
 @Composable
 fun TitleBar(
@@ -29,12 +30,12 @@ fun TitleBar(
     titleTextStyle: TextStyle = MaterialTheme.typography.titleMedium,
     showBottomBorder: Boolean = false,
     showBackPressButton: Boolean = true,
+    backgroundColor: Color = MaterialTheme.colorScheme.background,
     leadingActions: @Composable (() -> Unit) = {},
     actions: @Composable (() -> Unit ) = {},
     onBackPress: () -> Unit = {}
 ) {
     val titleBarHeight = 60.dp
-//    val titleBarFontSize =
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -45,7 +46,7 @@ fun TitleBar(
                 0.dp,
                 if (showBottomBorder) 1.dp else 0.dp
             )
-            .background(MaterialTheme.colorScheme.background)
+            .background(backgroundColor)
             .padding(start = 4.dp, end = 4.dp, top = 8.dp, bottom = 4.dp)
         ,
         contentAlignment = Alignment.Center
@@ -79,10 +80,10 @@ fun TitleBar(
             modifier = Modifier.align(Alignment.Center),
             text = label,
             style = titleTextStyle.copy(
-                fontSize = 17.sp,
+                fontSize = 18.sp,
                 fontWeight = FontWeight.W600
             ),
-            color = MaterialTheme.colorScheme.onBackground,
+            color = MaterialTheme.colorScheme.onBackground.copy(.7f),
             textAlign = TextAlign.Center,
         )
 

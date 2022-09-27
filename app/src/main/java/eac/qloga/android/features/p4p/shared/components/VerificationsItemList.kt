@@ -1,4 +1,4 @@
-package eac.qloga.android.features.p4p.showroom.shared.components
+package eac.qloga.android.features.p4p.shared.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons

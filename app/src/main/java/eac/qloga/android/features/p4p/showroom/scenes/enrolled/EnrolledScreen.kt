@@ -111,11 +111,9 @@ fun EnrolledScreen(
                         }
                     }
                 }
-
             }
         }
     }
-
 }
 
 @Composable

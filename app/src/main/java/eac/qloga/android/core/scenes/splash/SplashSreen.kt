@@ -1,6 +1,5 @@
 package eac.qloga.android.core.scenes.splash
 
-import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -20,7 +19,6 @@ import eac.qloga.android.NavigationActions
 import eac.qloga.android.R
 import eac.qloga.android.core.services.BrowserState
 import eac.qloga.android.core.shared.theme.green1
-import eac.qloga.android.core.shared.utils.LoadingState
 import eac.qloga.android.core.shared.utils.PreTransition
 import eac.qloga.android.core.shared.viewmodels.ApiViewModel
 import eac.qloga.android.core.shared.viewmodels.AuthenticationViewModel

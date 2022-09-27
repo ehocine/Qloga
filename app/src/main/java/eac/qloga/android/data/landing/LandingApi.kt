@@ -7,7 +7,7 @@ import retrofit2.http.POST
 
 interface LandingApi {
 
-    @POST("landing/")
+    @POST("a/signup/")
     suspend fun register(
         @Body body: RegistrationRequest
     ): Response<Unit>

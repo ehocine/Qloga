@@ -1,13 +1,15 @@
 package eac.qloga.android.features.platform.landing.scenes.signUp
 
 import android.app.Application
+import android.os.Build
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
+import androidx.annotation.RequiresApi
+import androidx.compose.runtime.*
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import eac.qloga.android.core.shared.utils.DateConverter
 import eac.qloga.android.core.shared.utils.InputFieldState
 import eac.qloga.android.core.shared.utils.LoadingState
 import eac.qloga.android.core.shared.utils.QTAG
@@ -30,56 +32,51 @@ class SignupViewModel @Inject constructor(
         const val TAG = "${QTAG}-SignupViewModel"
     }
 
-    private val _firstName = mutableStateOf(InputFieldState(hint = "First Name"))
-    val firstName: State<InputFieldState> = _firstName
+    var firstName by mutableStateOf(InputFieldState(hint = "First Name"))
+        private  set
 
-    private val _familyName = mutableStateOf(InputFieldState(hint = "Family Name"))
-    val familyName: State<InputFieldState> = _familyName
+    var familyName by mutableStateOf(InputFieldState(hint = "Family Name"))
+        private set
 
-    private val _emailAddress = mutableStateOf(InputFieldState(hint = "E-mail address"))
-    val emailAddress: State<InputFieldState> = _emailAddress
+    var emailAddress by mutableStateOf(InputFieldState(hint = "E-mail address"))
+        private set
 
-    private val _birthday = mutableStateOf<String?>(null)
-    val birthday: State<String?> = _birthday
+    var birthday by mutableStateOf<String?>(null)
+        private set
 
-    private val _LocalDatebirthday = mutableStateOf<LocalDate?>(null)
-
-    private val _gender = mutableStateOf<Gender?>(null)
-    val gender: State<Gender?> = _gender
+    var gender by mutableStateOf<Gender?>(null)
+        private set
 
     fun onTriggerEvent(event: SignupEvents) {
         try {
             viewModelScope.launch {
                 when (event) {
                     is SignupEvents.EnterFirstName -> {
-                        _firstName.value = _firstName.value.copy(text = event.firstName)
+                        firstName = firstName.copy(text = event.firstName)
                     }
                     is SignupEvents.EnterFamilyName -> {
-                        _familyName.value = _familyName.value.copy(text = event.familyName)
+                        familyName = familyName.copy(text = event.familyName)
                     }
                     is SignupEvents.EnterEmailAddress -> {
-                        _emailAddress.value = _emailAddress.value.copy(text = event.emailAddress)
+                        emailAddress = emailAddress.copy(text = event.emailAddress)
                     }
                     is SignupEvents.EnterBirthday -> {
-                        _birthday.value = event.birthday
-                    }
-                    is SignupEvents.EnterLocalDateBirthday -> {
-                        _LocalDatebirthday.value = event.localDateBirthday
+                        birthday = event.birthday
                     }
                     is SignupEvents.EnterGender -> {
-                        _gender.value = event.gender
+                        gender = event.gender
                     }
                     is SignupEvents.FocusEmailAddress -> {
-                        _emailAddress.value =
-                            _emailAddress.value.copy(isFocused = event.focusState.isFocused)
+                        emailAddress =
+                            emailAddress.copy(isFocused = event.focusState.isFocused)
                     }
                     is SignupEvents.FocusFamilyName -> {
-                        _familyName.value =
-                            _familyName.value.copy(isFocused = event.focusState.isFocused)
+                        familyName =
+                            familyName.copy(isFocused = event.focusState.isFocused)
                     }
                     is SignupEvents.FocusFirstName -> {
-                        _firstName.value =
-                            _firstName.value.copy(isFocused = event.focusState.isFocused)
+                        firstName =
+                            firstName.copy(isFocused = event.focusState.isFocused)
                     }
                 }
             }
@@ -90,24 +87,24 @@ class SignupViewModel @Inject constructor(
 
     var signUpLoadingState = MutableStateFlow(LoadingState.IDLE)
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun signUpApply() {
         viewModelScope.launch {
             try {
                 val registrationRequest: RegistrationRequest
                 if (
-                    _firstName.value.text.isNotEmpty() &&
-                    _familyName.value.text.isNotEmpty() &&
-                    _emailAddress.value.text.isNotEmpty() &&
-                    !_birthday.value.isNullOrEmpty() &&
-                    _gender.value != null
+                    firstName.text.isNotEmpty() &&
+                    familyName.text.isNotEmpty() &&
+                    emailAddress.text.isNotEmpty() &&
+                    birthday != null &&
+                    gender != null
                 ) {
                     registrationRequest = RegistrationRequest(
-                        _firstName.value.text,
-                        _familyName.value.text,
-                        _LocalDatebirthday.value,
-                        _emailAddress.value.text,
-                        _gender.value
-
+                        firstName.text,
+                        familyName.text,
+                        DateConverter.stringToLocalDate(birthday),
+                        emailAddress.text,
+                        gender
                     )
                     signUpLoadingState.emit(LoadingState.LOADING)
                     val response = landingRepository.register(registrationRequest)
@@ -116,10 +113,9 @@ class SignupViewModel @Inject constructor(
                     } else {
                         signUpLoadingState.emit(LoadingState.ERROR)
                     }
-
                 } else {
                     Toast.makeText(
-                        getApplication<Application>(),
+                        getApplication(),
                         "Fill out all the fields",
                         Toast.LENGTH_SHORT
                     ).show()

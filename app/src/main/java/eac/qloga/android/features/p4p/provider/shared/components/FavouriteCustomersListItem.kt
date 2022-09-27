@@ -1,8 +1,11 @@
 package eac.qloga.android.features.p4p.provider.shared.components
 
+import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowForwardIos
@@ -12,19 +15,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import eac.qloga.android.R
 import eac.qloga.android.core.shared.components.Buttons.FullRoundedButton
 import eac.qloga.android.core.shared.components.DividerLines.LightDividerLine
+import eac.qloga.android.core.shared.components.PulsePlaceholder
 import eac.qloga.android.core.shared.theme.gray30
 
 @Composable
 fun FavouriteCustomersListItem(
     modifier: Modifier = Modifier,
-    imageId: Int,
+    imageId: Bitmap?,
     name: String,
     location: String,
     showBottomLine: Boolean = true,
@@ -42,17 +48,31 @@ fun FavouriteCustomersListItem(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Image(
+            val painter = rememberAsyncImagePainter(model = imageId)
+
+            Box(
                 modifier = Modifier
-                    .size(imageWidth)
                     .align(Alignment.Top)
-                    .clip(CircleShape)
                     .padding(top = 8.dp)
-                ,
-                painter = rememberAsyncImagePainter(model = imageId),
-                contentDescription = null,
-                alignment = Alignment.TopCenter
-            )
+            ) {
+                if(imageId == null){
+                    PulsePlaceholder(
+                        modifier = Modifier.size(imageWidth),
+                        roundedCornerShape = CircleShape
+                    )
+                }else {
+                    Image(
+                        modifier = Modifier
+                            .size(imageWidth)
+                            .clip(CircleShape)
+                        ,
+                        painter = painter,
+                        contentScale = ContentScale.Crop,
+                        contentDescription = null,
+                        alignment = Alignment.TopCenter
+                    )
+                }
+            }
 
             Column(
                 modifier = Modifier
@@ -109,7 +129,7 @@ fun FavouriteCustomersListItem(
 @Composable
 fun PreviewProvidersItem() {
     FavouriteCustomersListItem(
-        imageId = R.drawable.pvr_profile_ava,
+        imageId = null,
         name = "Kai's Cleaning agency",
         location = "Edinburgh",
         address = "Baird House 18, Holyrood Park Rd, Edinburgh, GB",

@@ -25,13 +25,15 @@ class NotEnrolledViewModel @Inject constructor(
         const val TAG = "${QTAG}-NotEnrolledViewModel"
     }
 
-    private var _inputFieldState = mutableStateOf(
-        InputFieldState(
-            text = ApiViewModel.userProfile.value.contacts.address.shortAddress,
-            hint = "Enter new address"
-        )
+    private val _inputFieldState = mutableStateOf(
+        ApiViewModel.userProfile.value.contacts?.address?.let {
+            InputFieldState(
+                text = it.shortAddress,
+                hint = "Enter new address"
+            )
+        } ?: InputFieldState()
     )
-    var inputFieldState: MutableState<InputFieldState> = _inputFieldState
+    val inputFieldState: MutableState<InputFieldState> = _inputFieldState
 
     private val _selectedNav = mutableStateOf<ServiceCategory?>(null)
     val selectedNav: State<ServiceCategory?> = _selectedNav

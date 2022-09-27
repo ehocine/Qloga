@@ -20,39 +20,39 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import eac.qloga.android.R
-import eac.qloga.android.core.shared.utils.SEARCH_BAR_HEIGHT
 import eac.qloga.android.core.shared.theme.QLOGATheme
 import eac.qloga.android.core.shared.theme.gray1
 
 @Composable
 fun SearchBar(
+    modifier: Modifier = Modifier,
     onValueChange: (String) -> Unit,
     onSubmit: () -> Unit,
     value : String = "",
     hint : String = "Search",
     onClear: () -> Unit,
     isFocused: Boolean = false,
+    height: Dp = 44.dp,
+    background: Color = Color.Transparent,
     focusRequester: FocusRequester,
     onFocusedChanged: (FocusState) -> Unit
 ) {
-    val searchBarHeight = SEARCH_BAR_HEIGHT.dp
-
-    Box(modifier = Modifier
-        .fillMaxWidth()
-    ){
+    Box(modifier = modifier.fillMaxWidth()){
         CustomInputTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(focusRequester),
             value = value,
+            background = background,
             focusRequester = focusRequester,
             leadingIcon = { SearchIcon(if(isFocused) MaterialTheme.colorScheme.primary else gray1) },
             trailingIcon = { if(value.isNotEmpty()) CrossTrailingIcon(onClick = {onClear()}) },
             singleLine = true,
             placeholder = hint,
-            minHeight = searchBarHeight,
+            minHeight = height,
             borderColor = if(isFocused) MaterialTheme.colorScheme.primary else gray1,
             borderSize = if(isFocused) 1.5.dp else 1.dp,
             shape = RoundedCornerShape(12.dp),
@@ -74,13 +74,13 @@ fun SearchBar(
 }
 
 @Composable private fun SearchIcon(
-    color: Color  = Color.Black
+    color: Color  = Color.Black,
+    size: Dp = 28.dp
 ){
   Box {
       Icon(
-          modifier = Modifier.size(28.dp).padding(horizontal = 4.dp),
+          modifier = Modifier.size(size).padding(horizontal = 4.dp),
           painter = painterResource(id = R.drawable.ic_ql_search),
-//          imageVector = Icons.Rounded.Search,
           contentDescription = "Search Icon",
           tint = color
       )

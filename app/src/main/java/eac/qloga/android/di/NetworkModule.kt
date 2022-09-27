@@ -15,6 +15,7 @@ import eac.qloga.android.data.p4p.P4pApi
 import eac.qloga.android.data.p4p.customer.P4pCustomerApi
 import eac.qloga.android.data.p4p.lookups.LookupsApi
 import eac.qloga.android.data.p4p.provider.P4pProviderApi
+import eac.qloga.android.data.p4p.provider.P4pProviderRepository
 import eac.qloga.android.data.qbe.*
 import eac.qloga.android.data.qmp.ChatApi
 import eac.qloga.android.data.qmp.MsgApi

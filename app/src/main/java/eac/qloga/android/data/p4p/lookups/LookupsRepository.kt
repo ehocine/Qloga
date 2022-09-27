@@ -10,4 +10,8 @@ class LookupsRepository @Inject constructor(@PrivateQLOGAApiService private val 
 
     //Get conditions
     suspend fun getConditions() = lookupsApi.getConditions()
+
+    //Get QServices
+    suspend fun getServices() = lookupsApi.getServices()
+
 }

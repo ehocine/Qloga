@@ -36,7 +36,7 @@ class AddressViewModel @Inject constructor(
         const val TAG = "${QTAG}-AddAddressViewModel"
         val selectedAddressSuggestion: MutableState<Suggestion> = mutableStateOf(Suggestion())
         val fullAddress: MutableState<FullAddress> =
-            if (ApiViewModel.userProfile.value.contacts.address != null) mutableStateOf(
+            if (ApiViewModel.userProfile.value.contacts?.address != null) mutableStateOf(
                 FullAddress(
                     postcode = ApiViewModel.userProfile.value.contacts.address.postcode ?: "",
                     latitude = ApiViewModel.userProfile.value.contacts.address.lat ?: 0.0,
@@ -73,7 +73,7 @@ class AddressViewModel @Inject constructor(
     val addressInputFieldState: State<InputFieldState> = _addressInputFieldState
 
 
-    private val parking = if (ApiViewModel.userProfile.value.contacts.address != null) {
+    private val parking = if (ApiViewModel.userProfile.value.contacts?.address != null) {
         when (ApiViewModel.userProfile.value.contacts.address.parking) {
             Parking.PAID -> ParkingType.PaidType
             else -> ParkingType.FreeType

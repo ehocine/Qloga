@@ -43,6 +43,7 @@ fun CustomInputTextField(
     borderColor: Color? = null,
     bottomLineColor: Color? = null,
     bottomBorderWidth: Dp = .8.dp,
+    background: Color = Color.Transparent,
     inputFieldPadding: PaddingValues = PaddingValues(0.dp),
     borderSize: Dp = 0.dp,
     value : String = "",
@@ -73,6 +74,8 @@ fun CustomInputTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = minHeight)
+                .clip(shape)
+                .background(background)
                 .clickable(
                     interactionSource = interactionSource,
                     indication = null

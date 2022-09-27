@@ -1,9 +1,12 @@
 package eac.qloga.android.features.p4p.showroom.scenes.addAddress
 
+import android.app.Activity
 import android.os.Build
+import android.view.WindowManager
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,7 +18,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntSize
@@ -33,9 +38,12 @@ import eac.qloga.android.core.shared.utils.CONTAINER_TOP_PADDING
 import eac.qloga.android.core.shared.utils.InputFieldState
 import eac.qloga.android.core.shared.utils.LoadingState
 import eac.qloga.android.core.shared.viewmodels.ApiViewModel
+import eac.qloga.android.data.shared.models.address_suggestions.Suggestion
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import eac.qloga.android.features.p4p.showroom.shared.components.ParkingSelection
+import eac.qloga.android.features.p4p.showroom.shared.components.SearchBar
 import eac.qloga.android.features.p4p.showroom.shared.viewModels.AddressViewModel
+import eac.qloga.android.features.platform.landing.scenes.noAddress.NoAddressEvent
 import eac.qloga.bare.dto.person.Address
 import eac.qloga.bare.enums.Parking
 import kotlinx.coroutines.launch
@@ -51,6 +59,7 @@ fun AddAddressScreen(
     val containerTopPadding = CONTAINER_TOP_PADDING.dp
     val containerHorizontalPadding = 24.dp
 
+    val activity = LocalContext.current as Activity
     val coroutineScope = rememberCoroutineScope()
     val modalBottomSheetState =
         rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
@@ -87,6 +96,10 @@ fun AddAddressScreen(
     }
     var apartmentsState by remember {
         mutableStateOf(viewModel.apartmentsState.value)
+    }
+
+    LaunchedEffect(Unit){
+        activity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
     }
 
     LaunchedEffect(key1 = true) {

@@ -6,6 +6,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -60,15 +61,16 @@ fun SignIn(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
                     .fillMaxWidth(),
-                painter = painterResource(id = R.drawable.curvy_wave_back_3),
+                painter = painterResource(id = R.drawable.gray_vawe),
                 contentDescription = null,
                 contentScale = ContentScale.FillWidth
             )
             Image(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
+                    .rotate(180f)
                     .fillMaxWidth(),
-                painter = painterResource(id = R.drawable.curvy_wave_back_2),
+                painter = painterResource(id = R.drawable.gray_vawe),
                 contentDescription = null,
                 contentScale = ContentScale.FillWidth
             )

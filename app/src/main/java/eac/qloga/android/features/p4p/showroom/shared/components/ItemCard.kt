@@ -57,9 +57,7 @@ fun ItemCard(
             modifier = Modifier
                 .padding(bottom = 8.dp),
             text = label,
-            style = MaterialTheme.typography.titleMedium.copy(
-                fontSize = 16.sp
-            )
+            style = MaterialTheme.typography.titleLarge
         )
     }
 }

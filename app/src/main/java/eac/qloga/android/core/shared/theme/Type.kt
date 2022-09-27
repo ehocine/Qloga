@@ -1,12 +1,30 @@
 package eac.qloga.android.core.shared.theme
 
 import androidx.compose.material3.Typography
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.unit.sp
 import eac.qloga.android.R
+
+@OptIn(ExperimentalTextApi::class)
+val provider = GoogleFont.Provider(
+    providerAuthority = "com.google.android.gms.fonts",
+    providerPackage = "com.google.android.gms",
+    certificates = R.array.com_google_android_gms_fonts_certs
+)
+
+@OptIn(ExperimentalTextApi::class)
+val fontName = GoogleFont("Roboto")
+//val fontName = GoogleFont("Lobster Two")
+
+@OptIn(ExperimentalTextApi::class)
+val fontFamily = FontFamily(
+    androidx.compose.ui.text.googlefonts.Font(googleFont = fontName, fontProvider = provider)
+)
 
 private val Arial = FontFamily(
     Font(R.font.arial)
@@ -25,14 +43,14 @@ private val Arial2 = FontFamily(
 // Set of Material typography styles to start with
 val Typography = Typography(
     bodyLarge = TextStyle(
-        fontFamily = Arial,
+        fontFamily = fontFamily,
         fontWeight = FontWeight.Normal,
         fontSize = 20.sp,
         letterSpacing = 0.6.sp,
         ),
 
     bodyMedium = TextStyle(
-        fontFamily = Arial,
+        fontFamily = fontFamily,
         fontWeight = FontWeight.Normal,
         fontSize = 18.sp,
         letterSpacing = 0.6.sp,
@@ -40,7 +58,7 @@ val Typography = Typography(
         ),
 
     bodySmall = TextStyle(
-        fontFamily = Arial,
+        fontFamily = fontFamily,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         letterSpacing = 0.6.sp,
@@ -48,22 +66,22 @@ val Typography = Typography(
         ),
 
     titleLarge = TextStyle(
-        fontFamily = Arial,
+        fontFamily = fontFamily,
         fontWeight = FontWeight.W500,
         fontSize = 18.sp,
         letterSpacing = 0.6.sp,
         ),
 
     titleMedium = TextStyle(
-        fontFamily = Arial,
-        fontWeight = FontWeight.W500,
+        fontFamily = fontFamily,
+        fontWeight = FontWeight(570),
         fontSize = 16.sp,
         letterSpacing = 0.6.sp,
         lineHeight = 24.0.sp
     ),
 
     titleSmall = TextStyle(
-        fontFamily = Arial,
+        fontFamily = fontFamily,
         fontWeight = FontWeight.W500,
         fontSize = 14.sp,
         letterSpacing = 0.6.sp,
@@ -71,24 +89,23 @@ val Typography = Typography(
         ),
 
     labelLarge = TextStyle(
-        fontFamily = Arial,
+        fontFamily = fontFamily,
         fontWeight = FontWeight.Normal,
         fontSize = 15.sp,
         letterSpacing = 0.6.sp,
         ),
 
     labelMedium = TextStyle(
-        fontFamily = Arial,
+        fontFamily = fontFamily,
         fontWeight = FontWeight.Medium,
         fontSize = 13.sp,
         letterSpacing = 0.6.sp,
         ),
 
     labelSmall = TextStyle(
-        fontFamily = Arial,
+        fontFamily = fontFamily,
         fontWeight = FontWeight.Medium,
         fontSize = 11.sp,
         letterSpacing = 0.6.sp,
         )
-
 )

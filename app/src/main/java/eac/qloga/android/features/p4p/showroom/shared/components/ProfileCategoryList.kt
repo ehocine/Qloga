@@ -31,6 +31,9 @@ fun ProfileCategoryList(
     showDivider: Boolean = true,
     onExpand : () -> Unit
 ){
+    // Not enough room for long text so remove some
+    val valueText = if(value.length > 29) value.substring(0,28) else value
+
     Column(
         modifier = modifier.clickable { onExpand() }
     ) {
@@ -46,6 +49,7 @@ fun ProfileCategoryList(
                 verticalAlignment = Alignment.CenterVertically
             ){
                 Icon(
+                    modifier = Modifier.size(24.dp),
                     painter = painterResource(id = iconId),
                     contentDescription = "",
                     tint = MaterialTheme.colorScheme.primary
@@ -62,18 +66,21 @@ fun ProfileCategoryList(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ){
-                Text(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 4.dp),
-                    text = value,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.W400,
-                    color = gray30,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    textAlign = TextAlign.End
-                )
+                Row(
+                    modifier = Modifier.weight(1f)
+                        .padding(end = 4.dp, start = 4.dp),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Text(
+                        text = valueText,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.W400,
+                        color = gray30,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        textAlign = TextAlign.Start
+                    )
+                }
                 Icon(
                     modifier = Modifier
                         .size(22.dp)
@@ -95,6 +102,6 @@ fun ProfileCategoryList(
 @Composable
 fun PreviewProfileList() {
     Box(modifier = Modifier.fillMaxSize()) {
-        ProfileCategoryList(title = "Rating",value =  "ID Address, Phone",iconId=  R.drawable.ic_rating_star){}
+        ProfileCategoryList(title = "Rating",value =  "ID Address, ",iconId=  R.drawable.ic_rating_star){}
     }
 }

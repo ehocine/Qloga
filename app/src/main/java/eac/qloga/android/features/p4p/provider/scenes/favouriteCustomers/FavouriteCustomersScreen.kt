@@ -6,25 +6,27 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import eac.qloga.android.NavigationActions
 import eac.qloga.android.R
 import eac.qloga.android.core.shared.components.Buttons.ProviderUserButton
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.theme.info_sky
+import eac.qloga.android.core.shared.utils.AddressConverter
+import eac.qloga.android.core.shared.utils.CUSTOMER_ID
+import eac.qloga.android.core.shared.utils.PROVIDER_ID
 import eac.qloga.android.features.p4p.provider.scenes.P4pProviderScreens
+import eac.qloga.android.features.p4p.provider.scenes.favouriteCustomer.FavouriteCustomerViewModel
 import eac.qloga.android.features.p4p.provider.shared.components.FavouriteCustomersListItem
-import eac.qloga.android.features.p4p.provider.shared.viewModels.ProviderNegotiationViewModel
 import eac.qloga.android.features.p4p.shared.components.OrdersEmptyStateCard
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import kotlinx.coroutines.launch
@@ -33,15 +35,22 @@ import kotlinx.coroutines.launch
 @Composable
 fun FavouriteCustomersScreen(
     navController: NavController,
-    viewModel: ProviderNegotiationViewModel = hiltViewModel()
+    actions: NavigationActions,
+    viewModel: FavouriteCustomersViewModel = hiltViewModel()
 ) {
     val containerHorizontalPadding = 24.dp
-    val isProvidersEmpty = remember{ mutableStateOf(false) }
+    val prvId = viewModel.providerId.value
+    val favouriteCustomersList = viewModel.cstPublicProfileList.value
+    val favouriteCustomersState = viewModel.cstPublicProfileState.collectAsState()
     val lazyScrollState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
     BackHandler {
         navController.popBackStack(route = P4pShowroomScreens.Enrolled.route, inclusive = false)
+    }
+
+    LaunchedEffect(Unit){
+        viewModel.preCallsLoad()
     }
 
     Scaffold(
@@ -80,41 +89,55 @@ fun FavouriteCustomersScreen(
         ) {
             Spacer(modifier = Modifier.height(titleBarHeight))
 
-            if(isProvidersEmpty.value){
-                //TODO SVG
-                OrdersEmptyStateCard(modifier = Modifier.weight(1f), imageId = R.drawable.empty_state_holder4)
-            }else{
-                val providersList = listOf( 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
+            Button(
+                onClick = {
+                    actions.goToProviderDetails(prvId)
+                }
+            ) {
+                Text(text = "Go to Provider")
+            }
+            when(true){
+                favouriteCustomersList.isNotEmpty() -> {
+                    LazyColumn(
+                        state = lazyScrollState,
+                        contentPadding = PaddingValues(top = 8.dp, bottom = 16.dp)
+                    ){
+                        items(favouriteCustomersList, key = {it.id} ){ favouriteCustomer ->
+                            val address = favouriteCustomer.contacts.address
+                            val cstId = favouriteCustomer.id
+                            val mediaId = favouriteCustomer.avatarId
 
-                LazyColumn(
-                    state = lazyScrollState,
-                    contentPadding = PaddingValues(top = 8.dp, bottom = 16.dp)
-                ){
-                    items(providersList, key = {it} ){
-                        FavouriteCustomersListItem(
-                            modifier = Modifier
-                                .clickable {
-                                    scope.launch {
-                                       navController.navigate(P4pProviderScreens.FavouriteCustomer.route)
+                            FavouriteCustomersListItem(
+                                modifier = Modifier
+                                    .clickable {
+                                        FavouriteCustomerViewModel.customerId.value = cstId
+                                        FavouriteCustomerViewModel.providerId.value = prvId
+                                        FavouriteCustomerViewModel.customerProfile.value = favouriteCustomer
+                                        navController.navigate(
+                                            P4pProviderScreens.FavouriteCustomer.route
+                                        )
                                     }
-                                }
-                                .padding(horizontal = containerHorizontalPadding)
-                            ,
-                            onclickQuote = {
-                                scope.launch {
-                                    /*navController.navigate(
-                                        Screen.Services.route+"?$PARENT_ROUTE_KEY=${Screen.FavouriteCustomers.route}"
-                                    )
-                                     */
-                                }
-                            },
-                            imageId = R.drawable.ql_cst_avtr_acc,
-                            name = "Kai's Cleaning agency",
-                            location = "Edinburgh",
-                            showBottomLine = it != providersList.last(),
-                            address = "Baird House 18, Holyrood Park Rd, Edinburgh, GB"
-                        )
+                                    .padding(horizontal = containerHorizontalPadding)
+                                ,
+                                onclickQuote = {
+                                    scope.launch {
+                                        /*navController.navigate(
+                                            Screen.Services.route+"?$PARENT_ROUTE_KEY=${Screen.FavouriteCustomers.route}"
+                                        )
+                                         */
+                                    }
+                                },
+                                imageId = viewModel.avatarList.value.find { it.id == mediaId}?.bitmap,
+                                name = favouriteCustomer.fullName,
+                                location = favouriteCustomer.contacts.address.town,
+                                showBottomLine = favouriteCustomer != favouriteCustomersList.last(),
+                                address = AddressConverter.addressToString(address)
+                            )
+                        }
                     }
+                }
+                else -> {
+                    OrdersEmptyStateCard(modifier = Modifier.weight(1f), imageId = R.drawable.empty_state_holder4)
                 }
             }
         }

@@ -1,5 +1,6 @@
 package eac.qloga.android
 
+import P4pCustomerScreens
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.*
@@ -13,8 +14,10 @@ import androidx.navigation.navArgument
 import com.google.accompanist.navigation.animation.composable
 import eac.qloga.android.core.scenes.CoreScreens
 import eac.qloga.android.core.scenes.splash.SplashScreen
+import eac.qloga.android.core.shared.utils.CUSTOMER_ID
 import eac.qloga.android.core.shared.utils.ID_KEY
 import eac.qloga.android.core.shared.utils.PARENT_ROUTE_KEY
+import eac.qloga.android.core.shared.utils.PROVIDER_ID
 import eac.qloga.android.features.p4p.customer.scenes.dashboard.CustomerDashboardScreen
 import eac.qloga.android.features.p4p.customer.scenes.favouriteProviders.FavouriteProvidersScreen
 import eac.qloga.android.features.p4p.customer.scenes.openRequests.OpenRequestsScreen
@@ -26,12 +29,20 @@ import eac.qloga.android.features.p4p.provider.scenes.favouriteCustomer.Favourit
 import eac.qloga.android.features.p4p.provider.scenes.favouriteCustomers.FavouriteCustomersScreen
 import eac.qloga.android.features.p4p.provider.scenes.orders.ProviderOrdersScreen
 import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
+import eac.qloga.android.features.p4p.shared.scenes.P4pSharedScreens
 import eac.qloga.android.features.p4p.shared.scenes.confirmAddress.ConfirmAddressScreen
+import eac.qloga.android.features.p4p.shared.scenes.contactDetails.ContactDetailsScreen
 import eac.qloga.android.features.p4p.shared.scenes.enrollment.EnrollmentScreen
 import eac.qloga.android.features.p4p.shared.scenes.idVerification.IdVerificationScreen
 import eac.qloga.android.features.p4p.shared.scenes.passport.PassportScreen
+import eac.qloga.android.features.p4p.shared.scenes.providerSearch.ProviderSearchScreen
+import eac.qloga.android.features.p4p.shared.scenes.ratingDetails.RatingDetailsScreen
+import eac.qloga.android.features.p4p.shared.scenes.reviews.ReviewsScreen
 import eac.qloga.android.features.p4p.shared.scenes.selectLocationMap.SelectLocationScreen
+import eac.qloga.android.features.p4p.shared.scenes.serviceInfo.ServiceInfoScreen
+import eac.qloga.android.features.p4p.shared.scenes.serviceinfoedit.ServiceInfoEditScreen
 import eac.qloga.android.features.p4p.shared.scenes.tc.EnrollmentTcScreen
+import eac.qloga.android.features.p4p.shared.scenes.verifications.VerificationsScreen
 import eac.qloga.android.features.p4p.shared.scenes.verifyPhone.VerifyPhoneScreen
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import eac.qloga.android.features.p4p.showroom.scenes.addAddress.AddAddressScreen
@@ -40,11 +51,12 @@ import eac.qloga.android.features.p4p.showroom.scenes.categories.CategoriesScree
 import eac.qloga.android.features.p4p.showroom.scenes.enrolled.EnrolledScreen
 import eac.qloga.android.features.p4p.showroom.scenes.notEnrolled.NotEnrolledScreen
 import eac.qloga.android.features.p4p.showroom.scenes.portfolioAlbums.PortfolioAlbumsScreen
-import eac.qloga.android.features.p4p.showroom.scenes.preoviderDetails.ProviderDetailsScreen
-import eac.qloga.android.features.p4p.shared.scenes.providerSearch.ProviderSearchScreen
+import eac.qloga.android.features.p4p.showroom.scenes.providerDetails.ProviderDetailsScreen
+import eac.qloga.android.features.p4p.showroom.scenes.providerServices.ProviderServicesScreen
+import eac.qloga.android.features.p4p.showroom.scenes.providerWorkingSchedule.ProviderWorkingScheduleScreen
 import eac.qloga.android.features.p4p.showroom.scenes.serviceContract.ServiceContractScreen
-import eac.qloga.android.features.p4p.showroom.scenes.serviceInfo.ServiceInfoScreen
 import eac.qloga.android.features.platform.landing.scenes.LandingScreens
+import eac.qloga.android.features.platform.landing.scenes.dataPrivacy.DataPrivacyScreen
 import eac.qloga.android.features.platform.landing.scenes.noAddress.NoAddressScreen
 import eac.qloga.android.features.platform.landing.scenes.postSignup.PostSignupScreen
 import eac.qloga.android.features.platform.landing.scenes.signIn.SignIn
@@ -222,37 +234,50 @@ fun NavGraphBuilder.categories(
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.serviceInfo(
-    navController: NavController,
+    navActions: NavigationActions
 ) {
     composable(
-        P4pShowroomScreens.ServiceInfo.route + "?$PARENT_ROUTE_KEY={$PARENT_ROUTE_KEY}" +
-                "&$ID_KEY={$ID_KEY}",
+        P4pSharedScreens.ServiceInfo.route + "?$ID_KEY={$ID_KEY}",
         arguments = listOf(
-            navArgument(
-                name = PARENT_ROUTE_KEY
-            ) {
-                type = NavType.StringType
-                defaultValue = ""
-            },
             navArgument(
                 name = ID_KEY
             ) {
-                type = NavType.IntType
-                defaultValue = 0
+                type = NavType.LongType
+                defaultValue = 0L
             }
         ),
         enterTransition = { enterTransition() },
         popEnterTransition = { popEnterTransition() },
         popExitTransition = { popExitTransition() },
         exitTransition = { exitTransition() }
-    ) { stackEntry ->
-        val parentRoute = stackEntry.arguments?.getString(PARENT_ROUTE_KEY)
-        val id = stackEntry.arguments?.getInt(ID_KEY)
-
+    ) {
         ServiceInfoScreen(
-            navController = navController,
-            parentRoute = parentRoute,
-            id = id
+            navActions = navActions
+        )
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.serviceInfoEdit(
+    navActions: NavigationActions
+) {
+    composable(
+        P4pSharedScreens.ServiceInfoEdit.route + "?$ID_KEY={$ID_KEY}",
+        arguments = listOf(
+            navArgument(
+                name = ID_KEY
+            ) {
+                type = NavType.LongType
+                defaultValue = 0L
+            }
+        ),
+        enterTransition = { enterTransition() },
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ) {
+        ServiceInfoEditScreen(
+            navActions = navActions
         )
     }
 }
@@ -357,17 +382,25 @@ fun NavGraphBuilder.providers(
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.providersDetails(
-    navController: NavController
+    navController: NavController,
+    actions: NavigationActions
 ){
     composable(
-        P4pShowroomScreens.ProviderDetails.route,
+        P4pShowroomScreens.ProviderDetails.route+"?$PROVIDER_ID={$PROVIDER_ID}",
+        arguments = listOf(
+            navArgument(name = PROVIDER_ID){
+                type = NavType.LongType
+                defaultValue = -1L
+            }
+        ),
         enterTransition = { enterTransition()},
         popEnterTransition = { popEnterTransition() },
         popExitTransition = { popExitTransition() },
         exitTransition = { exitTransition() }
     ){
         ProviderDetailsScreen(
-            navController = navController
+            navController = navController,
+            navigationActions = actions
         )
     }
 }
@@ -447,7 +480,8 @@ fun NavGraphBuilder.favouriteCustomers(
         exitTransition = { exitTransition() }
     ){
         FavouriteCustomersScreen(
-            navController = navController
+            navController = navController,
+            actions = NavigationActions(navController)
         )
     }
 }
@@ -475,14 +509,29 @@ fun NavGraphBuilder.favouriteCustomer(
     navController: NavController
 ){
     composable(
-        route = P4pProviderScreens.FavouriteCustomer.route,
+        route = P4pProviderScreens.FavouriteCustomer.route+
+                "?$CUSTOMER_ID={$CUSTOMER_ID}&&$PROVIDER_ID={$PROVIDER_ID}",
+        arguments = listOf(
+            navArgument(
+                name = CUSTOMER_ID
+            ) {
+                type = NavType.LongType
+                defaultValue = -1
+            },
+            navArgument(
+                name = PROVIDER_ID
+            ) {
+                type = NavType.LongType
+                defaultValue = -1
+            }
+        ),
         enterTransition = { enterTransition()},
         popEnterTransition = { popEnterTransition() },
         popExitTransition = { popExitTransition() },
         exitTransition = { exitTransition() }
     ){
         FavouriteCustomerScreen(
-            navController = navController
+            navController = navController,
         )
     }
 }
@@ -499,6 +548,23 @@ fun NavGraphBuilder.noAddress(
         exitTransition = { exitTransition() }
     ) {
         NoAddressScreen(
+            navController = navController
+        )
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.providerServices(
+    navController: NavController
+) {
+    composable(
+        route = P4pShowroomScreens.ProviderServices.route,
+        enterTransition = { enterTransition() },
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ) {
+        ProviderServicesScreen(
             navController = navController
         )
     }
@@ -539,6 +605,23 @@ fun NavGraphBuilder.verifyPhone(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.providerWorkingSchedule(
+    navController: NavController,
+) {
+    composable(
+        route = P4pShowroomScreens.ProviderWorkingSchedule.route,
+        enterTransition = { enterTransition() },
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ) {
+        ProviderWorkingScheduleScreen(
+            navController = navController,
+        )
+    }
+}
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.confirmAddress(
@@ -612,6 +695,66 @@ fun NavGraphBuilder.passport(
 }
 
 @OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.ratingDetails(
+    navActions: NavigationActions ,
+) {
+    composable(
+        route = P4pSharedScreens.RatingDetails.route,
+        enterTransition = { enterTransition() },
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ) {
+        RatingDetailsScreen(navigationActions = navActions)
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.reviews(
+    navActions: NavigationActions ,
+) {
+    composable(
+        route = P4pSharedScreens.Reviews.route,
+        enterTransition = { enterTransition() },
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ) {
+        ReviewsScreen(navigationActions = navActions)
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.contactDetails(
+    navActions: NavigationActions ,
+) {
+    composable(
+        route = P4pSharedScreens.ContactDetails.route,
+        enterTransition = { enterTransition() },
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ) {
+        ContactDetailsScreen(navigationActions = navActions)
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.verifications(
+    navActions: NavigationActions ,
+) {
+    composable(
+        route = P4pSharedScreens.Verifications.route,
+        enterTransition = { enterTransition() },
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ) {
+        VerificationsScreen(navigationActions = navActions)
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.enrollmentTermsConditions(
     navController: NavController,
 ){
@@ -630,6 +773,7 @@ fun NavGraphBuilder.enrollmentTermsConditions(
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.customerDashboard(
     navController: NavController
@@ -685,6 +829,21 @@ fun NavGraphBuilder.favouriteProviders(
 }
 
 @OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.dataPrivacy(
+    navActions: NavigationActions ,
+) {
+    composable(
+        route = LandingScreens.DataPrivacy.route,
+        enterTransition = { enterTransition() },
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ) {
+        DataPrivacyScreen(navigationActions = navActions)
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.openRequests(
     navController: NavController,
 ){
@@ -734,6 +893,82 @@ class NavigationActions(navController: NavController) {
     val goToOrderLisrPrv: () -> Unit = {
         navController.navigate(P4pShowroomScreens.Enrolled.route) {
             popUpTo(navController.graph.findStartDestination().id)
+            launchSingleTop = true
+        }
+    }
+
+    val goToProviderServices: () -> Unit = {
+        navController.navigate(P4pShowroomScreens.ProviderServices.route)
+    }
+
+    val goToProviderDetails: (providerId: Long? ) -> Unit = { providerId ->
+        navController.navigate(
+            P4pShowroomScreens.ProviderDetails.route+"?$PROVIDER_ID=$providerId"
+        )
+    }
+
+    val goToProviderWorkingSchedule: () -> Unit = {
+        navController.navigate(
+            P4pShowroomScreens.ProviderWorkingSchedule.route
+        )
+    }
+
+    val goToServiceInfo: (serviceId: Long) -> Unit = { serviceID ->
+        navController.navigate(
+            P4pSharedScreens.ServiceInfo.route+"?$ID_KEY=$serviceID"
+        )
+    }
+
+    val goToServiceInfoEdit: (serviceId: Long) -> Unit = { serviceID ->
+        navController.navigate(
+            P4pSharedScreens.ServiceInfoEdit.route+"?$ID_KEY=$serviceID"
+        )
+    }
+
+    val goToServiceContract: () -> Unit = {
+        navController.navigate(
+            P4pShowroomScreens.ServiceContract.route
+        ) {
+            launchSingleTop = true
+        }
+    }
+
+    val goToContactDetails: () -> Unit = {
+        navController.navigate(
+            P4pSharedScreens.ContactDetails.route
+        ) {
+            launchSingleTop = true
+        }
+    }
+
+    val goToRatingDetails: () -> Unit = {
+        navController.navigate(
+            P4pSharedScreens.RatingDetails.route
+        ) {
+            launchSingleTop = true
+        }
+    }
+
+    val goToReviews: () -> Unit = {
+        navController.navigate(
+            P4pSharedScreens.Reviews.route
+        ) {
+            launchSingleTop = true
+        }
+    }
+
+    val goToVerifications: () -> Unit = {
+        navController.navigate(
+            P4pSharedScreens.Verifications.route
+        ) {
+            launchSingleTop = true
+        }
+    }
+
+    val goToDataPrivacy: () -> Unit = {
+        navController.navigate(
+            LandingScreens.DataPrivacy.route
+        ) {
             launchSingleTop = true
         }
     }

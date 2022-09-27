@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -42,17 +43,18 @@ fun PostSignupScreen(
                     .align(Alignment.TopCenter)
                     .fillMaxWidth()
                 ,
-                painter = painterResource(id = R.drawable.curvy_wave_back_1),
+                painter = painterResource(id = R.drawable.gray_vawe),
                 contentDescription = null,
                 contentScale = ContentScale.FillWidth
             )
 //            Spacer(modifier = Modifier.weight(1f))
             Image(
                 modifier = Modifier
+                    .rotate(180f)
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
                 ,
-                painter = painterResource(id = R.drawable.curvy_wave_back_2),
+                painter = painterResource(id = R.drawable.gray_vawe),
                 contentDescription = null,
                 contentScale = ContentScale.FillWidth
             )

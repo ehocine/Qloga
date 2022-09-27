@@ -1,4 +1,4 @@
-package eac.qloga.android.features.p4p.showroom.scenes.serviceInfo
+package eac.qloga.android.features.p4p.shared.scenes.serviceInfo
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
@@ -9,7 +9,6 @@ import eac.qloga.android.core.shared.utils.QTAG
 import eac.qloga.android.features.p4p.showroom.shared.utils.CleaningServiceCategory
 import eac.qloga.p4p.lookups.dto.QService
 import javax.inject.Inject
-
 
 @HiltViewModel
 class ServiceInfoViewModel @Inject constructor() : ViewModel() {

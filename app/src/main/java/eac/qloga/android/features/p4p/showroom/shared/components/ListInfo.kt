@@ -36,7 +36,7 @@ fun ListInfo(
             Text(
                 modifier = Modifier.weight(1f).padding(start = 12.dp),
                 text = label,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.W400,
                 color = gray30
             )
@@ -45,7 +45,7 @@ fun ListInfo(
                 Text(
                     modifier = Modifier.padding(start = 8.dp),
                     text = "\$$it",
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
                 )

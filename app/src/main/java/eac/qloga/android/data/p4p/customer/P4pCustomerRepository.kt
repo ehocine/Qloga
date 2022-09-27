@@ -19,7 +19,7 @@ import eac.qloga.p4p.search_filters.OrderFilter
 import eac.qloga.p4p.search_filters.PrvSearchFilter
 import javax.inject.Inject
 
-class P4pCustomerRepository @Inject constructor(@QLOGAApiService private val apiService: P4pCustomerApi) {
+class P4pCustomerRepository(@QLOGAApiService private val apiService: P4pCustomerApi) {
     //Customer
     suspend fun create() = apiService.create()
     suspend fun get() = apiService.get()
