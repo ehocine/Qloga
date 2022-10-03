@@ -29,6 +29,8 @@ import eac.qloga.android.core.shared.viewmodels.ApiViewModel
 import eac.qloga.android.core.shared.viewmodels.AuthenticationViewModel
 import eac.qloga.android.data.shared.models.address_suggestions.Suggestion
 import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
+import eac.qloga.android.features.p4p.shared.utils.EnrollmentType
+import eac.qloga.android.features.p4p.shared.viewmodels.EnrollmentViewModel
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import eac.qloga.android.features.p4p.showroom.shared.components.LeftNavBar
 import eac.qloga.android.features.p4p.showroom.shared.components.MainContent
@@ -102,6 +104,7 @@ fun NotEnrolledScreen(
                                 AddressViewModel.selectedAddressSuggestion.value =
                                     Suggestion(searchBarValue, "", "")
                                 navController.navigate(P4pShowroomScreens.AddAddress.route)
+                                AddressViewModel.addressSaved.value = true
                             }
 
                         },
@@ -139,6 +142,8 @@ fun NotEnrolledScreen(
                                         )
                                         AddressViewModel.selectedAddressSuggestion.value =
                                             addressSuggestion
+                                        AddressViewModel.addressSaved.value = false
+                                        AddressViewModel.searchAddress.value = true
                                         navController.navigate(P4pShowroomScreens.AddAddress.route)
                                     }
                                 ) {
@@ -180,14 +185,17 @@ fun NotEnrolledScreen(
                         MainContent(
                             onClickBecomeProvider = {
                                 scope.launch {
-                                    if (isAlreadyEnrolled.value) {
-                                        // navController.navigate(Screen.OrderListPrv.route)
-                                    } else {
-                                        // navController.navigate(Screen.ProviderEnrollment.route)
+                                    // User not enrolled wants to become a provider
+                                    EnrollmentViewModel.enrollmentType.value =
+                                        EnrollmentType.PROVIDER
+                                    scope.launch {
+                                        navController.navigate(P4pScreens.Enrollment.route)
                                     }
                                 }
                             },
                             onClickRequest = {
+                                //By requesting the user becomes a customer
+                                EnrollmentViewModel.enrollmentType.value = EnrollmentType.CUSTOMER
                                 scope.launch {
                                     navController.navigate(P4pScreens.Enrollment.route)
                                 }

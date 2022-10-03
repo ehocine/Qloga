@@ -1,5 +1,6 @@
 package eac.qloga.android.core.shared.viewmodels
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.util.Log
@@ -54,6 +55,7 @@ class AuthenticationViewModel @Inject constructor(
         }
     }
 
+    @SuppressLint("LongLogTag")
     fun appleLogin(context: Context) {
         viewModelScope.launch {
             if (oktaManager.appleSignIn(context)) {
@@ -63,6 +65,7 @@ class AuthenticationViewModel @Inject constructor(
         }
     }
 
+    @SuppressLint("LongLogTag")
     fun googleLogin(context: Context) {
         viewModelScope.launch {
             if (oktaManager.googleSignIn(context)) {

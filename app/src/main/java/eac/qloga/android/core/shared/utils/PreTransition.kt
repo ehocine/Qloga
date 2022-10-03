@@ -5,6 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import eac.qloga.android.core.shared.viewmodels.ApiViewModel
+import eac.qloga.android.features.p4p.shared.utils.EnrollmentType
+import eac.qloga.android.features.p4p.shared.viewmodels.EnrollmentViewModel
 
 
 @Composable
@@ -47,11 +49,27 @@ fun PreTransition(
                                             LoadingState.LOADED -> {
                                                 loadingState(false)
                                                 if (responseEnrollsModel.CUSTOMER != null || responseEnrollsModel.PROVIDER != null) {
-//                                                    actions.goToOrderLisrPrv.invoke()
+                                                    when {
+                                                        responseEnrollsModel.CUSTOMER != null && responseEnrollsModel.PROVIDER == null -> {
+                                                            EnrollmentViewModel.currentEnrollmentType.value =
+                                                                EnrollmentType.CUSTOMER
+                                                        }
+                                                        responseEnrollsModel.PROVIDER != null && responseEnrollsModel.CUSTOMER == null -> {
+                                                            EnrollmentViewModel.currentEnrollmentType.value =
+                                                                EnrollmentType.PROVIDER
+                                                        }
+                                                        else->{
+                                                            EnrollmentViewModel.currentEnrollmentType.value =
+                                                                EnrollmentType.BOTH
+                                                        }
+                                                    }
+                                                    Log.d(
+                                                        "Tag",
+                                                        "Enro: ${EnrollmentViewModel.currentEnrollmentType.value}"
+                                                    )
                                                     checkEnrollment(true)
 
                                                 } else {
-//                                                    actions.goToIntro.invoke()
                                                     checkEnrollment(false)
                                                 }
                                             }
@@ -63,7 +81,6 @@ fun PreTransition(
                                         loadingState(false)
                                         checkAddress(false)
                                         Log.d("Tag", "User has no address")
-//                                        actions.goToNoAddress.invoke()
                                     }
                                 }
                                 else -> Unit

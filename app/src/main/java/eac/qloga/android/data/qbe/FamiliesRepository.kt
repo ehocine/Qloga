@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @RequiresApi(Build.VERSION_CODES.O)
 
-class FamiliesRepository @Inject constructor(@QLOGAApiService private val apiService: FamiliesApi) {
+class FamiliesRepository(@QLOGAApiService private val apiService: FamiliesApi) {
     //Families
     suspend fun getFamilies() = apiService.getFamilies()
     suspend fun update(family: Family) = apiService.update(family)

@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import eac.qloga.android.core.shared.components.Cards
 import eac.qloga.android.core.shared.components.Cards.ContainerBorderedCard
 import eac.qloga.android.core.shared.utils.InputFieldState
 import eac.qloga.android.core.shared.utils.ParkingType
@@ -18,25 +19,24 @@ import eac.qloga.android.core.shared.utils.ParkingType
 @Composable
 fun AddressCard(
     parkingType: ParkingType,
+    line1State: InputFieldState,
+    line2State: InputFieldState,
+    line3State: InputFieldState,
     postcodeState: InputFieldState,
-    streetState: InputFieldState,
-    apartmentsState: InputFieldState,
-    townState: InputFieldState,
-    buildingState: InputFieldState,
+    cityState: InputFieldState,
+    onChangeLine1: (String) -> Unit,
+    onChangeLine3: (String) -> Unit,
+    onChangeCity: (String) -> Unit,
+    onChangeLine2: (String) -> Unit,
     onChangePostcode: (String) -> Unit,
-    onChangeStreet: (String) -> Unit,
-    onChangeBuilding: (String) -> Unit,
-    onChangeTown: (String) -> Unit,
-    onChangeApartments: (String) -> Unit,
+    onFocusLine1: (FocusState) -> Unit,
+    onFocusLine3: (FocusState) -> Unit,
+    onFocusCity: (FocusState) -> Unit,
+    onFocusLine2: (FocusState) -> Unit,
     onFocusPostcode: (FocusState) -> Unit,
-    onFocusStreet: (FocusState) -> Unit,
-    onFocusBuilding: (FocusState) -> Unit,
-    onFocusTown: (FocusState) -> Unit,
-    onFocusApartments: (FocusState) -> Unit,
     onClickParkingType: () -> Unit
 ) {
-
-    ContainerBorderedCard {
+    Cards.ContainerBorderedCard {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -49,8 +49,49 @@ fun AddressCard(
                 textStyle = MaterialTheme.typography.bodyMedium.copy(
                     color = MaterialTheme.colorScheme.onBackground
                 ),
-                actions = { ParkingTypeButton(type = parkingType.label) { onClickParkingType() }
+                actions = {
+                    ParkingTypeButton(type = parkingType.label) { onClickParkingType() }
                 }
+            )
+
+            AddressCardItem(
+                title = "Line 1",
+                value = line1State.text,
+                hint = line1State.hint,
+                textStyle = MaterialTheme.typography.bodyMedium,
+                editable = true,
+                onValueChange = { onChangeLine1(it) },
+                onFocusChange = { onFocusLine1(it) }
+            )
+
+            AddressCardItem(
+                title = "Line 2",
+                value = line2State.text,
+                hint = line2State.hint,
+                textStyle = MaterialTheme.typography.bodyMedium,
+                editable = true,
+                onValueChange = { onChangeLine2(it) },
+                onFocusChange = { onFocusLine2(it) }
+            )
+
+            AddressCardItem(
+                title = "Line 3",
+                value = line3State.text,
+                hint = line3State.hint,
+                textStyle = MaterialTheme.typography.bodyMedium,
+                editable = true,
+                onValueChange = { onChangeLine3(it) },
+                onFocusChange = { onFocusLine3(it) }
+            )
+
+            AddressCardItem(
+                title = "City",
+                value = cityState.text,
+                hint = cityState.hint,
+                textStyle = MaterialTheme.typography.bodyMedium,
+                editable = true,
+                onValueChange = { onChangeCity(it) },
+                onFocusChange = { onFocusCity(it) }
             )
 
             AddressCardItem(
@@ -59,49 +100,9 @@ fun AddressCard(
                 hint = postcodeState.hint,
                 textStyle = MaterialTheme.typography.bodyMedium,
                 editable = true,
+                showDivider = false,
                 onValueChange = { onChangePostcode(it) },
                 onFocusChange = { onFocusPostcode(it) }
-            )
-
-            AddressCardItem(
-                title = "Town",
-                value = townState.text,
-                hint = townState.hint,
-                textStyle = MaterialTheme.typography.bodyMedium,
-                editable = true,
-                onValueChange = { onChangeTown(it) },
-                onFocusChange = { onFocusTown(it) }
-            )
-
-            AddressCardItem(
-                title = "Street",
-                value = streetState.text,
-                hint = streetState.hint,
-                textStyle = MaterialTheme.typography.bodyMedium,
-                editable = true,
-                onValueChange = { onChangeStreet(it) },
-                onFocusChange = { onFocusStreet(it) }
-            )
-
-            AddressCardItem(
-                title = "Building",
-                value = buildingState.text,
-                hint = buildingState.hint,
-                textStyle = MaterialTheme.typography.bodyMedium,
-                editable = true,
-                onValueChange = { onChangeBuilding(it) },
-                onFocusChange = { onFocusBuilding(it) }
-            )
-
-            AddressCardItem(
-                title = "Apartments",
-                value = apartmentsState.text,
-                hint = apartmentsState.hint,
-                textStyle = MaterialTheme.typography.bodyMedium,
-                editable = true,
-                showDivider = false,
-                onValueChange = { onChangeApartments(it) },
-                onFocusChange = { onFocusApartments(it) }
             )
         }
     }
@@ -112,21 +113,21 @@ fun AddressCard(
 fun PreviewAddressCard2(){
     AddressCard(
         parkingType = ParkingType.FreeType,
+        line1State = InputFieldState(),
+        line2State = InputFieldState(),
+        line3State = InputFieldState(),
         postcodeState = InputFieldState(),
-        streetState = InputFieldState(),
-        apartmentsState = InputFieldState(),
-        townState = InputFieldState(),
-        buildingState = InputFieldState(),
+        cityState = InputFieldState(),
+        onChangeLine1 = {},
+        onChangeLine3 = {},
+        onChangeCity = {},
+        onChangeLine2 = {},
         onChangePostcode = {},
-        onChangeStreet = {},
-        onChangeBuilding = {},
-        onChangeTown = {},
-        onChangeApartments = {},
+        onFocusLine1 = {},
+        onFocusLine3 = {},
+        onFocusCity = {},
+        onFocusLine2 = {},
         onFocusPostcode = {},
-        onFocusStreet = {},
-        onFocusBuilding = {},
-        onFocusTown = {},
-        onFocusApartments = {},
         onClickParkingType = {}
     )
 }

@@ -272,7 +272,7 @@ fun SaveButton(
             gray1
         }
         Text(
-            text = "Save",
+            text = "Done",
             color = textColor,
             style = textStyle
         )

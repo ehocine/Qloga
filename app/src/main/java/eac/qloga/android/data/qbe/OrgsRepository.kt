@@ -5,6 +5,7 @@ import eac.qloga.android.di.QLOGAApiService
 import eac.qloga.bare.dto.OffTime
 import eac.qloga.bare.dto.Org
 import eac.qloga.bare.dto.WorkHours
+import javax.inject.Inject
 
 class OrgsRepository(@QLOGAApiService private val apiService: OrgsApi) {
     suspend fun getOrgs() = apiService.getOrgs()

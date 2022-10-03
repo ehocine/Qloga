@@ -1,6 +1,5 @@
 package eac.qloga.android.features.p4p.provider.scenes.favouriteCustomer
 
-import android.widget.RemoteViews.RemoteView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -11,7 +10,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -139,7 +141,6 @@ fun FavouriteCustomerScreen(
                             color = MaterialTheme.colorScheme.onBackground
                         )
                         Spacer(modifier= Modifier.height(8.dp))
-
                         if(customer.active == true){
                             Box(
                                 modifier = Modifier
@@ -162,6 +163,7 @@ fun FavouriteCustomerScreen(
 
                         Text(
                             modifier = Modifier.padding(end = 8.dp),
+
                             text = "Completed orders: ${customer.orderQuantity ?: 0}",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.W500,

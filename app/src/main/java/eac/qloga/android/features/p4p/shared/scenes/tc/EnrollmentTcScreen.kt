@@ -3,21 +3,21 @@ package eac.qloga.android.features.p4p.shared.scenes.tc
 import android.graphics.Bitmap
 import android.util.Log
 import android.webkit.WebView
+import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.google.accompanist.web.AccompanistWebViewClient
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.rememberWebViewState
@@ -27,8 +27,11 @@ import eac.qloga.android.core.shared.components.DottedLine
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.theme.gray1
 import eac.qloga.android.core.shared.theme.grayTextColor
+import eac.qloga.android.core.shared.theme.green1
 import eac.qloga.android.core.shared.utils.CUSTOMER_TERMS_CONDITIONS_LINK
+import eac.qloga.android.core.shared.utils.LoadingState
 import eac.qloga.android.core.shared.utils.PROVIDER_TERMS_CONDITIONS_LINK
+import eac.qloga.android.features.p4p.provider.scenes.P4pProviderScreens
 import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
 import eac.qloga.android.features.p4p.shared.utils.EnrollmentEvent
 import eac.qloga.android.features.p4p.shared.utils.EnrollmentType
@@ -42,12 +45,16 @@ fun EnrollmentTcScreen(
     navController: NavController,
     viewModel: EnrollmentViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val roundedCornerRadius = 16.dp
     val containerHorizontalPadding = 24.dp
     val checkTermsConditions = viewModel.isCheckTermsConditions.value
     val providerTermsConditionsLink = PROVIDER_TERMS_CONDITIONS_LINK
     val customerTermsConditionsLink = CUSTOMER_TERMS_CONDITIONS_LINK
-    val enrollmentType = viewModel.enrollmentType.value
+    val enrollmentType = EnrollmentViewModel.enrollmentType.value
+    val createCustomerState by viewModel.createCustomerState.collectAsState()
+    val createProviderState by viewModel.createProviderState.collectAsState()
+    var loadingState by remember { mutableStateOf(false) }
     val webClient = remember {
         object : AccompanistWebViewClient() {
             override fun onPageStarted(
@@ -67,7 +74,7 @@ fun EnrollmentTcScreen(
         } else providerTermsConditionsLink
     )
 
-    val enableCheckBox = remember{
+    val enableCheckBox = remember {
         derivedStateOf {
             !(webViewState.isLoading || webViewState.errorsForCurrentRequest.isNotEmpty())
         }
@@ -90,8 +97,7 @@ fun EnrollmentTcScreen(
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                ,
+                    .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(modifier = Modifier.height(topPadding + 4.dp))
@@ -104,8 +110,7 @@ fun EnrollmentTcScreen(
                             .fillMaxWidth(.5f)
                             .height(20.dp)
                             .align(Alignment.CenterStart)
-                            .padding(end = 20.dp)
-                        ,
+                            .padding(end = 20.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         DottedLine(
@@ -118,7 +123,7 @@ fun EnrollmentTcScreen(
                         modifier = Modifier
                             .size(40.dp)
                             .align(Alignment.Center)
-                    ){
+                    ) {
                         DotCircleArcCanvas(
                             arcStrokeColor = gray1,
                             circleColor = MaterialTheme.colorScheme.primary
@@ -136,7 +141,7 @@ fun EnrollmentTcScreen(
                         .padding(horizontal = containerHorizontalPadding)
                         .border(1.5.dp, gray1, RoundedCornerShape(roundedCornerRadius)),
                     contentAlignment = Alignment.Center
-                ){
+                ) {
                     //terms and conditions webviews
                     WebView(
                         state = webViewState,
@@ -148,7 +153,7 @@ fun EnrollmentTcScreen(
                         },
                         client = webClient
                     )
-                    if(webViewState.isLoading){
+                    if (webViewState.isLoading) {
                         CircularProgressIndicator(
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -156,14 +161,13 @@ fun EnrollmentTcScreen(
                 }
 
                 Column(
-                    modifier= Modifier
+                    modifier = Modifier
                         .padding(horizontal = containerHorizontalPadding)
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 16.dp)
-                        ,
+                            .padding(top = 16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Checkbox(
@@ -178,22 +182,62 @@ fun EnrollmentTcScreen(
                             color = grayTextColor
                         )
                     }
-                    //accept button
-                    FullRoundedButton(
-                        modifier = Modifier
-                            .padding( vertical = 16.dp),
-                        buttonText = "Accept",
-                        enabled = viewModel.isCheckTermsConditions.value,
-                        textColor = MaterialTheme.colorScheme.background,
-                        backgroundColor = MaterialTheme.colorScheme.primary,
-                    ) {
-                        coroutineScope.launch {
-                            /*
-                            navController.navigate(Screen.GotoProfile.route +
-                                    "?accountType=${if(enrollmentType == EnrollmentType.CUSTOMER) 
-                                        AccountType.CUSTOMER.label else AccountType.PROVIDER.label}"
+                    if (!loadingState) {
+                        //accept button
+                        FullRoundedButton(
+                            modifier = Modifier
+                                .padding(vertical = 16.dp),
+                            buttonText = "Accept",
+                            enabled = viewModel.isCheckTermsConditions.value,
+                            textColor = MaterialTheme.colorScheme.background,
+                            backgroundColor = MaterialTheme.colorScheme.primary,
+                        ) {
+                            coroutineScope.launch {
+                                viewModel.createCustomerOrProvider()
+                            }
+                        }
+                    } else {
+                        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                            androidx.compose.material.CircularProgressIndicator(
+                                color = green1
                             )
-                             */
+                        }
+                    }
+
+                    when (EnrollmentViewModel.enrollmentType.value) {
+                        EnrollmentType.PROVIDER -> {
+                            when (createProviderState) {
+                                LoadingState.LOADING -> loadingState = true
+                                LoadingState.LOADED -> {
+                                    //go to provider dashboard
+                                    EnrollmentViewModel.currentEnrollmentType.value =
+                                        EnrollmentType.PROVIDER
+                                    LaunchedEffect(key1 = true) {
+                                        navController.navigate(P4pProviderScreens.ProviderDashboard.route) {
+                                            popUpTo(navController.graph.findStartDestination().id)
+                                            launchSingleTop = true
+                                        }
+                                    }
+                                }
+                                else -> loadingState = false
+                            }
+                        }
+                        else -> {
+                            when (createCustomerState) {
+                                LoadingState.LOADING -> loadingState = true
+                                LoadingState.LOADED -> {
+                                    //go to customer dashboard
+                                    EnrollmentViewModel.currentEnrollmentType.value =
+                                        EnrollmentType.CUSTOMER
+                                    Toast.makeText(
+                                        context,
+                                        "You have been successfully enrolled as a customer, there is no customer dashboard for now",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    loadingState = false
+                                }
+                                else -> loadingState = false
+                            }
                         }
                     }
                 }

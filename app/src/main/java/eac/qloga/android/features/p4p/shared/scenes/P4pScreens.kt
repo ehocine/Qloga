@@ -1,6 +1,5 @@
 package eac.qloga.android.features.p4p.shared.scenes
 
-import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 
 sealed class P4pScreens (
     val route: String,
@@ -9,6 +8,8 @@ sealed class P4pScreens (
     object Enrollment: P4pScreens("enrollment", "Enrollment")
     object VerifyPhone: P4pScreens("verify_phone", "Verify phone")
     object ConfirmAddress: P4pScreens("confirm_address", "Confirm address")
+    object ChoosingNewAddress : P4pScreens("choosing_new_address", "Choosing new address")
+    object SaveNewAddress : P4pScreens("save_new_address", "Save new address")
     object SelectLocationMap: P4pScreens("select_location_map","Your location")
     object IdVerification: P4pScreens("id_verification", "Identity verification")
     object Passport: P4pScreens("passport","Passport")
@@ -21,11 +22,13 @@ sealed class P4pScreens (
             Enrollment,
             VerifyPhone,
             ConfirmAddress,
+            ChoosingNewAddress,
+            SaveNewAddress,
             SelectLocationMap,
             IdVerification,
             Passport,
-            EnrollmentTermsConditions
+            EnrollmentTermsConditions,
+            ProviderSearch
         )}
-
     }
 }

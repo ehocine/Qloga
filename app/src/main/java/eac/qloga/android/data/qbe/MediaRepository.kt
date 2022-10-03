@@ -6,7 +6,6 @@ import eac.qloga.android.di.QLOGAApiService
 import eac.qloga.bare.dto.media.MediaMeta
 import eac.qloga.bare.enums.AccessLevel
 import eac.qloga.bare.enums.AvatarType
-import javax.inject.Inject
 
 class MediaRepository(@QLOGAApiService private val apiService: MediaApi) {
     //Media

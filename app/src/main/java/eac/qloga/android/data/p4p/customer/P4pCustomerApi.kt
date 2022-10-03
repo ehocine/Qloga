@@ -21,7 +21,7 @@ interface P4pCustomerApi {
 
     @POST("p4p/cst")
     suspend fun create(
-    ): Customer
+    ): Response<Customer>
 
     @GET("p4p/cst")
     suspend fun get(): Customer

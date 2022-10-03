@@ -1,11 +1,11 @@
 package eac.qloga.android.data.qbe
 
+import eac.qloga.android.data.shared.models.VrfPhone
 import eac.qloga.android.di.QLOGAApiService
 import eac.qloga.bare.dto.person.Person
 import eac.qloga.bare.enums.SettingsScope
-import javax.inject.Inject
 
-class PlatformRepository @Inject constructor(@QLOGAApiService private val apiService: PlatformApi) {
+class PlatformRepository(@QLOGAApiService private val apiService: PlatformApi) {
     //platform
     suspend fun getSettings(scope: SettingsScope, orgId: Long?, set: Boolean?) =
         apiService.getSettings(scope, orgId, set)
@@ -22,5 +22,5 @@ class PlatformRepository @Inject constructor(@QLOGAApiService private val apiSer
     suspend fun deleteVerification(id: Long) = apiService.deleteVerification(id)
     suspend fun getVerifications() = apiService.getVerifications()
     suspend fun getPhoneVerificationCode() = apiService.getPhoneVerificationCode()
-    suspend fun verifyPhone(code: Long) = apiService.verifyPhone(code)
+    suspend fun verifyPhone(code: VrfPhone) = apiService.verifyPhone(code)
 }

@@ -1,11 +1,10 @@
 package eac.qloga.android.features.p4p.showroom.shared.viewModels
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
@@ -61,6 +60,12 @@ class AddressViewModel @Inject constructor(
                     thoroughfare = "",
                 )
             ) else mutableStateOf(FullAddress())
+        var fullAddressLoadingState = MutableStateFlow(LoadingState.IDLE)
+        val addressSaved: MutableState<Boolean> = mutableStateOf(false)
+        val searchAddress: MutableState<Boolean> = mutableStateOf(false)
+        val selectedAddress: MutableState<Address> =
+            mutableStateOf(ApiViewModel.userProfile.value.contacts.address ?: Address())
+        var hasAddressSaved :MutableState<Boolean> =  mutableStateOf(ApiViewModel.userProfile.value.contacts.address != null)
     }
 
     private val _addressInputFieldState =
@@ -78,7 +83,7 @@ class AddressViewModel @Inject constructor(
             Parking.PAID -> ParkingType.PaidType
             else -> ParkingType.FreeType
         }
-    }else{
+    } else {
         ParkingType.FreeType
     }
     private val _parkingType = mutableStateOf(parking)
@@ -97,30 +102,30 @@ class AddressViewModel @Inject constructor(
         mutableStateOf(InputFieldState(text = fullAddress.value.postcode, hint = "Postcode"))
     val postCodeState: State<InputFieldState> = _postCodeState
 
-    private val _townState =
-        mutableStateOf(InputFieldState(text = fullAddress.value.townOrCity, hint = "Town"))
-    val townState: State<InputFieldState> = _townState
+    private val _line1State =
+        mutableStateOf(InputFieldState(text = fullAddress.value.line1, hint = "Line 1"))
+    val line1State: State<InputFieldState> = _line1State
 
-    private val _streetState =
-        mutableStateOf(InputFieldState(text = fullAddress.value.district, hint = "Street"))
-    val streetState: State<InputFieldState> = _streetState
+    private val _line2State =
+        mutableStateOf(InputFieldState(text = fullAddress.value.line2, hint = "Line 2"))
+    val line2State: State<InputFieldState> = _line2State
 
-    private val _buildingState =
+    private val _cityState =
         mutableStateOf(
             InputFieldState(
-                text = fullAddress.value.buildingNumber,
-                hint = "Building"
+                text = fullAddress.value.townOrCity,
+                hint = "City"
             )
         )
-    val buildingState: State<InputFieldState> = _buildingState
+    val cityState: State<InputFieldState> = _cityState
 
-    private val _apartmentsState = mutableStateOf(
+    private val _line3State = mutableStateOf(
         InputFieldState(
-            text = fullAddress.value.subBuildingNumber,
-            hint = "Apartments"
+            text = fullAddress.value.line3,
+            hint = "Line 3"
         )
     )
-    val apartmentsState: State<InputFieldState> = _apartmentsState
+    val line3State: State<InputFieldState> = _line3State
 
     private val _selectedMapLatLng = mutableStateOf<LatLng?>(null)
     val selectedMapLatLng: State<LatLng?> = _selectedMapLatLng
@@ -128,16 +133,10 @@ class AddressViewModel @Inject constructor(
     private val _selectedAddress = mutableStateOf("")
     val selectedAddress: State<String> = _selectedAddress
 
-    init {
-        getAddresses()
-        setAddressState()
-    }
-
     val addressSuggestionsList: MutableState<List<Suggestion>> = mutableStateOf(listOf())
 
     var getAddressSuggestionsLoadingState = MutableStateFlow(LoadingState.IDLE)
 
-    var fullAddressLoadingState = MutableStateFlow(LoadingState.IDLE)
 
     fun getAddressSuggestions(term: String) {
         viewModelScope.launch {
@@ -193,6 +192,7 @@ class AddressViewModel @Inject constructor(
         }
     }
 
+    @SuppressLint("LongLogTag")
     fun onTriggerEvent(event: AddressEvent) {
         try {
             viewModelScope.launch {
@@ -209,40 +209,39 @@ class AddressViewModel @Inject constructor(
                         _postCodeState.value =
                             _postCodeState.value.copy(isFocused = event.focusState.isFocused)
                     }
-                    is AddressEvent.EnterTown -> {
-                        _townState.value = _townState.value.copy(text = event.town)
+                    is AddressEvent.EnterCity -> {
+                        _cityState.value = _cityState.value.copy(text = event.city)
                     }
-                    is AddressEvent.FocusTown -> {
-                        _townState.value =
-                            _townState.value.copy(isFocused = event.focusState.isFocused)
+                    is AddressEvent.FocusCity -> {
+                        _cityState.value =
+                            _cityState.value.copy(isFocused = event.focusState.isFocused)
                     }
-                    is AddressEvent.EnterStreet -> {
-                        _streetState.value = _streetState.value.copy(text = event.street)
+                    is AddressEvent.EnterLine1 -> {
+                        _line1State.value = _line1State.value.copy(text = event.line1)
                     }
-                    is AddressEvent.FocusStreet -> {
-                        _streetState.value =
-                            _streetState.value.copy(isFocused = event.focusState.isFocused)
+                    is AddressEvent.FocusLine1 -> {
+                        _line1State.value =
+                            _line1State.value.copy(isFocused = event.focusState.isFocused)
                     }
-                    is AddressEvent.EnterBuilding -> {
-                        _buildingState.value = _buildingState.value.copy(text = event.building)
+                    is AddressEvent.EnterLine2 -> {
+                        _line2State.value = _line2State.value.copy(text = event.line2)
                     }
-                    is AddressEvent.FocusBuilding -> {
-                        _buildingState.value =
-                            _buildingState.value.copy(isFocused = event.focusState.isFocused)
+                    is AddressEvent.FocusLine2 -> {
+                        _line2State.value =
+                            _line2State.value.copy(isFocused = event.focusState.isFocused)
                     }
-                    is AddressEvent.EnterApartments -> {
-                        _apartmentsState.value =
-                            _apartmentsState.value.copy(text = event.apartments)
+                    is AddressEvent.EnterLine3 -> {
+                        _line3State.value =
+                            _line3State.value.copy(text = event.line3)
                     }
-                    is AddressEvent.FocusApartments -> {
-                        _apartmentsState.value =
-                            _apartmentsState.value.copy(isFocused = event.focusState.isFocused)
+                    is AddressEvent.FocusLine3 -> {
+                        _line3State.value =
+                            _line3State.value.copy(isFocused = event.focusState.isFocused)
                     }
                     is AddressEvent.EnterText -> {
                         _addressInputFieldState.value = addressInputFieldState.value.copy(
                             text = event.text
                         )
-                        getAddresses()
                     }
 
                     is AddressEvent.ClearInput -> {
@@ -273,6 +272,7 @@ class AddressViewModel @Inject constructor(
     var saveFamilyAddressLoadingState = MutableStateFlow(LoadingState.IDLE)
     val saveAddressResponse: MutableState<Address> = mutableStateOf(Address())
 
+    @SuppressLint("LongLogTag")
     @RequiresApi(Build.VERSION_CODES.O)
     fun onSaveNewAddress(newAddress: Address) {
         viewModelScope.launch {
@@ -290,13 +290,6 @@ class AddressViewModel @Inject constructor(
                 e.printStackTrace()
             }
         }
-
-
-        val addrList = ArrayList<String>(_listOfAddress.value)
-        Log.d(TAG, "onSaveNewAddress: ${_addressInputFieldState.value.text}")
-        addrList.add(_addressInputFieldState.value.text)
-        Log.d(TAG, "onSaveNewAddress: $addrList")
-        _listOfAddress.value = addrList
     }
 
     var switchToAddressLoadingState = MutableStateFlow(LoadingState.IDLE)
@@ -319,10 +312,31 @@ class AddressViewModel @Inject constructor(
         }
     }
 
+    var updateAddressLoadingState = MutableStateFlow(LoadingState.IDLE)
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun updateAddress(address: Address) {
+
+        viewModelScope.launch {
+            try {
+                updateAddressLoadingState.emit(LoadingState.LOADING)
+                val response = familiesRepository.updateAddress(address)
+                if (response.isSuccessful) {
+                    saveAddressResponse.value = response.body()!!
+                    updateAddressLoadingState.emit(LoadingState.LOADED)
+                } else {
+                    updateAddressLoadingState.emit(LoadingState.ERROR)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                updateAddressLoadingState.emit(LoadingState.ERROR)
+            }
+        }
+
+    }
+
     private fun onClickMap(latLng: LatLng) {
         _selectedMapLatLng.value = latLng
-        //parse address using geo coding here
-        setAddressState()
     }
 
     private fun onSearch() {
@@ -333,42 +347,9 @@ class AddressViewModel @Inject constructor(
         _parkingType.value = parkingType
     }
 
-    fun setAddress(address: String) {
-        _selectedAddress.value = address
-    }
-
-    private fun getAddresses() {
-        _listOfAddress.value = listOf(
-            "09 Princes Street, Edinburgh, GB",
-            "3 Lupus St, Pimlico, London, GB",
-            "Barnett House 53, Fountain Street, Manchester, GB",
-            "30 Cloth Market, Merchant House, Newcastle upon Tyne, GB",
-            "05 West George Street, Glasgow, GB",
-            "54 George Street, Edinburgh, GB",
-            "St Martin-in-the-Fields Trafalgar Square, London, GB",
-            "14 St Mary's Pl, Newcastle upon Tyne, GB"
-        )
-        _selectedAddress.value = _listOfAddress.value[0]
-    }
-
-    fun setAddressState() {
-        _addressState.value = addressState.value.copy(
-            postCode = fullAddress.value.postcode,
-            town = fullAddress.value.townOrCity,
-            street = fullAddress.value.district,
-            building = fullAddress.value.buildingNumber,
-            apartments = fullAddress.value.subBuildingNumber
-        )
-    }
-
     private fun clearInputState() {
         _addressInputFieldState.value = addressInputFieldState.value.copy(
             text = ""
         )
-    }
-
-    fun clearAddressState() {
-        _addressState.value = AddressState()
-        clearInputState()
     }
 }

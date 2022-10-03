@@ -36,12 +36,12 @@ interface FamiliesApi {
     @GET("qbe/families/addresses")
     suspend fun getAddresses(
         @Query("fid") fid: Long?
-    ): List<Address>
+    ): Response<List<Address>>
 
     @PUT("qbe/families/addresses")
     suspend fun updateAddress(
         @Body address: Address
-    ): Address
+    ): Response<Address>
 
     @DELETE("qbe/families/addresses/{aid}")
     suspend fun deleteAddress(

@@ -1,5 +1,7 @@
 package eac.qloga.android.features.p4p.showroom.scenes.enrolled
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,6 +22,9 @@ import eac.qloga.android.core.shared.theme.green1
 import eac.qloga.android.core.shared.viewmodels.ApiViewModel
 import eac.qloga.android.core.shared.viewmodels.AuthenticationViewModel
 import eac.qloga.android.features.p4p.provider.scenes.P4pProviderScreens
+import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
+import eac.qloga.android.features.p4p.shared.utils.EnrollmentType
+import eac.qloga.android.features.p4p.shared.viewmodels.EnrollmentViewModel
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import eac.qloga.android.features.p4p.showroom.shared.components.ItemCard
 import eac.qloga.android.features.p4p.showroom.shared.components.LeftNavBar
@@ -43,6 +48,8 @@ fun EnrolledScreen(
     }.sortedBy {
         it.catGroupOrder
     }
+    val currentEnrollment by EnrollmentViewModel.currentEnrollmentType
+    Log.d("Tag", "currentEnrollment: $currentEnrollment")
 
     Scaffold { paddingValues ->
 
@@ -78,21 +85,60 @@ fun EnrolledScreen(
             ) {
                 CustomerCard(
                     onClickCard = {
-                       scope.launch {
-                                 navController.navigate(P4pCustomerScreens.CustomerDashboard.route){
-                                   launchSingleTop = true
-                             }
-                       }
+                        when(currentEnrollment){
+                            EnrollmentType.CUSTOMER->{
+                                //User is already a customer, we go to customer dashboard
+                                Toast.makeText(
+                                    context,
+                                    "You are already a customer, Customer dashboard not yet implemented",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                            EnrollmentType.PROVIDER->{
+                                //User is already a provider and wants to become a customer
+                                EnrollmentViewModel.enrollmentType.value = EnrollmentType.CUSTOMER
+                                scope.launch {
+                                    navController.navigate(P4pScreens.Enrollment.route)
+                                }
+                            }
+                            else->{
+                                //User is already a customer, we go to customer dashboard
+                                Toast.makeText(
+                                    context,
+                                    "You are already a customer, Customer dashboard not yet implemented",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
                     }
                 )
                 ProviderCard(
                     onClickCard = {
-                                   scope.launch {
-                                       navController.navigate(P4pProviderScreens.ProviderDashboard.route) {
-                                           launchSingleTop = true
-                                       }
-                                   }
-                             }
+                        when(currentEnrollment){
+                            EnrollmentType.PROVIDER->{
+                                //User is already a provider, we go to provider dashboard
+                                scope.launch {
+                                    navController.navigate(P4pProviderScreens.ProviderDashboard.route) {
+                                        launchSingleTop = true
+                                    }
+                                }
+                            }
+                            EnrollmentType.CUSTOMER->{
+                                //User is already a customer and wants to become a provider
+                                EnrollmentViewModel.enrollmentType.value = EnrollmentType.PROVIDER
+                                scope.launch {
+                                    navController.navigate(P4pScreens.Enrollment.route)
+                                }
+                            }
+                            else->{
+                                scope.launch {
+                                    navController.navigate(P4pProviderScreens.ProviderDashboard.route) {
+                                        launchSingleTop = true
+                                    }
+                                }
+                            }
+                        }
+                    }
                 )
                 when (oktaState) {
                     is BrowserState.Loading -> {

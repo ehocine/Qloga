@@ -27,7 +27,7 @@ interface P4pProviderApi {
     @POST("p4p/prv")
     suspend fun create(
         @Body body: Provider
-    ): Provider
+    ): Response<Provider>
 
     @PATCH("p4p/prv")
     suspend fun update(

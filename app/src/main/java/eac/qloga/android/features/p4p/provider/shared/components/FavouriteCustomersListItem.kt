@@ -1,11 +1,9 @@
 package eac.qloga.android.features.p4p.provider.shared.components
 
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowForwardIos
@@ -19,9 +17,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
-import eac.qloga.android.R
 import eac.qloga.android.core.shared.components.Buttons.FullRoundedButton
 import eac.qloga.android.core.shared.components.DividerLines.LightDividerLine
 import eac.qloga.android.core.shared.components.PulsePlaceholder

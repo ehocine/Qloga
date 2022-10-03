@@ -35,7 +35,7 @@ fun IdVerificationScreen(
     viewModel: EnrollmentViewModel = hiltViewModel()
 ) {
     val containerHorizontalPadding = 24.dp
-    val enrollmentType = viewModel.enrollmentType.value
+    val enrollmentType = EnrollmentViewModel.enrollmentType.value
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -55,8 +55,7 @@ fun IdVerificationScreen(
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                ,
+                    .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
@@ -70,8 +69,7 @@ fun IdVerificationScreen(
                             .fillMaxWidth(.5f)
                             .height(20.dp)
                             .align(Alignment.CenterStart)
-                            .padding(end = 20.dp)
-                        ,
+                            .padding(end = 20.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         DottedLine(
@@ -84,7 +82,7 @@ fun IdVerificationScreen(
                         modifier = Modifier
                             .size(40.dp)
                             .align(Alignment.Center)
-                    ){
+                    ) {
                         DotCircleArcCanvas(
                             arcStrokeColor = gray1,
                             circleColor = MaterialTheme.colorScheme.primary
@@ -96,8 +94,7 @@ fun IdVerificationScreen(
                             .fillMaxWidth(.5f)
                             .height(20.dp)
                             .align(Alignment.CenterEnd)
-                            .padding(start = 20.dp)
-                        ,
+                            .padding(start = 20.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         DottedLine(
@@ -135,23 +132,32 @@ fun IdVerificationScreen(
                     }
                 }
 
-                DocumentTypeItem(iconId = R.drawable.ic_drivers_license, label = "Driver's License") {
+                DocumentTypeItem(
+                    iconId = R.drawable.ic_drivers_license,
+                    label = "Driver's License"
+                ) {
                     // TODO onDriversLicense()
                 }
 
-                DocumentTypeItem(iconId = R.drawable.ic_national_id, label = "National Identity Card") {
+                DocumentTypeItem(
+                    iconId = R.drawable.ic_national_id,
+                    label = "National Identity Card"
+                ) {
                     // TODO onNationalId()
                 }
 
-                DocumentTypeItem(iconId = R.drawable.ic_residence_pr, label = "Residence Permit Card") {
+                DocumentTypeItem(
+                    iconId = R.drawable.ic_residence_pr,
+                    label = "Residence Permit Card"
+                ) {
                     // TODO onResidencePR()
                 }
             }
 
             Column(
-                modifier= Modifier.align(Alignment.BottomCenter)
+                modifier = Modifier.align(Alignment.BottomCenter)
             ) {
-                if(enrollmentType == EnrollmentType.CUSTOMER){
+                if (enrollmentType == EnrollmentType.CUSTOMER) {
                     //skip button
                     FullRoundedButton(
                         modifier = Modifier
@@ -163,7 +169,7 @@ fun IdVerificationScreen(
                         showBorder = true
                     ) {
                         coroutineScope.launch {
-                            navController.navigate(P4pScreens.EnrollmentTermsConditions.route){
+                            navController.navigate(P4pScreens.EnrollmentTermsConditions.route) {
                                 launchSingleTop = true
                             }
                         }
@@ -179,7 +185,7 @@ fun IdVerificationScreen(
                     backgroundColor = MaterialTheme.colorScheme.primary,
                 ) {
                     coroutineScope.launch {
-                        navController.navigate(P4pScreens.EnrollmentTermsConditions.route){
+                        navController.navigate(P4pScreens.EnrollmentTermsConditions.route) {
                             launchSingleTop = true
                         }
                     }

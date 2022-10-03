@@ -45,7 +45,7 @@ fun ConfirmAddressScreen(
     val infoMsg = "Your address is required to proceed with the order."
     val infoMsgInput = "You can start by typing postcode or first line of your address"
     val containerHorizontalPadding = 24.dp
-    val enrollmentType = viewModel.enrollmentType.value
+    val enrollmentType = EnrollmentViewModel.enrollmentType.value
     val focusManager = LocalFocusManager.current
 
     val coroutineScope = rememberCoroutineScope()

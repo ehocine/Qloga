@@ -56,7 +56,6 @@ fun AddressCardItem(
                             color = gray30
                         )
                     }
-
                     if(editable){
                         EditTextInputField(
                             modifier = Modifier.fillMaxWidth(),
@@ -88,5 +87,5 @@ fun AddressCardItem(
 @Preview(showBackground = true)
 @Composable
 fun PreviewAddressCard() {
-    AddressCardItem("Apartments", value = "12")
+    AddressCardItem("Line 1", hint = "Line 1", value = "")
 }

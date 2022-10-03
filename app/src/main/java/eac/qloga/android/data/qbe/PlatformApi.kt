@@ -1,5 +1,6 @@
 package eac.qloga.android.data.qbe
 
+import eac.qloga.android.data.shared.models.VrfPhone
 import eac.qloga.bare.dto.Verification
 import eac.qloga.bare.dto.person.Family
 import eac.qloga.bare.dto.person.Person
@@ -62,11 +63,10 @@ interface PlatformApi {
 
     @GET("qbe/user/phone")
     suspend fun getPhoneVerificationCode(
-    ): Long
+    ): Response<Long>
 
     @PUT("qbe/user/phone")
     suspend fun verifyPhone(
-        @Body code: Long
-    ): Object
-
+        @Body code: VrfPhone
+    ): Response<Unit>
 }

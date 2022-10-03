@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import eac.qloga.android.R
 import eac.qloga.android.core.shared.theme.QLOGATheme
 import eac.qloga.android.core.shared.theme.gray1
-
 @Composable
 fun SearchBar(
     modifier: Modifier = Modifier,
@@ -100,4 +99,5 @@ fun PreviewSearchBar(){
         ){}
     }
 }
+
 

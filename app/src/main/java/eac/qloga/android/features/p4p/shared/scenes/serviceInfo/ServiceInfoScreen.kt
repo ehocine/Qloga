@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowForwardIos
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -17,13 +18,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
@@ -32,9 +31,9 @@ import eac.qloga.android.NavigationActions
 import eac.qloga.android.core.shared.components.PulsePlaceholder
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.theme.gray30
+import eac.qloga.android.core.shared.theme.green1
 import eac.qloga.android.core.shared.utils.CONTAINER_TOP_PADDING
 import eac.qloga.android.features.p4p.shared.scenes.P4pSharedScreens
-import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import eac.qloga.android.features.p4p.showroom.shared.components.ExpandableConditionsListItem
 import eac.qloga.android.features.p4p.showroom.shared.components.SelectedListItem
 import eac.qloga.android.features.p4p.showroom.shared.components.StatusButton
@@ -55,7 +54,6 @@ fun ServiceInfoScreen(
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
 
-
     Scaffold(
         topBar = {
             TitleBar(
@@ -75,7 +73,6 @@ fun ServiceInfoScreen(
         ) {
             Spacer(modifier = Modifier.height(topPadding))
             Spacer(modifier = Modifier.height(containerTopPadding))
-
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = selectedService?.name ?: "",
@@ -163,6 +160,7 @@ fun ServiceInfoScreen(
                     when (painter.state) {
                         is AsyncImagePainter.State.Loading -> {
                             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator(color = green1)
                                 PulsePlaceholder(
                                     modifier = Modifier.width(imageWidth),
                                     roundedCornerShape = RoundedCornerShape(8.dp)
@@ -188,15 +186,28 @@ fun ServiceInfoScreen(
                     label = it.descr
                 )
             }
-
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = "Conditions: ",
                 style = MaterialTheme.typography.titleMedium
             )
 
+//            Text(
+//                modifier = Modifier.fillMaxWidth(),
+//                text = "Conditions: ",
+//                style = MaterialTheme.typography.titleMedium
+//            )
+//
+//            Spacer(Modifier.height(8.dp))
+//
+//            conditionsList.forEach {
+//                ExpandableConditionsListItem(
+//                    label = it.name,
+//                    description = it.descr
+//                )
+//                Spacer(Modifier.height(8.dp))
+//            }
             Spacer(Modifier.height(8.dp))
-
             conditions.forEach { _ ->
                 ExpandableConditionsListItem(
                     label = "",

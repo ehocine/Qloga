@@ -84,6 +84,8 @@ private fun BuildScreen() {
                     customers(navController)
                     favouriteCustomer(navController)
                     noAddress(navController)
+                    chooseNewAddress(navController)
+                    saveNewAddress(navController)
                     providerServices(navController)
                     providerWorkingSchedule(navController)
                     ratingDetails(actions)

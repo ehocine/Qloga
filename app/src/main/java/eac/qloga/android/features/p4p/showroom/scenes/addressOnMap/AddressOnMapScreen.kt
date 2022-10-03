@@ -28,17 +28,11 @@ fun MapViewScreen(
     navController: NavController,
     viewModel: AddressViewModel = hiltViewModel()
 ) {
-//    val regues = LatLng(54.9715, -1.6123)
     val regues = LatLng(
         AddressViewModel.fullAddress.value.latitude,
         AddressViewModel.fullAddress.value.longitude
     )
-    val mapLatLng = viewModel.selectedMapLatLng.value
-    val markerTitle = viewModel.addressState.value.postCode + " " +
-            viewModel.addressState.value.street + "," +
-            viewModel.addressState.value.town + "-" +
-            viewModel.addressState.value.building
-
+    val markerTitle = AddressViewModel.fullAddress.value.formattedAddress[0]
     val scope = rememberCoroutineScope()
 
     Scaffold(
@@ -68,8 +62,8 @@ fun MapViewScreen(
             Spacer(modifier = Modifier.height(titleBarHeight))
 
             AddressMapView(
-                latitude = mapLatLng?.latitude ?: regues.latitude,
-                longitude = mapLatLng?.longitude ?: regues.longitude,
+                latitude = regues.latitude,
+                longitude = regues.longitude,
                 title = markerTitle,
                 onClickMap = { viewModel.onTriggerEvent(AddressEvent.ClickMap(it)) }
             )

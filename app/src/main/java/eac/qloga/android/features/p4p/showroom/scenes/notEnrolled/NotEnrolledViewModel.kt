@@ -1,5 +1,6 @@
 package eac.qloga.android.features.p4p.showroom.scenes.notEnrolled
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
@@ -69,6 +70,7 @@ class NotEnrolledViewModel @Inject constructor(
         getProvidersCoordinates()
     }
 
+    @SuppressLint("LongLogTag")
     fun onTriggerEvent(event: NotEnrolledEvent) {
         try {
             viewModelScope.launch {

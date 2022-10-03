@@ -1,5 +1,7 @@
 package eac.qloga.android.features.p4p.shared.scenes.enrollment
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
@@ -11,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,13 +24,14 @@ import androidx.navigation.NavController
 import eac.qloga.android.core.shared.components.Buttons.FullRoundedButton
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.utils.CONTAINER_TOP_PADDING
+import eac.qloga.android.core.shared.viewmodels.ApiViewModel
 import eac.qloga.android.features.p4p.shared.components.EnrollmentStepsInfo
 import eac.qloga.android.features.p4p.shared.components.VerifyPhoneInfo
 import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
-import eac.qloga.android.features.p4p.shared.utils.EnrollmentType
 import eac.qloga.android.features.p4p.shared.viewmodels.EnrollmentViewModel
 import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun EnrollmentScreen(
@@ -37,13 +41,16 @@ fun EnrollmentScreen(
 
     val containerTopPadding = CONTAINER_TOP_PADDING.dp
     val containerHorizontalPadding = 24.dp
-    val enrollmentType = viewModel.enrollmentType.value
+    val enrollmentType = EnrollmentViewModel.enrollmentType.value
 
     val coroutineScope = rememberCoroutineScope()
-    val modalBottomSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    val modalBottomSheetState =
+        rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
 
-    LaunchedEffect(Unit){
-        viewModel.setEnrollmentType(EnrollmentType.CUSTOMER)
+    val currentUser by ApiViewModel.userProfile
+
+    LaunchedEffect(key1 = true) {
+        viewModel.getAddresses(currentUser.familyId)
     }
 
     ModalBottomSheetLayout(
@@ -70,9 +77,9 @@ fun EnrollmentScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(start = containerHorizontalPadding)
-                        // padding is only for start because the divider line
-                        // touches end of the screen. right -> end padding is manually
-                        // added inside the each items
+                    // padding is only for start because the divider line
+                    // touches end of the screen. right -> end padding is manually
+                    // added inside the each items
                     ,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -83,9 +90,11 @@ fun EnrollmentScreen(
                     enrollmentType?.let {
                         EnrollmentStepsInfo(
                             enrollmentType = it,
-                            onVerifyPhoneInfo = { coroutineScope.launch {
-                                modalBottomSheetState.show()
-                            }},
+                            onVerifyPhoneInfo = {
+                                coroutineScope.launch {
+                                    modalBottomSheetState.show()
+                                }
+                            },
                             onConfirmAddressInfo = {},
                             onIdVerificationsInfo = {},
                             onAcceptTermsConditionsInfo = {}

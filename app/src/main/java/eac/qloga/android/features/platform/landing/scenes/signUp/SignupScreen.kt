@@ -45,7 +45,6 @@ import eac.qloga.android.core.shared.utils.*
 import eac.qloga.android.features.platform.landing.scenes.LandingScreens
 import eac.qloga.bare.enums.Gender
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)

@@ -30,6 +30,7 @@ import eac.qloga.android.features.p4p.provider.scenes.favouriteCustomers.Favouri
 import eac.qloga.android.features.p4p.provider.scenes.orders.ProviderOrdersScreen
 import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
 import eac.qloga.android.features.p4p.shared.scenes.P4pSharedScreens
+import eac.qloga.android.features.p4p.shared.scenes.choosingNewAddress.ChoosingNewAddressScreen
 import eac.qloga.android.features.p4p.shared.scenes.confirmAddress.ConfirmAddressScreen
 import eac.qloga.android.features.p4p.shared.scenes.contactDetails.ContactDetailsScreen
 import eac.qloga.android.features.p4p.shared.scenes.enrollment.EnrollmentScreen
@@ -38,6 +39,7 @@ import eac.qloga.android.features.p4p.shared.scenes.passport.PassportScreen
 import eac.qloga.android.features.p4p.shared.scenes.providerSearch.ProviderSearchScreen
 import eac.qloga.android.features.p4p.shared.scenes.ratingDetails.RatingDetailsScreen
 import eac.qloga.android.features.p4p.shared.scenes.reviews.ReviewsScreen
+import eac.qloga.android.features.p4p.shared.scenes.saveNewAddress.SaveNewAddressScreen
 import eac.qloga.android.features.p4p.shared.scenes.selectLocationMap.SelectLocationScreen
 import eac.qloga.android.features.p4p.shared.scenes.serviceInfo.ServiceInfoScreen
 import eac.qloga.android.features.p4p.shared.scenes.serviceinfoedit.ServiceInfoEditScreen
@@ -51,6 +53,7 @@ import eac.qloga.android.features.p4p.showroom.scenes.categories.CategoriesScree
 import eac.qloga.android.features.p4p.showroom.scenes.enrolled.EnrolledScreen
 import eac.qloga.android.features.p4p.showroom.scenes.notEnrolled.NotEnrolledScreen
 import eac.qloga.android.features.p4p.showroom.scenes.portfolioAlbums.PortfolioAlbumsScreen
+import eac.qloga.android.features.p4p.showroom.scenes.preoviderDetails.ProviderDetailsScreen
 import eac.qloga.android.features.p4p.showroom.scenes.providerDetails.ProviderDetailsScreen
 import eac.qloga.android.features.p4p.showroom.scenes.providerServices.ProviderServicesScreen
 import eac.qloga.android.features.p4p.showroom.scenes.providerWorkingSchedule.ProviderWorkingScheduleScreen
@@ -356,13 +359,13 @@ fun NavGraphBuilder.signupTermsConds(
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.providers(
     navController: NavController,
-){
+) {
     composable(
         P4pScreens.ProviderSearch.route+"?$PARENT_ROUTE_KEY={$PARENT_ROUTE_KEY}",
         arguments = listOf(
             navArgument(
                 name = PARENT_ROUTE_KEY
-            ){
+            ) {
                 type = NavType.StringType
                 defaultValue = ""
             }
@@ -379,6 +382,7 @@ fun NavGraphBuilder.providers(
         )
     }
 }
+
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.providersDetails(
@@ -420,7 +424,7 @@ fun NavGraphBuilder.albums(
                 defaultValue = ""
             }
         ),
-        enterTransition = { enterTransition()},
+        enterTransition = { enterTransition() },
         popEnterTransition = { popEnterTransition() },
         popExitTransition = { popExitTransition() },
         exitTransition = { exitTransition() }
@@ -437,7 +441,7 @@ fun NavGraphBuilder.albums(
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.providerDashboard(
     navController: NavController
-){
+) {
     composable(
         route = P4pProviderScreens.ProviderDashboard.route,
         enterTransition = { enterTransition()},
@@ -448,7 +452,6 @@ fun NavGraphBuilder.providerDashboard(
         ProviderDashboardScreen(navController = navController )
     }
 }
-
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.providerOrders(
@@ -468,6 +471,7 @@ fun NavGraphBuilder.providerOrders(
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.favouriteCustomers(
     navController: NavController
@@ -486,11 +490,10 @@ fun NavGraphBuilder.favouriteCustomers(
     }
 }
 
-
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.customers(
     navController: NavController,
-){
+) {
     composable(
         route = P4pProviderScreens.Customers.route,
         enterTransition = { enterTransition()},
@@ -504,10 +507,28 @@ fun NavGraphBuilder.customers(
     }
 }
 
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.providersDetails(
+    navController: NavController
+) {
+    composable(
+        P4pShowroomScreens.ProviderDetails.route,
+        enterTransition = { enterTransition() },
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ) {
+        ProviderDetailsScreen(
+            navController = navController
+        )
+    }
+}
+
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.favouriteCustomer(
     navController: NavController
-){
+) {
     composable(
         route = P4pProviderScreens.FavouriteCustomer.route+
                 "?$CUSTOMER_ID={$CUSTOMER_ID}&&$PROVIDER_ID={$PROVIDER_ID}",
@@ -553,6 +574,154 @@ fun NavGraphBuilder.noAddress(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.enrollment(
+    navController: NavController
+) {
+    composable(
+        P4pScreens.Enrollment.route,
+        enterTransition = { enterTransition() },
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ) {
+        EnrollmentScreen(
+            navController = navController,
+        )
+    }
+}
+
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.verifyPhone(
+    navController: NavController,
+) {
+    composable(
+        P4pScreens.VerifyPhone.route,
+        enterTransition = { enterTransition() },
+
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ) {
+        VerifyPhoneScreen(
+            navController = navController
+        )
+    }
+}
+
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.chooseNewAddress(
+    navController: NavController
+) {
+    composable(
+        P4pScreens.ChoosingNewAddress.route,
+        enterTransition = { enterTransition() },
+
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ) {
+        ChoosingNewAddressScreen(
+            navController = navController
+        )
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.saveNewAddress(
+    navController: NavController
+) {
+    composable(
+        P4pScreens.SaveNewAddress.route,
+        enterTransition = { enterTransition() },
+
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ) {
+        SaveNewAddressScreen(
+            navController = navController
+        )
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.userLocationMapView(
+    navController: NavController
+) {
+    composable(
+        P4pScreens.SelectLocationMap.route,
+        enterTransition = { enterTransition() },
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ) {
+        SelectLocationScreen(
+            navController = navController
+        )
+    }
+}
+
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.identityVerification(
+    navController: NavController
+) {
+    composable(
+        P4pScreens.IdVerification.route,
+        enterTransition = { enterTransition() },
+
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ) {
+        IdVerificationScreen(
+            navController = navController
+        )
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.passport(
+    navController: NavController,
+) {
+    composable(
+        P4pScreens.Passport.route,
+        enterTransition = { enterTransition() },
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ) {
+        PassportScreen(
+            navController = navController
+        )
+    }
+}
+
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.enrollmentTermsConditions(
+    navController: NavController,
+) {
+    composable(
+        P4pScreens.EnrollmentTermsConditions.route,
+        enterTransition = { enterTransition() },
+
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ) {
+        EnrollmentTcScreen(
+            navController = navController
+        )
+    }
+}
+
+
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.providerServices(
     navController: NavController
@@ -570,40 +739,6 @@ fun NavGraphBuilder.providerServices(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
-fun NavGraphBuilder.enrollment(
-    navController: NavController
-){
-    composable(
-        P4pScreens.Enrollment.route,
-        enterTransition = { enterTransition()},
-        popEnterTransition = { popEnterTransition() },
-        popExitTransition = { popExitTransition() },
-        exitTransition = { exitTransition() }
-    ){
-        EnrollmentScreen(
-            navController = navController,
-        )
-    }
-}
-
-@OptIn(ExperimentalAnimationApi::class)
-fun NavGraphBuilder.verifyPhone(
-    navController: NavController,
-){
-    composable(
-        P4pScreens.VerifyPhone.route,
-        enterTransition = { enterTransition()},
-
-        popEnterTransition = { popEnterTransition() },
-        popExitTransition = { popExitTransition() },
-        exitTransition = { exitTransition() }
-    ){
-        VerifyPhoneScreen(
-            navController = navController
-        )
-    }
-}
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalAnimationApi::class)
@@ -641,58 +776,7 @@ fun NavGraphBuilder.confirmAddress(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
-fun NavGraphBuilder.userLocationMapView(
-    navController: NavController
-){
-    composable(
-        P4pScreens.SelectLocationMap.route,
-        enterTransition = { enterTransition()},
-        popEnterTransition = { popEnterTransition() },
-        popExitTransition = { popExitTransition() },
-        exitTransition = { exitTransition() }
-    ){
-        SelectLocationScreen(
-            navController = navController
-        )
-    }
-}
 
-
-@OptIn(ExperimentalAnimationApi::class)
-fun NavGraphBuilder.identityVerification(
-    navController: NavController
-){
-    composable(
-        P4pScreens.IdVerification.route,
-        enterTransition = { enterTransition()},
-
-        popEnterTransition = { popEnterTransition() },
-        popExitTransition = { popExitTransition() },
-        exitTransition = { exitTransition() }
-    ){
-        IdVerificationScreen(
-            navController = navController
-        )
-    }
-}
-
-@OptIn(ExperimentalAnimationApi::class)
-fun NavGraphBuilder.passport(
-    navController: NavController,
-){
-    composable(
-        P4pScreens.Passport.route,
-        enterTransition = { enterTransition()},
-        popEnterTransition = { popEnterTransition() },
-        popExitTransition = { popExitTransition() },
-        exitTransition = { exitTransition() }
-    ){
-        PassportScreen(
-            navController = navController
-        )
-    }
-}
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.ratingDetails(
@@ -751,24 +835,6 @@ fun NavGraphBuilder.verifications(
         exitTransition = { exitTransition() }
     ) {
         VerificationsScreen(navigationActions = navActions)
-    }
-}
-
-@OptIn(ExperimentalAnimationApi::class)
-fun NavGraphBuilder.enrollmentTermsConditions(
-    navController: NavController,
-){
-    composable(
-        P4pScreens.EnrollmentTermsConditions.route,
-        enterTransition = { enterTransition()},
-
-        popEnterTransition = { popEnterTransition() },
-        popExitTransition = { popExitTransition() },
-        exitTransition = { exitTransition() }
-    ){
-        EnrollmentTcScreen(
-            navController = navController
-        )
     }
 }
 

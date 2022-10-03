@@ -61,7 +61,7 @@ fun NoAddressScreen(
     // to avoid resize the layout automatically
     activity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
 
-    DisposableEffect(true){
+    DisposableEffect(true) {
         onDispose {
             //make adjustResize to rest of screen
             activity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
@@ -99,10 +99,9 @@ fun NoAddressScreen(
             ) {
                 Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                    ,
+                        .fillMaxSize(),
                     contentAlignment = Alignment.Center
-                ){
+                ) {
                     Image(
                         painter = rememberAsyncImagePainter(model = R.drawable.curvy_back_15),
                         contentDescription = null,

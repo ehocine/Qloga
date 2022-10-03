@@ -10,7 +10,7 @@ import retrofit2.http.*
 interface OrgsApi {
 
     @GET("qbe/orgs")
-    suspend fun getOrgs(): List<Org>
+    suspend fun getOrgs(): Response<List<Org>>
 
     @PUT("qbe/orgs")
     suspend fun update(
@@ -42,7 +42,7 @@ interface OrgsApi {
     suspend fun addOffTime(
         @Path("oid") oid: Long,
         @Path("record") record: OffTime,
-    ) : Response<Unit>
+    ): Response<Unit>
 
     @DELETE("qbe/orgs/{oid}")
     suspend fun deleteOffTime(
@@ -53,7 +53,7 @@ interface OrgsApi {
     @POST("qbe/orgs/{oid}/work-hours")
     suspend fun setWorkingHours(
         @Path("oid") oid: Long,
-        @Path("hrs") hrs:  List<WorkHours>
+        @Path("hrs") hrs: List<WorkHours>
     ): Response<Unit>
 
     //0

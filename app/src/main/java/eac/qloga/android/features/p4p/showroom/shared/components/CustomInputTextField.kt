@@ -113,11 +113,11 @@ fun CustomInputTextField(
                     if(showBottomLine){
                         Spacer(modifier = Modifier.height(3.dp))
                         Box(modifier = Modifier
-                                .alpha(.3f)
-                                .height(bottomBorderWidth)
-                                .fillMaxWidth()
-                                .padding(horizontal = bottomBorderPadding)
-                                .background( bottomLineColor?: gray1)
+                            .alpha(.3f)
+                            .height(bottomBorderWidth)
+                            .fillMaxWidth()
+                            .padding(horizontal = bottomBorderPadding)
+                            .background( bottomLineColor?: gray1)
                         )
                     }
                 }

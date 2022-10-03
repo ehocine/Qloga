@@ -2,15 +2,18 @@ package eac.qloga.android.features.p4p.showroom.scenes.addAddress
 
 import android.app.Activity
 import android.os.Build
+import android.util.Log
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -18,7 +21,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -30,20 +32,20 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import eac.qloga.android.R
+import eac.qloga.android.core.shared.components.Buttons
 import eac.qloga.android.core.shared.components.SaveButton
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.components.address.AddressCard
 import eac.qloga.android.core.shared.components.address.AddressSearchBar
+import eac.qloga.android.core.shared.theme.dangerRed
+import eac.qloga.android.core.shared.theme.green1
 import eac.qloga.android.core.shared.utils.CONTAINER_TOP_PADDING
 import eac.qloga.android.core.shared.utils.InputFieldState
 import eac.qloga.android.core.shared.utils.LoadingState
 import eac.qloga.android.core.shared.viewmodels.ApiViewModel
-import eac.qloga.android.data.shared.models.address_suggestions.Suggestion
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import eac.qloga.android.features.p4p.showroom.shared.components.ParkingSelection
-import eac.qloga.android.features.p4p.showroom.shared.components.SearchBar
 import eac.qloga.android.features.p4p.showroom.shared.viewModels.AddressViewModel
-import eac.qloga.android.features.platform.landing.scenes.noAddress.NoAddressEvent
 import eac.qloga.bare.dto.person.Address
 import eac.qloga.bare.enums.Parking
 import kotlinx.coroutines.launch
@@ -56,6 +58,7 @@ fun AddAddressScreen(
     viewModel: AddressViewModel = hiltViewModel(),
     apiViewModel: ApiViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val containerTopPadding = CONTAINER_TOP_PADDING.dp
     val containerHorizontalPadding = 24.dp
 
@@ -66,17 +69,24 @@ fun AddAddressScreen(
 
     val addressSuggestionsLoadingState by viewModel.getAddressSuggestionsLoadingState.collectAsState()
     val addressSuggestions by viewModel.addressSuggestionsList
-
+    val currentUser by ApiViewModel.userProfile
     var expanded by remember { mutableStateOf(false) }
     var parentSize by remember { mutableStateOf(IntSize.Zero) }
 
-    val currentUser by ApiViewModel.userProfile
+    val selectedAddress by remember {
+        mutableStateOf(
+            AddressViewModel.selectedAddress
+        )
+    }
 
-    val fullAddressLoadingState by viewModel.fullAddressLoadingState.collectAsState()
+    val fullAddressLoadingState by AddressViewModel.fullAddressLoadingState.collectAsState()
 
     val saveFamilyAddressLoadingState by viewModel.saveFamilyAddressLoadingState.collectAsState()
+    val updateAddressLoadingState by viewModel.updateAddressLoadingState.collectAsState()
     val switchToAddressLoadingState by viewModel.switchToAddressLoadingState.collectAsState()
     val userProfileLoadingState by apiViewModel.userProfileLoadingState.collectAsState()
+
+    var oldSelectedAddress by remember { mutableStateOf(Address()) }
 
     var parkingType by remember {
         mutableStateOf(viewModel.parkingType.value)
@@ -85,51 +95,102 @@ fun AddAddressScreen(
     var postCodeState by remember {
         mutableStateOf(viewModel.postCodeState.value)
     }
-    var townState by remember {
-        mutableStateOf(viewModel.townState.value)
+    var line1State by remember {
+        mutableStateOf(viewModel.line1State.value)
     }
-    var streetState by remember {
-        mutableStateOf(viewModel.streetState.value)
+    var line2State by remember {
+        mutableStateOf(viewModel.line2State.value)
     }
-    var buildingState by remember {
-        mutableStateOf(viewModel.buildingState.value)
+    var cityState by remember {
+        mutableStateOf(viewModel.cityState.value)
     }
-    var apartmentsState by remember {
-        mutableStateOf(viewModel.apartmentsState.value)
+    var line3State by remember {
+        mutableStateOf(viewModel.line3State.value)
     }
+
+
+    var loading by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit){
         activity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
     }
 
-    LaunchedEffect(key1 = true) {
-        if (AddressViewModel.selectedAddressSuggestion.value.id.isNotEmpty()) {
-            viewModel.getFullAddress(id = AddressViewModel.selectedAddressSuggestion.value.id)
-        } else {
-            viewModel.getAddressSuggestions(AddressViewModel.selectedAddressSuggestion.value.address)
+    LaunchedEffect(key1 = Unit) {
+        if (AddressViewModel.searchAddress.value) {
+            if (AddressViewModel.selectedAddressSuggestion.value.id.isNotEmpty()) {
+                viewModel.getFullAddress(id = AddressViewModel.selectedAddressSuggestion.value.id)
+            } else {
+                viewModel.getAddressSuggestions(AddressViewModel.selectedAddressSuggestion.value.address)
+            }
+            AddressViewModel.searchAddress.value = false
         }
     }
     LaunchedEffect(key1 = true) {
         apiViewModel.userProfileLoadingState.emit(LoadingState.IDLE)
     }
 
-    if (fullAddressLoadingState == LoadingState.LOADED) {
-        parkingType = viewModel.parkingType.value
-        postCodeState = InputFieldState(text = AddressViewModel.fullAddress.value.postcode)
-        townState = InputFieldState(text = AddressViewModel.fullAddress.value.townOrCity)
-        streetState = InputFieldState(text = AddressViewModel.fullAddress.value.district)
-        buildingState = InputFieldState(text = AddressViewModel.fullAddress.value.buildingNumber)
-        apartmentsState =
-            InputFieldState(text = AddressViewModel.fullAddress.value.subBuildingNumber)
+    when (fullAddressLoadingState) {
+        LoadingState.LOADED -> {
+            selectedAddress.value =
+                Address(
+                    currentUser.familyId,
+                    "GB",
+                    AddressViewModel.fullAddress.value.line1,
+                    AddressViewModel.fullAddress.value.line2,
+                    AddressViewModel.fullAddress.value.line3,
+                    AddressViewModel.fullAddress.value.line4,
+                    AddressViewModel.fullAddress.value.townOrCity,
+                    AddressViewModel.fullAddress.value.postcode,
+                    AddressViewModel.fullAddress.value.latitude,
+                    AddressViewModel.fullAddress.value.longitude,
+                    Parking.FREE,
+                    "",
+                    0L,
+                    currentUser.verifications,
+                    true
+                )
+
+            parkingType = viewModel.parkingType.value
+            postCodeState = InputFieldState(
+                text = AddressViewModel.fullAddress.value.postcode,
+                hint = "Postcode"
+            )
+            line1State =
+                InputFieldState(text = AddressViewModel.fullAddress.value.line1, hint = "Line 1")
+            line2State =
+                InputFieldState(text = AddressViewModel.fullAddress.value.line2, hint = "Line 2")
+            cityState =
+                InputFieldState(text = AddressViewModel.fullAddress.value.townOrCity, hint = "City")
+            line3State =
+                InputFieldState(text = AddressViewModel.fullAddress.value.line3, hint = "Line 3")
+
+            LaunchedEffect(key1 = true) {
+                AddressViewModel.fullAddressLoadingState.emit(LoadingState.IDLE)
+            }
+        }
     }
     var newAddress by remember { mutableStateOf(Address()) }
+
+    var gpsCoords by remember {
+        mutableStateOf(
+            AddressViewModel.fullAddress.value.latitude != 0.0 && AddressViewModel.fullAddress.value.longitude != 0.0
+        )
+    }
+    val saveAddressResponse by viewModel.saveAddressResponse
 
     ModalBottomSheetLayout(
         sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
         sheetState = modalBottomSheetState,
         sheetContent = {
             ParkingSelection(
-                onSelect = { viewModel.onClickParkingType(it) },
+                onSelect = {
+                    AddressViewModel.addressSaved.value = false
+                    parkingType = it
+                    viewModel.onClickParkingType(it)
+                    coroutineScope.launch {
+                        modalBottomSheetState.animateTo(ModalBottomSheetValue.Hidden)
+                    }
+                },
                 selected = viewModel.parkingType.value
             )
         }
@@ -141,36 +202,23 @@ fun AddAddressScreen(
                     iconColor = MaterialTheme.colorScheme.primary,
                     actions = {
                         SaveButton(
-                            isLoading = saveFamilyAddressLoadingState == LoadingState.LOADING
-                                    || switchToAddressLoadingState == LoadingState.LOADING,
+                            isLoading = switchToAddressLoadingState == LoadingState.LOADING,
                             onClick = {
-                                val parking = when (parkingType.label) {
-                                    "Free" -> Parking.FREE
-                                    else -> Parking.PAID
+                                if (!loading && AddressViewModel.addressSaved.value) {
+                                    coroutineScope.launch {
+                                        apiViewModel.getUserProfile()
+                                    }
+                                } else {
+                                    if (!AddressViewModel.addressSaved.value) Toast.makeText(
+                                        context,
+                                        "Save the address first",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
-                                newAddress = Address(
-                                    currentUser.familyId,
-                                    "GB",
-                                    AddressViewModel.fullAddress.value.line1,
-                                    AddressViewModel.fullAddress.value.line2,
-                                    AddressViewModel.fullAddress.value.line3,
-                                    AddressViewModel.fullAddress.value.line4,
-                                    AddressViewModel.fullAddress.value.townOrCity,
-                                    AddressViewModel.fullAddress.value.postcode,
-                                    AddressViewModel.fullAddress.value.latitude,
-                                    AddressViewModel.fullAddress.value.longitude,
-                                    parking,
-                                    "",
-                                    0L,
-                                    currentUser.verifications,
-                                    true
-                                )
-                                viewModel.onSaveNewAddress(newAddress = newAddress)
                             })
                     }
                 ) {
-                    val isLoading = saveFamilyAddressLoadingState == LoadingState.LOADING
-                            || switchToAddressLoadingState == LoadingState.LOADING
+                    val isLoading = switchToAddressLoadingState == LoadingState.LOADING
 
                     if (!isLoading) {
                         navController.navigateUp()
@@ -178,27 +226,16 @@ fun AddAddressScreen(
                 }
             }
         ) { paddingValues ->
-            when (saveFamilyAddressLoadingState) {
-                LoadingState.LOADING -> Unit
+            when (switchToAddressLoadingState) {
+                LoadingState.LOADING -> loading = true
                 LoadingState.LOADED -> {
-                    LaunchedEffect(key1 = true) {
-                        viewModel.switchToAddress(viewModel.saveAddressResponse.value.id)
-                    }
-                    when (switchToAddressLoadingState) {
+                    loading = false
+                    when (userProfileLoadingState) {
                         LoadingState.LOADING -> Unit
                         LoadingState.LOADED -> {
-                            LaunchedEffect(key1 = true) {
-                                apiViewModel.getUserProfile()
-                            }
-                            when (userProfileLoadingState) {
-                                LoadingState.LOADING -> Unit
-                                LoadingState.LOADED -> {
-                                    navController.navigate(P4pShowroomScreens.NotEnrolled.route) {
-                                        popUpTo(navController.graph.findStartDestination().id)
-                                        launchSingleTop = true
-                                    }
-                                }
-                                else -> Unit
+                            navController.navigate(P4pShowroomScreens.NotEnrolled.route) {
+                                popUpTo(navController.graph.findStartDestination().id)
+                                launchSingleTop = true
                             }
                         }
                         else -> Unit
@@ -242,16 +279,6 @@ fun AddAddressScreen(
                                         )
                                     },
                                     onSubmit = {
-                                        // getaddress.IO dropdown
-                                        /*
-                                    if(viewModel.addressInputFieldState.value.text.isNotEmpty()){
-                                        coroutineScope.launch {
-                                            navController.navigate(Screen.AddressSearchResultScreen.route)
-                                        }
-                                    }
-                                    viewModel.onTriggerEvent(AddressEvent.Search)
-
-                                     */
                                     },
                                     onClear = { viewModel.onTriggerEvent(AddressEvent.ClearInput) },
                                     onFocusedChanged = {
@@ -271,7 +298,6 @@ fun AddAddressScreen(
                                         }
                                     }
                                 }
-
                                 if (addressSuggestions.isNotEmpty()) {
 
                                     DropdownMenu(
@@ -293,6 +319,7 @@ fun AddAddressScreen(
                                                     AddressViewModel.selectedAddressSuggestion.value =
                                                         addressSuggestion
                                                     viewModel.getFullAddress(id = addressSuggestion.id)
+                                                    AddressViewModel.addressSaved.value = false
                                                 }
                                             ) {
                                                 Text(text = addressSuggestion.address)
@@ -307,7 +334,25 @@ fun AddAddressScreen(
                                 .clip(CircleShape)
                                 .clickable {
                                     coroutineScope.launch {
-                                        navController.navigate(P4pShowroomScreens.AddressOnMap.route)
+                                        if (gpsCoords && AddressViewModel.addressSaved.value) {
+                                            navController.navigate(P4pShowroomScreens.AddressOnMap.route)
+                                        } else {
+                                            if (!AddressViewModel.addressSaved.value) Toast
+                                                .makeText(
+                                                    context,
+                                                    "Save the address first",
+                                                    Toast.LENGTH_SHORT
+                                                )
+                                                .show()
+                                            if (!gpsCoords) Toast
+                                                .makeText(
+                                                    context,
+                                                    "GPS coords invalid",
+                                                    Toast.LENGTH_SHORT
+                                                )
+                                                .show()
+                                        }
+
                                     }
                                 }
                                 .padding(4.dp)
@@ -326,29 +371,52 @@ fun AddAddressScreen(
 
                     AddressCard(
                         parkingType = parkingType,
+                        line1State = line1State,
+                        line2State = line2State,
+                        line3State = line3State,
                         postcodeState = postCodeState,
-                        streetState = streetState,
-                        apartmentsState = apartmentsState,
-                        townState = townState,
-                        buildingState = buildingState,
-                        onChangePostcode = { viewModel.onTriggerEvent(AddressEvent.EnterPostcode(it)) },
-                        onChangeStreet = { viewModel.onTriggerEvent(AddressEvent.EnterStreet(it)) },
-                        onChangeBuilding = { viewModel.onTriggerEvent(AddressEvent.EnterBuilding(it)) },
-                        onChangeTown = { viewModel.onTriggerEvent(AddressEvent.EnterTown(it)) },
-                        onChangeApartments = {
+                        cityState = cityState,
+                        onChangeLine1 = {
+                            oldSelectedAddress = selectedAddress.value
+                            line1State = InputFieldState(text = it)
+                            viewModel.onTriggerEvent(AddressEvent.EnterLine1(it))
+                            AddressViewModel.addressSaved.value = false
+                        },
+                        onChangeLine3 = {
+                            oldSelectedAddress = selectedAddress.value
+                            line3State = InputFieldState(text = it)
+                            viewModel.onTriggerEvent(AddressEvent.EnterLine3(it))
+                            AddressViewModel.addressSaved.value = false
+                        },
+                        onChangeCity = {
+                            oldSelectedAddress = selectedAddress.value
+                            cityState = InputFieldState(text = it)
+                            viewModel.onTriggerEvent(AddressEvent.EnterCity(it))
+                            AddressViewModel.addressSaved.value = false
+                        },
+                        onChangeLine2 = {
+                            oldSelectedAddress = selectedAddress.value
+                            line2State = InputFieldState(text = it)
+                            viewModel.onTriggerEvent(AddressEvent.EnterLine2(it))
+                            AddressViewModel.addressSaved.value = false
+                        },
+                        onChangePostcode = {
+                            oldSelectedAddress = selectedAddress.value
+                            postCodeState = InputFieldState(text = it)
                             viewModel.onTriggerEvent(
-                                AddressEvent.EnterApartments(
+                                AddressEvent.EnterPostcode(
                                     it
                                 )
                             )
+                            AddressViewModel.addressSaved.value = false
                         },
-                        onFocusPostcode = { viewModel.onTriggerEvent(AddressEvent.FocusPostcode(it)) },
-                        onFocusStreet = { viewModel.onTriggerEvent(AddressEvent.FocusStreet(it)) },
-                        onFocusBuilding = { viewModel.onTriggerEvent(AddressEvent.FocusBuilding(it)) },
-                        onFocusTown = { viewModel.onTriggerEvent(AddressEvent.FocusTown(it)) },
-                        onFocusApartments = {
+                        onFocusLine1 = { viewModel.onTriggerEvent(AddressEvent.FocusLine1(it)) },
+                        onFocusLine3 = { viewModel.onTriggerEvent(AddressEvent.FocusLine3(it)) },
+                        onFocusCity = { viewModel.onTriggerEvent(AddressEvent.FocusCity(it)) },
+                        onFocusLine2 = { viewModel.onTriggerEvent(AddressEvent.FocusLine2(it)) },
+                        onFocusPostcode = {
                             viewModel.onTriggerEvent(
-                                AddressEvent.FocusApartments(
+                                AddressEvent.FocusPostcode(
                                     it
                                 )
                             )
@@ -359,6 +427,178 @@ fun AddAddressScreen(
                             }
                         },
                     )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    if (!gpsCoords) {
+                        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Default.Warning,
+                                    contentDescription = "",
+                                    tint = dangerRed
+                                )
+                                Spacer(modifier = Modifier.padding(4.dp))
+                                androidx.compose.material3.Text(
+                                    text = "No GPS coords",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = dangerRed
+                                )
+                            }
+                        }
+                    }
+                }
+                when {
+                    saveFamilyAddressLoadingState == LoadingState.LOADING || updateAddressLoadingState == LoadingState.LOADING -> {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.BottomCenter),
+                            color = green1
+                        )
+                    }
+                    saveFamilyAddressLoadingState == LoadingState.LOADED || updateAddressLoadingState == LoadingState.LOADED -> {
+                        if (saveFamilyAddressLoadingState == LoadingState.LOADED) AddressViewModel.hasAddressSaved.value =
+                            true
+                        oldSelectedAddress = selectedAddress.value
+                        AddressViewModel.addressSaved.value = true
+                        AddressViewModel.selectedAddress.value = viewModel.saveAddressResponse.value
+                        selectedAddress.value = viewModel.saveAddressResponse.value
+
+                        viewModel.onTriggerEvent(
+                            AddressEvent.EnterLine1(
+                                selectedAddress.value.line1 ?: ""
+                            )
+                        )
+                        viewModel.onTriggerEvent(
+                            AddressEvent.EnterLine2(
+                                selectedAddress.value.line2 ?: ""
+                            )
+                        )
+                        viewModel.onTriggerEvent(
+                            AddressEvent.EnterLine3(
+                                selectedAddress.value.line3 ?: ""
+                            )
+                        )
+                        viewModel.onTriggerEvent(
+                            AddressEvent.EnterCity(
+                                selectedAddress.value.town ?: ""
+                            )
+                        )
+                        viewModel.onTriggerEvent(
+                            AddressEvent.EnterPostcode(
+                                selectedAddress.value.postcode ?: ""
+                            )
+                        )
+
+                        gpsCoords =
+                            saveAddressResponse.lat != null && saveAddressResponse.lat != 0.0
+                                    && saveAddressResponse.lng != null && saveAddressResponse.lng != 0.0
+
+                        LaunchedEffect(key1 = true) {
+                            viewModel.saveFamilyAddressLoadingState.emit(LoadingState.IDLE)
+                            viewModel.updateAddressLoadingState.emit(LoadingState.IDLE)
+                        }
+                        if (gpsCoords && AddressViewModel.addressSaved.value) {
+                            LaunchedEffect(key1 = true) {
+                                viewModel.switchToAddress(viewModel.saveAddressResponse.value.id)
+                            }
+                        } else {
+                            if (!AddressViewModel.addressSaved.value) Toast.makeText(
+                                context,
+                                "Error saving the address, try again",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            if (!gpsCoords) Toast.makeText(
+                                context,
+                                "GPS coords invalid",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                    else -> {
+                        Buttons.FullRoundedButton(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .padding(
+                                    horizontal = containerHorizontalPadding,
+                                    vertical = 16.dp
+                                ),
+                            enabled = !AddressViewModel.addressSaved.value,
+                            buttonText = "Save",
+                            textColor = MaterialTheme.colorScheme.background,
+                            backgroundColor = MaterialTheme.colorScheme.primary,
+                        ) {
+                            if (!AddressViewModel.addressSaved.value) {
+                                val parking = when (parkingType.label) {
+                                    "Free" -> Parking.FREE
+                                    else -> Parking.PAID
+                                }
+                                Log.d(
+                                    "Tag",
+                                    "Line1 : ${line1State.text}, ${oldSelectedAddress.line1}"
+                                )
+                                Log.d(
+                                    "Tag",
+                                    "Line2 : ${line2State.text}, ${oldSelectedAddress.line2}"
+                                )
+                                Log.d(
+                                    "Tag",
+                                    "postCodeState : ${postCodeState.text}, ${oldSelectedAddress.postcode}"
+                                )
+                                Log.d(
+                                    "Tag", "Condition 1 ${
+                                        line1State.text != oldSelectedAddress.line1
+                                                && postCodeState.text != oldSelectedAddress.postcode
+                                    }"
+                                )
+                                Log.d(
+                                    "Tag",
+                                    "Condition 2 ${!AddressViewModel.hasAddressSaved.value}"
+                                )
+
+                                Log.d(
+                                    "Tag", "Condition ${
+                                        line1State.text != oldSelectedAddress.line1
+                                                && postCodeState.text != oldSelectedAddress.postcode
+                                                || !AddressViewModel.hasAddressSaved.value
+                                    }"
+                                )
+
+                                if (line1State.text != oldSelectedAddress.line1
+                                    && postCodeState.text != oldSelectedAddress.postcode
+                                    || !AddressViewModel.hasAddressSaved.value
+                                ) {
+                                    newAddress = Address(
+                                        currentUser.familyId,
+                                        "GB",
+                                        line1State.text,
+                                        line2State.text,
+                                        line3State.text,
+                                        AddressViewModel.fullAddress.value.line4,
+                                        cityState.text,
+                                        postCodeState.text,
+                                        AddressViewModel.fullAddress.value.latitude,
+                                        AddressViewModel.fullAddress.value.longitude,
+                                        parking,
+                                        "",
+                                        0L,
+                                        currentUser.verifications,
+                                        true
+                                    )
+                                    viewModel.onSaveNewAddress(newAddress = newAddress)
+                                } else {
+                                    // If the user is trying to correct the existing address, we update it
+                                    selectedAddress.value.parking = parking
+                                    selectedAddress.value.line1 = line1State.text
+                                    selectedAddress.value.line2 = line2State.text
+                                    selectedAddress.value.line3 = line3State.text
+                                    selectedAddress.value.town = cityState.text
+                                    selectedAddress.value.postcode = postCodeState.text
+                                    viewModel.updateAddress(selectedAddress.value)
+                                }
+                            } else {
+                                Toast.makeText(context, "Address already saved", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                        }
+                    }
                 }
             }
         }

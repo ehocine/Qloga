@@ -13,18 +13,14 @@ import eac.qloga.android.core.shared.utils.LoadingState
 import eac.qloga.android.data.ApiInterceptor
 import eac.qloga.android.data.p4p.P4pRepository
 import eac.qloga.android.data.p4p.lookups.LookupsRepository
-import eac.qloga.android.data.qbe.MediaRepository
 import eac.qloga.android.data.qbe.PlatformRepository
 import eac.qloga.android.data.shared.models.ResponseEnrollsModel
 import eac.qloga.android.data.shared.models.categories.CategoriesResponse
 import eac.qloga.android.data.shared.models.conditions.ConditionsResponse
 import eac.qloga.android.data.shared.models.q_services.QServicesResponse
-import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import eac.qloga.bare.dto.person.Person
-import eac.qloga.p4p.lookups.dto.ServiceCondition
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

@@ -9,6 +9,7 @@ sealed class SignupEvents {
     data class EnterFamilyName(val familyName: String): SignupEvents()
     data class EnterEmailAddress(val emailAddress: String): SignupEvents()
     data class EnterBirthday(val birthday: String): SignupEvents()
+    data class EnterLocalDateBirthday(val localDateBirthday: LocalDate): SignupEvents()
     data class EnterGender(val gender: Gender): SignupEvents()
     data class FocusFirstName(val focusState: FocusState): SignupEvents()
     data class FocusFamilyName(val focusState: FocusState): SignupEvents()

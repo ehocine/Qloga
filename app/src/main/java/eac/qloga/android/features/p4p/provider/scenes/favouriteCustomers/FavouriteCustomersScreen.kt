@@ -22,8 +22,6 @@ import eac.qloga.android.core.shared.components.Buttons.ProviderUserButton
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.theme.info_sky
 import eac.qloga.android.core.shared.utils.AddressConverter
-import eac.qloga.android.core.shared.utils.CUSTOMER_ID
-import eac.qloga.android.core.shared.utils.PROVIDER_ID
 import eac.qloga.android.features.p4p.provider.scenes.P4pProviderScreens
 import eac.qloga.android.features.p4p.provider.scenes.favouriteCustomer.FavouriteCustomerViewModel
 import eac.qloga.android.features.p4p.provider.shared.components.FavouriteCustomersListItem
@@ -88,7 +86,6 @@ fun FavouriteCustomersScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(titleBarHeight))
-
             Button(
                 onClick = {
                     actions.goToProviderDetails(prvId)

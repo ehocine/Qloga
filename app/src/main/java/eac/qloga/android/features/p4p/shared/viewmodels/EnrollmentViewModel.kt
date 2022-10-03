@@ -2,7 +2,10 @@ package eac.qloga.android.features.p4p.shared.viewmodels
 
 import android.annotation.SuppressLint
 import android.location.Geocoder
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.focus.FocusState
@@ -13,13 +16,21 @@ import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import eac.qloga.android.QlogaApplication
 import eac.qloga.android.R
-import eac.qloga.android.core.shared.utils.CountryCode
-import eac.qloga.android.core.shared.utils.CountryCodes
-import eac.qloga.android.core.shared.utils.InputFieldState
-import eac.qloga.android.core.shared.utils.QTAG
+import eac.qloga.android.core.shared.utils.*
+import eac.qloga.android.core.shared.viewmodels.ApiViewModel
+import eac.qloga.android.data.p4p.customer.P4pCustomerRepository
+import eac.qloga.android.data.p4p.provider.P4pProviderRepository
+import eac.qloga.android.data.qbe.FamiliesRepository
+import eac.qloga.android.data.qbe.PlatformRepository
+import eac.qloga.android.data.shared.models.VrfPhone
 import eac.qloga.android.features.p4p.shared.utils.EnrollmentEvent
 import eac.qloga.android.features.p4p.shared.utils.EnrollmentType
+import eac.qloga.bare.dto.Contacts
 import eac.qloga.bare.dto.person.Address
+import eac.qloga.bare.dto.person.Person
+import eac.qloga.p4p.cst.dto.Customer
+import eac.qloga.p4p.prv.dto.Provider
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
@@ -28,29 +39,64 @@ import javax.inject.Inject
 @SuppressLint("LongLogTag")
 @HiltViewModel
 class EnrollmentViewModel @Inject constructor(
-    private val application: QlogaApplication
-): ViewModel(){
+    private val application: QlogaApplication,
+    private val familiesRepository: FamiliesRepository,
+    private val platformRepository: PlatformRepository,
+    private val p4pCustomerRepository: P4pCustomerRepository,
+    private val p4pProviderRepository: P4pProviderRepository
+) : ViewModel() {
 
     companion object {
         const val TAG = "${QTAG}-EnrollmentViewModel"
+        val addressesList: MutableState<List<Address>> = mutableStateOf(listOf())
+        val selectedAddress: MutableState<Address> =
+            mutableStateOf(ApiViewModel.userProfile.value.contacts.address)
+        val enrollmentType: MutableState<EnrollmentType?> = mutableStateOf(null)
+        val currentEnrollmentType: MutableState<EnrollmentType?> = mutableStateOf(null)
+        val addressSaved : MutableState<Boolean> = mutableStateOf(false)
     }
-    private val _enrollmentType = mutableStateOf<EnrollmentType?>(null)
-    val enrollmentType: State<EnrollmentType?> = _enrollmentType
 
-    private val _numberFieldState = mutableStateOf(InputFieldState(hint = "Enter you number"))
+    private val _countryCodes = mutableStateOf<CountryCodes?>(null)
+    val countryCodes: State<CountryCodes?> = _countryCodes
+
+    init {
+        getCountryCodes()
+    }
+
+    private val _numberFieldState = mutableStateOf(
+        InputFieldState(
+            text = if (ApiViewModel.userProfile.value.contacts.phoneNumber != null) ApiViewModel.userProfile.value.contacts.phoneNumber.toString() else "",
+            hint = "Enter your number"
+        )
+    )
     val numberFieldState: State<InputFieldState> = _numberFieldState
 
     private val _codeState = mutableStateOf(InputFieldState())
     val codeState: State<InputFieldState> = _codeState
 
-    private val _addressFieldState = mutableStateOf(InputFieldState(hint = "Enter postcode or address"))
+    private val _addressFieldState = mutableStateOf(
+        InputFieldState(
+            text = ApiViewModel.userProfile.value.contacts.address.shortAddress,
+            hint = "Enter postcode or address"
+        )
+    )
     val addressFieldState: State<InputFieldState> = _addressFieldState
 
-    private val _selectedCountryCode = mutableStateOf(CountryCode("Nepal","+977","NP"))
+    private val _selectedCountryCode = mutableStateOf(
+        if (ApiViewModel.userProfile.value.contacts.phoneCountry != null) {
+            _countryCodes.value?.countryCodes?.first {
+                it.code == ApiViewModel.userProfile.value.contacts.phoneCountry
+            } ?: CountryCode("United Kingdom", "+44", "GB")
+        } else {
+            CountryCode("United Kingdom", "+44", "GB")
+        }
+    )
+
+    //    private val _selectedCountryCode = mutableStateOf(CountryCode("United Kingdom", "+44", "UK"))
     val selectedCountryCode: State<CountryCode> = _selectedCountryCode
 
     private val _isCodeSent = mutableStateOf(false)
-    val isCodeSent: State<Boolean> = _isCodeSent
+    val isCodeSent: MutableState<Boolean> = _isCodeSent
 
     private val _isCheckTermsConditions = mutableStateOf(false)
     val isCheckTermsConditions: State<Boolean> = _isCheckTermsConditions
@@ -61,38 +107,59 @@ class EnrollmentViewModel @Inject constructor(
     private val _selectedAddressIndex = mutableStateOf(0)
     val selectedAddressIndex = _selectedAddressIndex
 
-    private val _countryCodes = mutableStateOf<CountryCodes?>(null)
-    val countryCodes: State<CountryCodes?> = _countryCodes
-
     private val _userLocation = mutableStateOf<LatLng?>(null)
     val userLocation: State<LatLng?> = _userLocation
 
     private val _userAddress = mutableStateOf<Address?>(null)
     val userAddress: State<Address?> = _userAddress
 
-    init {
-        getCountryCodes()
-        getAddresses()
-    }
+    var verifyPhoneLoadingState = MutableStateFlow(LoadingState.IDLE)
 
-    fun onTriggerEvent(event: EnrollmentEvent){
+    fun onTriggerEvent(event: EnrollmentEvent) {
         try {
             viewModelScope.launch {
-                when(event){
-                    is EnrollmentEvent.EnterCode -> { enterCode(event.code)}
-                    is EnrollmentEvent.EnterNumber -> { enterNumber(event.number) }
-                    is EnrollmentEvent.EnterAddress -> { enterAddress(event.address) }
-                    is EnrollmentEvent.FocusAddressInput -> { onFocusAddressInput(event.focusState) }
-                    is EnrollmentEvent.FocusCodeInput -> { onFocusCodeInput(event.focusState) }
-                    is EnrollmentEvent.FocusNumberInput -> { onFocusNumberInput(event.focusState) }
-                    is EnrollmentEvent.SelectCountryCode -> { _selectedCountryCode.value = event.countryCode }
-                    is EnrollmentEvent.SendCode -> { sendCode() }
-                    is EnrollmentEvent.SubmitCode -> { submitCode() }
-                    is EnrollmentEvent.ToggleCheckTermsConditions -> { _isCheckTermsConditions.value = !isCheckTermsConditions.value}
-                    is EnrollmentEvent.ClickMap -> { _userLocation.value = event.latLng }
+                when (event) {
+                    is EnrollmentEvent.EnterCode -> {
+                        enterCode(event.code)
+                    }
+                    is EnrollmentEvent.EnterNumber -> {
+                        enterNumber(event.number)
+                    }
+                    is EnrollmentEvent.EnterAddress -> {
+                        enterAddress(event.address)
+                    }
+                    is EnrollmentEvent.FocusAddressInput -> {
+                        onFocusAddressInput(event.focusState)
+                    }
+                    is EnrollmentEvent.FocusCodeInput -> {
+                        onFocusCodeInput(event.focusState)
+                    }
+                    is EnrollmentEvent.FocusNumberInput -> {
+                        onFocusNumberInput(event.focusState)
+                    }
+                    is EnrollmentEvent.SelectCountryCode -> {
+                        _selectedCountryCode.value = event.countryCode
+                    }
+                    is EnrollmentEvent.SendCode -> {
+                        sendCode()
+                    }
+                    is EnrollmentEvent.SubmitCode -> {
+
+                    }
+                    is EnrollmentEvent.ToggleCheckTermsConditions -> {
+                        _isCheckTermsConditions.value = !isCheckTermsConditions.value
+                    }
+                    is EnrollmentEvent.ClickMap -> {
+                        _userLocation.value = event.latLng
+                    }
+                    is EnrollmentEvent.ClearAddress -> {
+                        _addressFieldState.value = addressFieldState.value.copy(
+                            text = ""
+                        )
+                    }
                 }
             }
-        }catch (e: Exception){
+        } catch (e: Exception) {
             Log.d(TAG, "onTriggerEvent: ${e.printStackTrace()}")
         }
     }
@@ -100,17 +167,17 @@ class EnrollmentViewModel @Inject constructor(
     fun parseAddressFromLatLng(
         latLng: LatLng? = null,
         address: String? = null
-    ){
+    ) {
         try {
             val geocoder = Geocoder(application, Locale.getDefault())
 
-            val addresses  = if(latLng != null ) {
+            val addresses = if (latLng != null) {
                 geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
-            }else{
+            } else {
                 geocoder.getFromLocationName(address, 1)
             }
 
-            if(addresses != null && addresses.size > 0){
+            if (addresses != null && addresses.size > 0) {
                 _userAddress.value = Address().apply {
                     line1 = addresses[0].getAddressLine(0)
                     town = addresses[0].locality
@@ -121,80 +188,116 @@ class EnrollmentViewModel @Inject constructor(
                     // countryCode = addresses[0].countryCode
                 }
             }
-        }catch (e: Exception){
+        } catch (e: Exception) {
             Log.e(TAG, "parseAddressFromLatLng: ${e.printStackTrace()}")
         }
     }
 
-    fun setEnrollmentType(type: EnrollmentType){
-        _enrollmentType.value = type
+    fun setEnrollmentType(type: EnrollmentType) {
+        enrollmentType.value = type
     }
 
-    private fun enterNumber(number: String){
+    private fun enterNumber(number: String) {
         _numberFieldState.value = numberFieldState.value.copy(
             text = number
         )
     }
 
-    private fun enterCode(code: String){
+    private fun enterCode(code: String) {
         _codeState.value = codeState.value.copy(
             text = code
         )
     }
 
-    private fun enterAddress(address: String){
+    private fun enterAddress(address: String) {
         _addressFieldState.value = addressFieldState.value.copy(
             text = address
         )
     }
 
-    private fun onFocusNumberInput(focusState: FocusState){
+    private fun onFocusNumberInput(focusState: FocusState) {
         _numberFieldState.value = numberFieldState.value.copy(
             isFocused = focusState.isFocused
         )
     }
 
-    private fun onFocusCodeInput(focusState: FocusState){
+    private fun onFocusCodeInput(focusState: FocusState) {
         _codeState.value = codeState.value.copy(
             isFocused = focusState.isFocused
         )
     }
 
-    private fun onFocusAddressInput(focusState: FocusState){
+    private fun onFocusAddressInput(focusState: FocusState) {
         _addressFieldState.value = addressFieldState.value.copy(
             isFocused = focusState.isFocused
         )
     }
 
-    private fun sendCode(){
-        _isCodeSent.value = true
-        _numberFieldState.value = numberFieldState.value.copy(
-            text = "",
-            isFocused = false
+    private fun sendCode() {
+        val newContact = Contacts(
+            ApiViewModel.userProfile.value.contacts.email,
+            _selectedCountryCode.value.code,
+            _numberFieldState.value.text.toLong(),
+            false,
+            ApiViewModel.userProfile.value.contacts.address
         )
+        val updatedUser = Person(
+            ApiViewModel.userProfile.value.familyId,
+            ApiViewModel.userProfile.value.fname,
+            ApiViewModel.userProfile.value.mname,
+            ApiViewModel.userProfile.value.madenname,
+            ApiViewModel.userProfile.value.sname,
+            ApiViewModel.userProfile.value.cognitoId,
+            ApiViewModel.userProfile.value.gender,
+            ApiViewModel.userProfile.value.dob,
+            ApiViewModel.userProfile.value.created,
+            ApiViewModel.userProfile.value.avatarVerified,
+            ApiViewModel.userProfile.value.avatarId,
+            ApiViewModel.userProfile.value.verifications,
+            ApiViewModel.userProfile.value.settings,
+            ApiViewModel.userProfile.value.langs,
+            ApiViewModel.userProfile.value.oktaStatus,
+            ApiViewModel.userProfile.value.oktaStatusUpdated,
+            ApiViewModel.userProfile.value.payMethods,
+            ApiViewModel.userProfile.value.cal,
+            ApiViewModel.userProfile.value.marketing,
+            newContact
+        )
+        viewModelScope.launch {
+            try {
+                val response = platformRepository.updateUser(updatedUser)
+                if (response.isSuccessful) {
+                    val verificationCodeRes = platformRepository.getPhoneVerificationCode()
+                    if (verificationCodeRes.isSuccessful) {
+                        _isCodeSent.value = true
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
     }
 
-    private fun submitCode(){
-        _codeState.value = codeState.value.copy(
-            text = "",
-            isFocused = false
-        )
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getAddresses(fid: Long) {
+        viewModelScope.launch {
+            try {
+                val response = familiesRepository.getAddresses(fid)
+                if (response.isSuccessful) {
+                    addressesList.value = response.body()!!
+                } else {
+
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
-    private fun getAddresses(){
-        _listOfAddress.value = listOf(
-            "09 Princes Street, Edinburgh, GB",
-            "3 Lupus St, Pimlico, London, GB",
-            "Barnett House 53, Fountain Street, Manchester, GB",
-            "30 Cloth Market, Merchant House, Newcastle upon Tyne, GB",
-            "05 West George Street, Glasgow, GB",
-            "54 George Street, Edinburgh, GB",
-            "St Martin-in-the-Fields Trafalgar Square, London, GB",
-            "14 St Mary's Pl, Newcastle upon Tyne, GB"
-        )
-    }
 
-    fun onSelectAddressOption(index: Int){
+    fun onSelectAddressOption(index: Int) {
         _selectedAddressIndex.value = index
         _addressFieldState.value = _addressFieldState.value.copy(
             text = _listOfAddress.value[index]
@@ -202,10 +305,69 @@ class EnrollmentViewModel @Inject constructor(
         parseAddressFromLatLng(address = _addressFieldState.value.text)
     }
 
-    private fun getCountryCodes(){
-        val countryCodesJson = application.resources.openRawResource(R.raw.country_codes).bufferedReader().use { it.readText() }
+    fun verifyPhone(verificationCode: Long) {
+        viewModelScope.launch {
+            try {
+                verifyPhoneLoadingState.emit(LoadingState.LOADING)
+                val response = platformRepository.verifyPhone(VrfPhone(verificationCode))
+                if (response.isSuccessful) {
+                    verifyPhoneLoadingState.emit(LoadingState.LOADED)
+                } else {
+                    verifyPhoneLoadingState.emit(LoadingState.ERROR)
+                }
+            } catch (e: Exception) {
+                verifyPhoneLoadingState.emit(LoadingState.ERROR)
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private fun getCountryCodes() {
+        val countryCodesJson =
+            application.resources.openRawResource(R.raw.country_codes).bufferedReader()
+                .use { it.readText() }
         val gson = Gson()
         val countryCodes = gson.fromJson(countryCodesJson, CountryCodes::class.java)
         _countryCodes.value = countryCodes
+    }
+
+    var createCustomerState = MutableStateFlow(LoadingState.IDLE)
+    var createProviderState = MutableStateFlow(LoadingState.IDLE)
+
+    val customer: MutableState<Customer> = mutableStateOf(Customer())
+    val provider: MutableState<Provider> = mutableStateOf(Provider())
+
+    fun createCustomerOrProvider() {
+        viewModelScope.launch {
+            try {
+                if (enrollmentType.value == EnrollmentType.PROVIDER) {
+                    val newProvider = Provider(
+                    )
+
+                    createProviderState.emit(LoadingState.LOADING)
+                    val providerResponse = p4pProviderRepository.create(newProvider)
+                    if (providerResponse.isSuccessful) {
+                        provider.value = providerResponse.body()!!
+                        createProviderState.emit(LoadingState.LOADED)
+                    } else {
+                        createProviderState.emit(LoadingState.ERROR)
+                    }
+
+                } else {
+                    createCustomerState.emit(LoadingState.LOADING)
+                    val customerResponse = p4pCustomerRepository.create()
+                    if (customerResponse.isSuccessful) {
+                        customer.value = customerResponse.body()!!
+                        createCustomerState.emit(LoadingState.LOADED)
+                    } else {
+                        createCustomerState.emit(LoadingState.ERROR)
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                createCustomerState.emit(LoadingState.ERROR)
+                createProviderState.emit(LoadingState.ERROR)
+            }
+        }
     }
 }

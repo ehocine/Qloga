@@ -28,13 +28,12 @@ fun SelectLocationScreen(
     navController: NavController,
     viewModel: EnrollmentViewModel = hiltViewModel()
 ) {
-    val regues = LatLng(54.9715, -1.6123)
-    val userLocation = viewModel.userLocation.value
-    val markerTitle = viewModel.userAddress.value?.line1 + " " +
-            viewModel.userAddress.value?.postcode + "," +
-            viewModel.userAddress.value?.country +" "+
-            viewModel.userAddress.value?.town
 
+    val regues = LatLng(
+        EnrollmentViewModel.selectedAddress.value.lat,
+        EnrollmentViewModel.selectedAddress.value.lng
+    )
+    val markerTitle = EnrollmentViewModel.selectedAddress.value.shortAddress
     val scope = rememberCoroutineScope()
 
     Scaffold(
@@ -42,7 +41,7 @@ fun SelectLocationScreen(
             TitleBar(
                 label = P4pScreens.SelectLocationMap.titleName,
                 iconColor = MaterialTheme.colorScheme.primary,
-                actions =  {
+                actions = {
                     DoneButton(onClick = {
                         scope.launch {
                             navController.navigateUp()
@@ -58,15 +57,14 @@ fun SelectLocationScreen(
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
-            ,
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(topPadding))
 
             SelectLocationMapView(
-                latitude = userLocation?.latitude ?: regues.latitude,
-                longitude = userLocation?.longitude ?: regues.longitude,
+                latitude = regues.latitude,
+                longitude = regues.longitude,
                 title = markerTitle,
                 onMapClick = {
                     scope.launch {
