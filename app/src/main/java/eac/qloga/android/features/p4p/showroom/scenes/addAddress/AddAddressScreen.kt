@@ -2,7 +2,6 @@ package eac.qloga.android.features.p4p.showroom.scenes.addAddress
 
 import android.app.Activity
 import android.os.Build
-import android.util.Log
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -21,6 +20,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -38,6 +38,7 @@ import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.components.address.AddressCard
 import eac.qloga.android.core.shared.components.address.AddressSearchBar
 import eac.qloga.android.core.shared.theme.dangerRed
+import eac.qloga.android.core.shared.theme.gray30
 import eac.qloga.android.core.shared.theme.green1
 import eac.qloga.android.core.shared.utils.CONTAINER_TOP_PADDING
 import eac.qloga.android.core.shared.utils.InputFieldState
@@ -111,7 +112,7 @@ fun AddAddressScreen(
 
     var loading by remember { mutableStateOf(true) }
 
-    LaunchedEffect(Unit){
+    LaunchedEffect(Unit) {
         activity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
     }
 
@@ -231,8 +232,9 @@ fun AddAddressScreen(
                 LoadingState.LOADED -> {
                     loading = false
                     when (userProfileLoadingState) {
-                        LoadingState.LOADING -> Unit
+                        LoadingState.LOADING -> loading = true
                         LoadingState.LOADED -> {
+                            loading = false
                             navController.navigate(P4pShowroomScreens.NotEnrolled.route) {
                                 popUpTo(navController.graph.findStartDestination().id)
                                 launchSingleTop = true
@@ -333,26 +335,27 @@ fun AddAddressScreen(
                             modifier = Modifier
                                 .clip(CircleShape)
                                 .clickable {
-                                    coroutineScope.launch {
-                                        if (gpsCoords && AddressViewModel.addressSaved.value) {
-                                            navController.navigate(P4pShowroomScreens.AddressOnMap.route)
-                                        } else {
-                                            if (!AddressViewModel.addressSaved.value) Toast
-                                                .makeText(
-                                                    context,
-                                                    "Save the address first",
-                                                    Toast.LENGTH_SHORT
-                                                )
-                                                .show()
-                                            if (!gpsCoords) Toast
-                                                .makeText(
-                                                    context,
-                                                    "GPS coords invalid",
-                                                    Toast.LENGTH_SHORT
-                                                )
-                                                .show()
+                                    if (AddressViewModel.addressSaved.value) {
+                                        coroutineScope.launch {
+                                            if (gpsCoords && AddressViewModel.addressSaved.value) {
+                                                navController.navigate(P4pShowroomScreens.AddressOnMap.route)
+                                            } else {
+                                                if (!AddressViewModel.addressSaved.value) Toast
+                                                    .makeText(
+                                                        context,
+                                                        "Save the address first",
+                                                        Toast.LENGTH_SHORT
+                                                    )
+                                                    .show()
+                                                if (!gpsCoords) Toast
+                                                    .makeText(
+                                                        context,
+                                                        "GPS coords invalid",
+                                                        Toast.LENGTH_SHORT
+                                                    )
+                                                    .show()
+                                            }
                                         }
-
                                     }
                                 }
                                 .padding(4.dp)
@@ -362,7 +365,8 @@ fun AddAddressScreen(
                                 painter = painterResource(
                                     id = R.drawable.ic_location_point
                                 ),
-                                contentDescription = ""
+                                contentDescription = "",
+                                colorFilter = ColorFilter.tint(color = if (AddressViewModel.addressSaved.value) green1 else gray30)
                             )
                         }
                     }
@@ -457,7 +461,6 @@ fun AddAddressScreen(
                         if (saveFamilyAddressLoadingState == LoadingState.LOADED) AddressViewModel.hasAddressSaved.value =
                             true
                         oldSelectedAddress = selectedAddress.value
-                        AddressViewModel.addressSaved.value = true
                         AddressViewModel.selectedAddress.value = viewModel.saveAddressResponse.value
                         selectedAddress.value = viewModel.saveAddressResponse.value
 
@@ -490,6 +493,8 @@ fun AddAddressScreen(
                         gpsCoords =
                             saveAddressResponse.lat != null && saveAddressResponse.lat != 0.0
                                     && saveAddressResponse.lng != null && saveAddressResponse.lng != 0.0
+
+                        AddressViewModel.addressSaved.value = true
 
                         LaunchedEffect(key1 = true) {
                             viewModel.saveFamilyAddressLoadingState.emit(LoadingState.IDLE)
@@ -530,37 +535,6 @@ fun AddAddressScreen(
                                     "Free" -> Parking.FREE
                                     else -> Parking.PAID
                                 }
-                                Log.d(
-                                    "Tag",
-                                    "Line1 : ${line1State.text}, ${oldSelectedAddress.line1}"
-                                )
-                                Log.d(
-                                    "Tag",
-                                    "Line2 : ${line2State.text}, ${oldSelectedAddress.line2}"
-                                )
-                                Log.d(
-                                    "Tag",
-                                    "postCodeState : ${postCodeState.text}, ${oldSelectedAddress.postcode}"
-                                )
-                                Log.d(
-                                    "Tag", "Condition 1 ${
-                                        line1State.text != oldSelectedAddress.line1
-                                                && postCodeState.text != oldSelectedAddress.postcode
-                                    }"
-                                )
-                                Log.d(
-                                    "Tag",
-                                    "Condition 2 ${!AddressViewModel.hasAddressSaved.value}"
-                                )
-
-                                Log.d(
-                                    "Tag", "Condition ${
-                                        line1State.text != oldSelectedAddress.line1
-                                                && postCodeState.text != oldSelectedAddress.postcode
-                                                || !AddressViewModel.hasAddressSaved.value
-                                    }"
-                                )
-
                                 if (line1State.text != oldSelectedAddress.line1
                                     && postCodeState.text != oldSelectedAddress.postcode
                                     || !AddressViewModel.hasAddressSaved.value

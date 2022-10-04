@@ -47,7 +47,7 @@ fun NoAddressScreen(
     val activity = LocalContext.current as Activity
     val searchBarValue = viewModel.inputFieldState.value.text
     val searchBarFocusRequester = remember { FocusRequester() }
-    val screenHeightDp = remember{ mutableStateOf(0) }
+    val screenHeightDp = remember { mutableStateOf(0) }
 
     val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
@@ -68,7 +68,7 @@ fun NoAddressScreen(
         }
     }
 
-    if(scrollState.isScrollInProgress){
+    if (scrollState.isScrollInProgress) {
         keyboardController?.hide()
     }
 
@@ -90,8 +90,7 @@ fun NoAddressScreen(
                         }
                     )
                 }
-                .padding(horizontal = Padding.containerHorizontalPadding.dp)
-            ,
+                .padding(horizontal = Padding.containerHorizontalPadding.dp),
             contentAlignment = Alignment.Center
         ) {
             Column(
@@ -169,10 +168,9 @@ fun NoAddressScreen(
                     SuggestionCard(
                         modifier = Modifier
                             .constrainAs(suggestionCard) {
-                                top.linkTo(searchBar.bottom, margin = 8.dp)
+                                bottom.linkTo(searchBar.top, margin = 8.dp)
                             }
-                            .verticalScroll(scrollState)
-                        ,
+                            .verticalScroll(scrollState),
                         width = with(LocalDensity.current) { parentSize.width.toDp() },
                         roundedCornerShape = RoundedCornerShape(8.dp),
                         expanded = expanded,
@@ -190,6 +188,7 @@ fun NoAddressScreen(
                                         )
                                         AddressViewModel.selectedAddressSuggestion.value =
                                             addressSuggestion
+                                        AddressViewModel.searchAddress.value = true
                                         navController.navigate(P4pShowroomScreens.AddAddress.route)
                                     }
                                     .padding(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 8.dp)

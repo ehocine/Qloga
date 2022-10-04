@@ -21,6 +21,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -41,6 +42,7 @@ import eac.qloga.android.core.shared.components.address.AddressCard
 import eac.qloga.android.core.shared.components.address.AddressSearchBar
 import eac.qloga.android.core.shared.theme.dangerRed
 import eac.qloga.android.core.shared.theme.gray1
+import eac.qloga.android.core.shared.theme.gray30
 import eac.qloga.android.core.shared.theme.green1
 import eac.qloga.android.core.shared.utils.InputFieldState
 import eac.qloga.android.core.shared.utils.LoadingState
@@ -87,25 +89,27 @@ fun SaveNewAddressScreen(
         rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
 
     var line1 by remember {
-        mutableStateOf(InputFieldState(text = selectedAddress.value.line1 ?: ""))
+        mutableStateOf(InputFieldState(text = selectedAddress.value.line1 ?: "", hint = "Line 1"))
     }
     var line2 by remember {
-        mutableStateOf(InputFieldState(text = selectedAddress.value.line2 ?: ""))
+        mutableStateOf(InputFieldState(text = selectedAddress.value.line2 ?: "", hint = "Line 2"))
     }
     var line3 by remember {
-        mutableStateOf(InputFieldState(text = selectedAddress.value.line3 ?: ""))
+        mutableStateOf(InputFieldState(text = selectedAddress.value.line3 ?: "", hint = "Line 3"))
     }
     var city by remember {
         mutableStateOf(
             InputFieldState(
-                text = selectedAddress.value.town ?: ""
+                text = selectedAddress.value.town ?: "",
+                hint = "City"
             )
         )
     }
     var postcode by remember {
         mutableStateOf(
             InputFieldState(
-                text = selectedAddress.value.postcode ?: ""
+                text = selectedAddress.value.postcode ?: "",
+                hint = "Postcode"
             )
         )
     }
@@ -143,11 +147,18 @@ fun SaveNewAddressScreen(
     var newAddress by remember { mutableStateOf(Address()) }
     when (fullAddressLoadingState) {
         LoadingState.LOADED -> {
-            line1 = InputFieldState(text = AddressViewModel.fullAddress.value.line1, hint = "Line 1")
-            line2 = InputFieldState(text = AddressViewModel.fullAddress.value.line2, hint = "Line 2")
-            line3 = InputFieldState(text = AddressViewModel.fullAddress.value.line3, hint = "Line 3")
-            city = InputFieldState(text = AddressViewModel.fullAddress.value.townOrCity, hint = "City")
-            postcode = InputFieldState(text = AddressViewModel.fullAddress.value.postcode,hint = "Postcode")
+            line1 =
+                InputFieldState(text = AddressViewModel.fullAddress.value.line1, hint = "Line 1")
+            line2 =
+                InputFieldState(text = AddressViewModel.fullAddress.value.line2, hint = "Line 2")
+            line3 =
+                InputFieldState(text = AddressViewModel.fullAddress.value.line3, hint = "Line 3")
+            city =
+                InputFieldState(text = AddressViewModel.fullAddress.value.townOrCity, hint = "City")
+            postcode = InputFieldState(
+                text = AddressViewModel.fullAddress.value.postcode,
+                hint = "Postcode"
+            )
             LaunchedEffect(key1 = true) {
                 AddressViewModel.fullAddressLoadingState.emit(LoadingState.IDLE)
             }
@@ -335,24 +346,26 @@ fun SaveNewAddressScreen(
                                 modifier = Modifier
                                     .clip(CircleShape)
                                     .clickable {
-                                        coroutineScope.launch {
-                                            if (gpsCoords && EnrollmentViewModel.addressSaved.value) {
-                                                navController.navigate(P4pScreens.SelectLocationMap.route)
-                                            } else {
-                                                if (!EnrollmentViewModel.addressSaved.value) Toast
-                                                    .makeText(
-                                                        context,
-                                                        "Save the address first",
-                                                        Toast.LENGTH_SHORT
-                                                    )
-                                                    .show()
-                                                if (!gpsCoords) Toast
-                                                    .makeText(
-                                                        context,
-                                                        "GPS coords invalid",
-                                                        Toast.LENGTH_SHORT
-                                                    )
-                                                    .show()
+                                        if (EnrollmentViewModel.addressSaved.value) {
+                                            coroutineScope.launch {
+                                                if (gpsCoords && EnrollmentViewModel.addressSaved.value) {
+                                                    navController.navigate(P4pScreens.SelectLocationMap.route)
+                                                } else {
+                                                    if (!EnrollmentViewModel.addressSaved.value) Toast
+                                                        .makeText(
+                                                            context,
+                                                            "Save the address first",
+                                                            Toast.LENGTH_SHORT
+                                                        )
+                                                        .show()
+                                                    if (!gpsCoords) Toast
+                                                        .makeText(
+                                                            context,
+                                                            "GPS coords invalid",
+                                                            Toast.LENGTH_SHORT
+                                                        )
+                                                        .show()
+                                                }
                                             }
                                         }
                                     }
@@ -363,7 +376,8 @@ fun SaveNewAddressScreen(
                                     painter = painterResource(
                                         id = R.drawable.ic_location_point
                                     ),
-                                    contentDescription = ""
+                                    contentDescription = "",
+                                    colorFilter = ColorFilter.tint(color = if (EnrollmentViewModel.addressSaved.value) green1 else gray30)
                                 )
                             }
                         }
@@ -447,16 +461,14 @@ fun SaveNewAddressScreen(
                         )
                     }
                     saveFamilyAddressLoadingState == LoadingState.LOADED || updateAddressLoadingState == LoadingState.LOADED -> {
-                        EnrollmentViewModel.addressSaved.value = true
                         EnrollmentViewModel.selectedAddress.value =
                             addressViewModel.saveAddressResponse.value
                         selectedAddress.value = addressViewModel.saveAddressResponse.value
 
-
-
                         gpsCoords =
                             ((saveAddressResponse.lat != null) && (saveAddressResponse.lat != 0.0)
                                     && (saveAddressResponse.lng != null) && (saveAddressResponse.lng != 0.0))
+                        EnrollmentViewModel.addressSaved.value = true
 
                         LaunchedEffect(key1 = true) {
                             viewModel.getAddresses(currentUser.familyId)

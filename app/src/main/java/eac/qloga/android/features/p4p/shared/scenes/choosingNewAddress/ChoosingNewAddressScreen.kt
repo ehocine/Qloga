@@ -241,7 +241,6 @@ fun ChoosingNewAddressScreen(
                                                         )
                                                         AddressViewModel.selectedAddressSuggestion.value =
                                                             addressSuggestion
-//                                                        addressViewModel.getFullAddress(id = addressSuggestion.id)
                                                         EnrollmentViewModel.addressSaved.value =
                                                             false
                                                         AddressViewModel.searchAddress.value = true
