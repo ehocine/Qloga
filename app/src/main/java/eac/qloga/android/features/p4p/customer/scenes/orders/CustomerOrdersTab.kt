@@ -1,5 +1,6 @@
 package eac.qloga.android.features.p4p.customer.scenes.orders
 
+import P4pCustomerScreens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -33,30 +34,30 @@ fun CustomerOrdersTab(
                     showMapMarker = false,
                     showFirstLastVisit = true,
                     onClickCard = {
-                        //navController.navigate(Screen.CustomerOrder.route)
+                        navController.navigate(P4pCustomerScreens.CustomerOrder.route)
                     }
                 ){
-                    //navController.navigate(Screen.CustomerOrder.route)
+                    navController.navigate(P4pCustomerScreens.CustomerOrder.route)
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 AcceptedCard(
                     showMapMarker = false,
                     showFirstLastVisit = true,
                     onClickCard = {
-                        //navController.navigate(Screen.CustomerOrder.route)
+                        navController.navigate(P4pCustomerScreens.CustomerOrder.route)
                     }
                 ){
-                    //navController.navigate(Screen.CustomerOrder.route)
+                    navController.navigate(P4pCustomerScreens.CustomerOrder.route)
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 FundCard(
                     showMapMarker = false,
                     showFirstLastVisit = false,
                     onClickCard = {
-                        //navController.navigate(Screen.CustomerOrder.route)
+                        navController.navigate(P4pCustomerScreens.CustomerOrder.route)
                     }
                 ){
-                    //navController.navigate(Screen.CustomerOrder.route)
+                    navController.navigate(P4pCustomerScreens.CustomerOrder.route)
                 }
             }
         }

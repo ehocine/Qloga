@@ -3,10 +3,7 @@ package eac.qloga.android.features.platform.landing.scenes.signUp
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -22,6 +19,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -36,6 +34,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import eac.qloga.android.R
 import eac.qloga.android.core.shared.components.Buttons
+import eac.qloga.android.core.shared.components.Containers
 import eac.qloga.android.core.shared.components.InputFields
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.theme.Red10
@@ -69,8 +68,10 @@ fun SignupScreen(
     val context = LocalContext.current
     val screenHeightDp = remember { mutableStateOf(0) }
     val errorRedColor = Red10.copy(alpha = .3f)
+    var bottomBtnContainerHeight by remember{ mutableStateOf(0.dp) }
 
     val scope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
     val signUpLoadingState by viewModel.signUpLoadingState.collectAsState()
 
     val isValidEmail by derivedStateOf {
@@ -92,7 +93,8 @@ fun SignupScreen(
         topBar = {
             TitleBar(
                 label = LandingScreens.Signup.titleName,
-                backgroundColor = Color.Transparent
+                backgroundColor = Color.Transparent,
+                iconColor = MaterialTheme.colorScheme.primary
             ){
                 navController.navigateUp()
             }
@@ -125,20 +127,9 @@ fun SignupScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .verticalScroll(scrollState)
                     .padding(horizontal = containerHorizontalPadding)
             ) {
-//                Spacer(modifier = Modifier.padding(top = 64.dp))
-//                Box(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    contentAlignment = Alignment.Center
-//                ) {
-//                    Image(
-//                        modifier = Modifier.size(84.dp),
-//                        painter = painterResource(R.drawable.qloga_small_logo),
-//                        contentScale = ContentScale.Crop,
-//                        contentDescription = null
-//                    )
-//                }
                 Spacer(Modifier.padding(top = topPadding + containerTopPadding*2 + 4.dp))
 
                 Buttons.FullRoundedButton(
@@ -362,14 +353,14 @@ fun SignupScreen(
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(20.dp))
+
+                Spacer(modifier = Modifier.height(16.dp))
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 24.dp)
+                        .width(IntrinsicSize.Max),
+                    horizontalAlignment = Alignment.End
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Checkbox(
@@ -401,78 +392,93 @@ fun SignupScreen(
                             )
                         }
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    when (signUpLoadingState) {
-                        LoadingState.LOADING -> {
-                            Box(
-                                modifier = Modifier.fillMaxWidth(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator(color = green1)
-                            }
-                        }
-                        LoadingState.LOADED -> {
-                            navController.navigate(LandingScreens.PostSignup.route)
-                        }
-                        else -> {
-                            Buttons.FullRoundedButton(
-                                buttonText = "Apply",
-                                backgroundColor = MaterialTheme.colorScheme.primary.copy(
-                                    if(isApplyBtnDisabled) .6f else 1f
-                                )
-                            ) {
-                                if(!isApplyBtnDisabled){
-                                    when(true){
-                                        !isAgreeChecked.value -> {
-                                            Toast.makeText(
-                                                context,
-                                                "Check the terms & conditions",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            return@FullRoundedButton
-                                        }
-                                        !isValidEmail -> {
-                                            Toast.makeText(
-                                                context,
-                                                "Invalid email format! ",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            return@FullRoundedButton
-                                        }
-                                        else -> {
-                                            scope.launch {
-                                                viewModel.signUpApply()
-                                            }
-                                        }
-                                    }
-                                }else{
-                                    Toast.makeText(
-                                        context,
-                                        "Fill all the fields first",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                                clickedApply.value = true
-                            }
+
+                    Row {
+                        Text(
+                            modifier = Modifier.padding(end = 4.dp),
+                            text = "and",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = gray30
+                        )
+                        Text(
+                            modifier = Modifier
+                                .clickable(
+                                    interactionSource = interactionSource,
+                                    indication = null
+                                ) {
+                                    navController.navigate(LandingScreens.DataPrivacy.route)
+                                },
+                            text = "data privacy policy",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            textDecoration = TextDecoration.Underline,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(bottomBtnContainerHeight/3 + 8.dp))
+                }
+            }
+
+            Containers.BottomButtonContainer(
+                modifier = Modifier
+                    .onGloballyPositioned { layoutCoordinates ->
+                        bottomBtnContainerHeight = layoutCoordinates.size.height.dp
+                    }
+                    .align(Alignment.BottomCenter)
+            ) {
+                when (signUpLoadingState) {
+                    LoadingState.LOADING -> {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = green1)
                         }
                     }
-
-                    Spacer(modifier = Modifier.height(20.dp))
-                    Text(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable(
-                                interactionSource = interactionSource,
-                                indication = null
-                            ) {
-                                navController.navigate(LandingScreens.DataPrivacy.route)
-                            },
-                        text = "Data privacy",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary,
-                        textDecoration = TextDecoration.Underline,
-                        textAlign = TextAlign.Center
-                    )
+                    LoadingState.LOADED -> {
+                        navController.navigate(LandingScreens.PostSignup.route)
+                    }
+                    else -> {
+                        Buttons.FullRoundedButton(
+                            buttonText = "Apply",
+                            backgroundColor = MaterialTheme.colorScheme.primary.copy(
+                                if(isApplyBtnDisabled) .6f else 1f
+                            )
+                        ) {
+                            if(!isApplyBtnDisabled){
+                                when(true){
+                                    !isAgreeChecked.value -> {
+                                        Toast.makeText(
+                                            context,
+                                            "Check the terms & conditions",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        return@FullRoundedButton
+                                    }
+                                    !isValidEmail -> {
+                                        Toast.makeText(
+                                            context,
+                                            "Invalid email format! ",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        return@FullRoundedButton
+                                    }
+                                    else -> {
+                                        scope.launch {
+                                            viewModel.signUpApply()
+                                        }
+                                    }
+                                }
+                            }else{
+                                Toast.makeText(
+                                    context,
+                                    "Fill all the fields first",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                            clickedApply.value = true
+                        }
+                    }
                 }
             }
         }

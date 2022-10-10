@@ -18,6 +18,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import eac.qloga.android.R
@@ -28,39 +29,15 @@ import eac.qloga.android.features.p4p.shared.utils.AccountType
 
 @ExperimentalMaterial3Api
 @Composable
-fun AccountTypeSwitchInfoDialog(
+fun ProfileInfoDialog(
     accountType: AccountType,
-    showAgain: Boolean,
-    onCheckShowAgain: () -> Unit,
-    onClose: () -> Unit
+    isDontShowAgainChecked: Boolean = false,
+    onClickCheckBox: () -> Unit,
+    goToProfile: () -> Unit
 ) {
     val imageSize = 130.dp
-    val inlineId = "inlineContent"
-    val labelText = buildAnnotatedString {
-        append("To switch to ")
-        appendInlineContent(inlineId, "[Account Type]")
-        append(" mode click onto profile icon")
-    }
-
-    val inlineContent = mapOf(
-        Pair(inlineId,
-            InlineTextContent(
-                Placeholder(
-                    width = 85.sp,
-                    height = 24.sp,
-                    placeholderVerticalAlign = PlaceholderVerticalAlign.Center
-                )
-            ) {
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = if (accountType == AccountType.CUSTOMER) "Provider" else "Customer",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = if(accountType == AccountType.CUSTOMER) info_sky else MaterialTheme.colorScheme.primary,
-                    textAlign = TextAlign.Center
-                )
-            }
-        )
-    )
+    val labelText = if(accountType == AccountType.PROVIDER) "To update your profile in future click on icon"
+                    else "To get started, you need to set up your profile by icon"
 
     Box(
         modifier = Modifier
@@ -103,10 +80,10 @@ fun AccountTypeSwitchInfoDialog(
 
             Text(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 24.dp)
                     .align(Alignment.Start),
                 text = buildAnnotatedString {
-                    append("You entered QLOGA as  ")
+                    append("You entered QLOGA as ")
                     append(
                         AnnotatedString(if(accountType == AccountType.CUSTOMER) "Customer" else "Provider",
                             spanStyle = SpanStyle(
@@ -125,7 +102,7 @@ fun AccountTypeSwitchInfoDialog(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 24.dp)
                 ,
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
@@ -135,17 +112,31 @@ fun AccountTypeSwitchInfoDialog(
                         .weight(1f)
                         .padding(end = 8.dp),
                     text = labelText,
-                    inlineContent = inlineContent,
                     style = MaterialTheme.typography.bodySmall,
                     color = gray30
                 )
-                Icon(
-                    painter = painterResource(
-                        id = if(accountType == AccountType.CUSTOMER) R.drawable.ic_ql_person else R.drawable.ic_ql_provider_people
-                    ),
-                    contentDescription = "",
-                    tint = if(accountType == AccountType.CUSTOMER) MaterialTheme.colorScheme.primary else info_sky
-                )
+
+                if(accountType == AccountType.CUSTOMER){
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        painter = painterResource(
+                            id = R.drawable.ic_ql_person
+                        ),
+                        contentDescription = "",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                if(accountType == AccountType.PROVIDER){
+                    Icon(
+                        modifier = Modifier.size(30.dp),
+                        painter = painterResource(
+                            id =  R.drawable.ic_ql_provider_people
+                        ),
+                        contentDescription = "",
+                        tint = info_sky
+                    )
+                }
             }
             Spacer(modifier = Modifier.height(4.dp))
             Row(
@@ -157,9 +148,9 @@ fun AccountTypeSwitchInfoDialog(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Checkbox(
-                    modifier = Modifier.padding(0.dp),
-                    checked = showAgain, //if show is true not check else check
-                    onCheckedChange = { onCheckShowAgain() },
+                    modifier = Modifier.clip(RoundedCornerShape(8.dp)),
+                    checked = isDontShowAgainChecked, //if show is true not check else check
+                    onCheckedChange = { onClickCheckBox() },
                     colors = CheckboxDefaults.colors(
                         uncheckedColor = gray1
                     )
@@ -174,14 +165,26 @@ fun AccountTypeSwitchInfoDialog(
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
-                    .clickable { onClose() }
+                    .clickable { goToProfile() }
                     .background(MaterialTheme.colorScheme.primary)
                     .padding(horizontal = 48.dp, vertical = 8.dp)
                 ,
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "Close", color  = Color.White, style = MaterialTheme.typography.titleMedium)
+                Text(text = "Go to profile", color  = Color.White, style = MaterialTheme.typography.titleMedium)
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Composable
+fun PreviewDialog() {
+    ProfileInfoDialog(
+        accountType = AccountType.CUSTOMER,
+        isDontShowAgainChecked = false,
+        goToProfile = {},
+        onClickCheckBox = {}
+    )
 }

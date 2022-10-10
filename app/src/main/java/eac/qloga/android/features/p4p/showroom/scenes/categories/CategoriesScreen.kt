@@ -17,9 +17,10 @@ import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.utils.CONTAINER_TOP_PADDING
 import eac.qloga.android.core.shared.utils.SCREEN_HORIZONTAL_PADDING
 import eac.qloga.android.core.shared.viewmodels.ApiViewModel
-import eac.qloga.android.features.p4p.shared.scenes.P4pSharedScreens
-import eac.qloga.android.features.p4p.shared.scenes.serviceInfo.ServiceInfoViewModel
+import eac.qloga.android.data.shared.models.ServicesWithConditions
+import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
+import eac.qloga.android.features.p4p.shared.scenes.serviceInfo.ServiceInfoViewModel
 import eac.qloga.android.features.p4p.showroom.shared.components.CategoryList
 import eac.qloga.android.features.p4p.showroom.shared.components.DescriptionText
 import eac.qloga.android.features.p4p.showroom.shared.components.TopNavBar
@@ -148,9 +149,10 @@ private fun ServicesListCard(
                         summery = service.descr,
                         catChanged = catChanged,
                         onClick = {
-                            ServiceInfoViewModel.selectedService.value = service
+                            ServiceInfoViewModel.servicesWithConditions.value =
+                                ServicesWithConditions(service,null,null)
                             coroutineScope.launch {
-                                navController.navigate(P4pSharedScreens.ServiceInfo.route)
+                                navController.navigate(P4pScreens.ServiceInfo.route)
                             }
                         },
                         onShowProviders = {

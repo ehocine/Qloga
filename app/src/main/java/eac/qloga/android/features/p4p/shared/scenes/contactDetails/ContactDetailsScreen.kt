@@ -21,7 +21,7 @@ import eac.qloga.android.R
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.utils.AddressConverter
 import eac.qloga.android.core.shared.utils.CONTAINER_TOP_PADDING
-import eac.qloga.android.features.p4p.shared.scenes.P4pSharedScreens
+import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,7 +41,7 @@ fun ContactDetailsScreen(
     Scaffold(
         topBar = {
             TitleBar(
-                label = P4pSharedScreens.ContactDetails.titleName,
+                label = P4pScreens.ContactDetails.titleName,
                 iconColor = MaterialTheme.colorScheme.primary,
             ) {
                 navigationActions.upPress()

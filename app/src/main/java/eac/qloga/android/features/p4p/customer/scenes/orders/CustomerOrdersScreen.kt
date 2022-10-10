@@ -32,8 +32,11 @@ import eac.qloga.android.core.shared.components.ImagePlaceholder
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.utils.InputFieldState
 import eac.qloga.android.features.p4p.customer.shared.components.CustomerOrdersSearchFilter
-import eac.qloga.android.features.p4p.customer.shared.viewModels.CustomerNegotiationViewModel
+import eac.qloga.android.features.p4p.customer.shared.viewModels.CustomerDashboardViewModel
 import eac.qloga.android.features.p4p.shared.components.OrdersTabRow
+import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
+import eac.qloga.android.features.p4p.shared.scenes.account.AccountViewModel
+import eac.qloga.android.features.p4p.shared.utils.AccountType
 import eac.qloga.android.features.p4p.shared.utils.OrdersTabTypes
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import kotlinx.coroutines.launch
@@ -47,7 +50,7 @@ import kotlinx.coroutines.launch
 fun CustomerOrdersScreen(
     navController: NavController,
     hideNavBar: (Boolean) -> Unit = {},
-    viewModel: CustomerNegotiationViewModel = hiltViewModel()
+    viewModel: CustomerDashboardViewModel = hiltViewModel()
 ) {
     val orderNumberState = remember{ mutableStateOf(InputFieldState(text = "10" ))}
     val isOrdersEmpty = remember{ mutableStateOf(false) }
@@ -76,7 +79,7 @@ fun CustomerOrdersScreen(
         sheetContent = {
             CustomerOrdersSearchFilter(
                 orderNumberState = orderNumberState.value,
-                selectedStatus = viewModel.selectedStatus.value,
+                selectedStatus = viewModel.selectedStatus,
                 fromDate = fromDate.value,
                 toDate = toDate.value,
                 onChangeOrderValue = { orderNumberState.value = orderNumberState.value.copy(text =it)},
@@ -107,10 +110,8 @@ fun CustomerOrdersScreen(
                         UserButton(
                             onClick = {
                                 scope.launch {
-                                    //navController.navigate(
-                                    //    Screen.Account.route+"?$ACCOUNT_TYPE_KEY=${AccountType.CUSTOMER.label}" +
-                                    //            "&$PARENT_ROUTE_KEY=${Screen.CustomerNavContainer.route}"
-                                    //)
+                                    AccountViewModel.selectedAccountType = AccountType.CUSTOMER
+                                    navController.navigate(P4pScreens.Account.route)
                                 }
                             },
                             color = MaterialTheme.colorScheme.primary

@@ -19,33 +19,33 @@ import com.google.accompanist.flowlayout.FlowRow
 import eac.qloga.android.R
 import eac.qloga.android.core.shared.components.Buttons.FullRoundedButton
 import eac.qloga.android.core.shared.components.Buttons.UserButton
-import eac.qloga.android.core.shared.components.Chips.SelectedServiceChip
 import eac.qloga.android.core.shared.components.Containers.BottomButtonContainer
 import eac.qloga.android.core.shared.components.ImagePlaceholder
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.utils.CONTAINER_TOP_PADDING
 import eac.qloga.android.core.shared.utils.SCREEN_HORIZONTAL_PADDING
 import eac.qloga.android.core.shared.viewmodels.ApiViewModel
-import eac.qloga.android.features.p4p.customer.shared.viewModels.CustomerNegotiationViewModel
+import eac.qloga.android.features.p4p.customer.shared.viewModels.CustomerDashboardViewModel
 import eac.qloga.android.features.p4p.shared.components.ServicesItem
+import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
+import eac.qloga.android.features.p4p.shared.scenes.account.AccountViewModel
+import eac.qloga.android.features.p4p.shared.utils.AccountType
 import eac.qloga.android.features.p4p.shared.utils.ServiceEvent
 import eac.qloga.android.features.p4p.shared.viewmodels.ServiceViewModel
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import eac.qloga.android.features.p4p.showroom.shared.components.TopNavBar
-import eac.qloga.p4p.lookups.dto.ServiceCategory
 import kotlinx.coroutines.launch
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OpenRequestsScreen(
     navController: NavController,
-    viewModel: CustomerNegotiationViewModel = hiltViewModel(),
+    viewModel: CustomerDashboardViewModel = hiltViewModel(),
     serviceViewModel: ServiceViewModel = hiltViewModel(),
 ) {
     val containerTopPadding = CONTAINER_TOP_PADDING.dp
     val horizontalContentPadding = SCREEN_HORIZONTAL_PADDING.dp
-    val showEmptyState = viewModel.showEmptyStateOpenRequest.value
+    val showEmptyState = viewModel.showEmptyStateOpenRequest
 
     //TODO: replace ServiceCategory by the back-end DTO
     /*
@@ -91,10 +91,8 @@ fun OpenRequestsScreen(
                     UserButton(
                         onClick = {
                             scope.launch {
-                               // navController.navigate(
-                               //     Screen.Account.route+"?$ACCOUNT_TYPE_KEY=${AccountType.CUSTOMER.label}" +
-                               //             "&$PARENT_ROUTE_KEY=${Screen.CustomerNavContainer.route}"
-                               // )
+                                AccountViewModel.selectedAccountType = AccountType.CUSTOMER
+                                navController.navigate(P4pScreens.Account.route)
                             }
                         },
                         color = MaterialTheme.colorScheme.primary
@@ -147,7 +145,7 @@ fun OpenRequestsScreen(
                 Column(modifier = Modifier.fillMaxWidth()) {
                     TopNavBar(
                         onClickItem = {  viewModel.onSelectServiceCategory(it) },
-                        selectedNav = viewModel.selectedServiceCategory.value,
+                        selectedNav = viewModel.selectedServiceCategory,
                         scrollable = true,
                         navList = categoriesList
                     )

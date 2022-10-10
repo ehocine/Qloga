@@ -1,7 +1,6 @@
 package eac.qloga.android.features.p4p.provider.scenes.favouriteCustomers
 
 import android.app.Application
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.runtime.State
@@ -13,8 +12,6 @@ import eac.qloga.android.core.shared.utils.LoadingState
 import eac.qloga.android.data.p4p.provider.P4pProviderRepository
 import eac.qloga.android.data.qbe.MediaRepository
 import eac.qloga.android.data.shared.models.AvatarImage
-import eac.qloga.android.data.shared.models.MediaSize
-import eac.qloga.android.features.p4p.provider.scenes.favouriteCustomer.FavouriteCustomerViewModel
 import eac.qloga.p4p.cst.dto.CstPublicProfile
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers

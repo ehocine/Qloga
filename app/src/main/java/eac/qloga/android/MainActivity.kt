@@ -21,7 +21,7 @@ import eac.qloga.android.core.scenes.CoreScreens
 import eac.qloga.android.core.shared.theme.QLOGATheme
 import eac.qloga.android.core.shared.utils.QTAG
 
-private val TAG = "${QTAG}-MainActivity"
+private const val TAG = "${QTAG}-MainActivity"
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -104,6 +104,45 @@ private fun BuildScreen() {
                     customerOrders(navController)
                     favouriteProviders(navController)
                     openRequests(navController)
+                    account(navController)
+                    providerAccountSettings(navController)
+                    customerAccountSettings(navController)
+                    inquiredServices(navController)
+                    selectAddress(navController)
+                    quote(navController)
+                    tracking(navController)
+                    paymentTracking(navController)
+                    displayVisits(navController)
+                    editVisits(navController)
+                    inquiry(navController)
+                    searchedAddrResult(navController)
+                    addressAdd(navController)
+                    addPrvAddress(navController)
+                    settingsPhone(navController)
+                    settingsEmail(navController)
+                    settingsLanguage(navController)
+                    businessDetails(navController)
+                    prvCstTC(navController)
+                    faqDashboard(navController)
+                    faQuestions(navController)
+                    servicesConditions(navController)
+                    workingScheduleEdit(navController)
+                    providedService(navController)
+                    providedServiceConditions(navController)
+                    openRequestList(navController)
+                    request(navController)
+                    customerOrder(navController)
+                    providerOrder(navController)
+                    notesEdit(navController)
+                    orderNotes(navController)
+                    providerOrderFilter(navController)
+                    closedOrder(navController)
+                    orderPayment(navController)
+                    orderVisits(navController)
+                    paidOrder(navController)
+                    showLocationMapView(navController)
+                    orderAddrMapview(navController)
+                    orderMapGps(navController)
                 }
             )
         }

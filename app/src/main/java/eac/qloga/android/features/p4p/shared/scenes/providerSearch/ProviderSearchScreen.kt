@@ -34,9 +34,12 @@ import eac.qloga.android.core.shared.components.Provider
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.theme.gray1
 import eac.qloga.android.core.shared.theme.gray30
+import eac.qloga.android.features.p4p.provider.scenes.P4pProviderScreens
 import eac.qloga.android.features.p4p.shared.components.BottomSheetFilter
 import eac.qloga.android.features.p4p.shared.components.TwoSwitchTabRow
 import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
+import eac.qloga.android.features.p4p.shared.scenes.account.AccountViewModel
+import eac.qloga.android.features.p4p.shared.utils.AccountType
 import eac.qloga.android.features.p4p.shared.utils.FilterTypes
 import eac.qloga.android.features.p4p.shared.viewmodels.ProviderSearchViewModel
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
@@ -133,10 +136,8 @@ fun ProviderSearchScreen(
                             UserButton(
                                 onClick = {
                                     scope.launch {
-                                       //navController.navigate(
-                                       // Screen.Account.route+"?$ACCOUNT_TYPE_KEY=${AccountType.CUSTOMER.label}" +
-                                       //     "&$PARENT_ROUTE_KEY=${Screen.CustomerNavContainer.route}"
-                                       // )
+                                        AccountViewModel.selectedAccountType = AccountType.CUSTOMER
+                                        navController.navigate(P4pScreens.Account.route)
                                     }
                                 },
                                 color = MaterialTheme.colorScheme.primary
@@ -279,7 +280,7 @@ fun ProviderSearchScreen(
                                             description = description,
                                             onClickItem = {
                                                 scope.launch {
-                                                    navController.navigate(P4pShowroomScreens.ProviderDetails.route)
+                                                    navController.navigate(P4pProviderScreens.ProviderProfile.route)
                                                 }
                                             },
                                             statusCompose = {

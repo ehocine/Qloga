@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import eac.qloga.android.core.shared.components.Buttons
 import eac.qloga.android.core.shared.theme.gray30
 
 @Composable
@@ -36,7 +37,8 @@ fun ExpandableConditionsListItem(
 
     Column( modifier = modifier.fillMaxWidth() ) {
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .clickable(
                     interactionSource = interactionSource,
                     indication = null
@@ -48,8 +50,7 @@ fun ExpandableConditionsListItem(
             CircleDot()
             Spacer(Modifier.width(8.dp))
             Text(
-                modifier = Modifier.weight(1f)
-                ,
+                modifier = Modifier.weight(1f).padding(end = 8.dp),
                 text = label,
                 style = MaterialTheme.typography.titleMedium,
                 color = gray30,
@@ -60,28 +61,16 @@ fun ExpandableConditionsListItem(
             )
 
             // expand arrow button
-            Box(
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .clickable { expanded.value = !expanded.value }
-                    .padding(8.dp)
-                    .rotate(animatedExpandIconAngle.value)
-            ) {
-                Icon(
-                    modifier = Modifier
-                        .size(20.dp)
-                    ,
-                    imageVector = Icons.Rounded.ArrowForwardIos,
-                    contentDescription = "",
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
+            Buttons.IOSArrowForwardButton(
+                modifier = Modifier.rotate(animatedExpandIconAngle.value),
+                onClick = { expanded.value = !expanded.value }
+            )
         }
         AnimatedVisibility(visible = expanded.value,) {
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 4.dp),
+                    .padding(top = 4.dp, start = 16.dp),
                 text = description,
                 style = MaterialTheme.typography.titleSmall,
                 color = gray30

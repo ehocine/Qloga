@@ -23,8 +23,11 @@ import eac.qloga.android.R
 import eac.qloga.android.core.shared.components.Buttons.UserButton
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.features.p4p.customer.shared.components.FavouriteProvidersListItem
-import eac.qloga.android.features.p4p.customer.shared.viewModels.CustomerNegotiationViewModel
+import eac.qloga.android.features.p4p.customer.shared.viewModels.CustomerDashboardViewModel
 import eac.qloga.android.features.p4p.shared.components.OrdersEmptyStateCard
+import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
+import eac.qloga.android.features.p4p.shared.scenes.account.AccountViewModel
+import eac.qloga.android.features.p4p.shared.utils.AccountType
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import kotlinx.coroutines.launch
 
@@ -32,7 +35,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun FavouriteProvidersScreen(
     navController: NavController,
-    viewModel: CustomerNegotiationViewModel = hiltViewModel()
+    viewModel: CustomerDashboardViewModel = hiltViewModel()
 ) {
     val containerHorizontalPadding = 24.dp
     val isProvidersEmpty = remember{ mutableStateOf(false) }
@@ -54,10 +57,8 @@ fun FavouriteProvidersScreen(
                     UserButton(
                         onClick = {
                             scope.launch {
-                                //navController.navigate(
-                                //    Screen.Account.route+"?$ACCOUNT_TYPE_KEY=${AccountType.CUSTOMER.label}" +
-                                //            "&$PARENT_ROUTE_KEY=${Screen.CustomerNavContainer.route}"
-                                //)
+                                AccountViewModel.selectedAccountType = AccountType.CUSTOMER
+                                navController.navigate(P4pScreens.Account.route)
                             }
                         },
                         color = MaterialTheme.colorScheme.primary

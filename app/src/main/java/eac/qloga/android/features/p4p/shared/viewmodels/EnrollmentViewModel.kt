@@ -24,6 +24,7 @@ import eac.qloga.android.data.qbe.FamiliesRepository
 import eac.qloga.android.data.qbe.PlatformRepository
 import eac.qloga.android.data.shared.models.VrfPhone
 import eac.qloga.android.features.p4p.shared.utils.EnrollmentEvent
+import eac.qloga.android.features.p4p.shared.utils.EnrollmentEvent.*
 import eac.qloga.android.features.p4p.shared.utils.EnrollmentType
 import eac.qloga.bare.dto.Contacts
 import eac.qloga.bare.dto.person.Address
@@ -118,50 +119,27 @@ class EnrollmentViewModel @Inject constructor(
     fun onTriggerEvent(event: EnrollmentEvent) {
         try {
             viewModelScope.launch {
-                when (event) {
-                    is EnrollmentEvent.EnterCode -> {
-                        enterCode(event.code)
-                    }
-                    is EnrollmentEvent.EnterNumber -> {
-                        enterNumber(event.number)
-                    }
-                    is EnrollmentEvent.EnterAddress -> {
-                        enterAddress(event.address)
-                    }
-                    is EnrollmentEvent.FocusAddressInput -> {
-                        onFocusAddressInput(event.focusState)
-                    }
-                    is EnrollmentEvent.FocusCodeInput -> {
-                        onFocusCodeInput(event.focusState)
-                    }
-                    is EnrollmentEvent.FocusNumberInput -> {
-                        onFocusNumberInput(event.focusState)
-                    }
-                    is EnrollmentEvent.SelectCountryCode -> {
-                        _selectedCountryCode.value = event.countryCode
-                    }
-                    is EnrollmentEvent.SendCode -> {
-                        sendCode()
-                    }
-                    is EnrollmentEvent.SubmitCode -> {
-
-                    }
-                    is EnrollmentEvent.ToggleCheckTermsConditions -> {
-                        _isCheckTermsConditions.value = !isCheckTermsConditions.value
-                    }
-                    is EnrollmentEvent.ClickMap -> {
-                        _userLocation.value = event.latLng
-                    }
-                    is EnrollmentEvent.ClearAddress -> {
-                        _addressFieldState.value = addressFieldState.value.copy(
-                            text = ""
-                        )
-                    }
+                when(event){
+                    is EnterCode -> { enterCode(event.code)}
+                    is EnterNumber -> { enterNumber(event.number) }
+                    is EnterAddress -> { enterAddress(event.address) }
+                    is FocusAddressInput -> { onFocusAddressInput(event.focusState) }
+                    is FocusCodeInput -> { onFocusCodeInput(event.focusState) }
+                    is FocusNumberInput -> { onFocusNumberInput(event.focusState) }
+                    is SelectCountryCode -> { _selectedCountryCode.value = event.countryCode }
+                    is SendCode -> { sendCode() }
+                    is SubmitCode -> { submitCode() }
+                    is ToggleCheckTermsConditions -> { _isCheckTermsConditions.value = !isCheckTermsConditions.value}
+                    is ClickMap -> { _userLocation.value = event.latLng }
                 }
             }
         } catch (e: Exception) {
             Log.d(TAG, "onTriggerEvent: ${e.printStackTrace()}")
         }
+    }
+
+    private fun submitCode(){
+
     }
 
     fun parseAddressFromLatLng(

@@ -26,21 +26,22 @@ fun TopNavBar(
 
     LaunchedEffect(Unit) {
         scope.launch {
-            selectedNav?.let {
-                val index =
-                    when (navList.indexOf(it)) {
-                        0 -> {
-                            navList.indexOf(it)
-                        }
-                        1 -> {
-                            navList.indexOf(it) - 1
-                        }
-                        else -> {
-                            navList.indexOf(it) - 2
-                        }
-                    }
-                lazyScrollState.animateScrollToItem(index)
-            }
+            //TODO animated scroll
+//            selectedNav?.let {
+//                val index =
+//                    when (navList.indexOf(it)) {
+//                        0 -> {
+//                            navList.indexOf(it)
+//                        }
+//                        1 -> {
+//                            navList.indexOf(it) - 1
+//                        }
+//                        else -> {
+//                            navList.indexOf(it) - 2
+//                        }
+//                    }
+//                lazyScrollState.animateScrollToItem(index)
+//            }
         }
     }
 

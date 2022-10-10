@@ -16,7 +16,7 @@ import eac.qloga.android.R
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.utils.CONTAINER_TOP_PADDING
 import eac.qloga.android.core.shared.utils.RatingConverter
-import eac.qloga.android.features.p4p.shared.scenes.P4pSharedScreens
+import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
 import eac.qloga.android.features.p4p.showroom.shared.components.RatingFiveStar
 import eac.qloga.android.features.p4p.showroom.shared.components.StatusButton
 
@@ -34,7 +34,7 @@ fun RatingDetailsScreen(
     Scaffold(
         topBar = {
             TitleBar(
-                label = P4pSharedScreens.RatingDetails.titleName,
+                label = P4pScreens.RatingDetails.titleName,
                 iconColor = MaterialTheme.colorScheme.primary,
             ) {
                 navigationActions.upPress()
@@ -58,12 +58,15 @@ fun RatingDetailsScreen(
 
 
             ratings.forEach {
-                RatingFiveStar(
-                    label = it.categoryName,
-                    ratings = RatingConverter.ratingToNorm(it.rating.toFloat()).toInt(),
-                    textStyle = MaterialTheme.typography.bodySmall
-                )
-                Spacer(modifier = Modifier.height(8.dp))
+                val convertedRating = RatingConverter.ratingToNorm(it.rating.toFloat())
+                if(convertedRating != null){
+                    RatingFiveStar(
+                        label = it.categoryName,
+                        ratings = convertedRating.toInt(),
+                        textStyle = MaterialTheme.typography.bodySmall
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
             }
         }
     }

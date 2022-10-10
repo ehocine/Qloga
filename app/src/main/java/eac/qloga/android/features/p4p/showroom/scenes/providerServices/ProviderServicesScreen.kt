@@ -11,13 +11,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -27,16 +24,15 @@ import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import coil.size.Size
-import eac.qloga.android.R
 import eac.qloga.android.core.shared.components.Buttons
 import eac.qloga.android.core.shared.components.Cards.ContainerBorderedCard
 import eac.qloga.android.core.shared.components.DividerLines
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.utils.CONTAINER_TOP_PADDING
+import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
+import eac.qloga.android.features.p4p.shared.scenes.serviceInfo.ServiceInfoViewModel
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
-import eac.qloga.android.features.p4p.showroom.shared.components.ContractButton
 import eac.qloga.android.features.p4p.showroom.shared.components.ListInfo
-import java.text.DecimalFormat
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,9 +42,8 @@ fun ProviderServicesScreen(
 ) {
     val containerTopPadding = CONTAINER_TOP_PADDING.dp
     val containerHorizontalPadding = 24.dp
-    val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
-    val services = viewModel.serviceWithCategories.value
+    val services = viewModel.servicesWithCategories
 
     LaunchedEffect(key1 = Unit, key2 = ProviderServicesViewModel.providerServices.value){
         viewModel.loadServices()
@@ -116,7 +111,10 @@ fun ProviderServicesScreen(
 
                                 Column(
                                     modifier = Modifier
-                                        .clickable {  }
+                                        .clickable {
+                                            ServiceInfoViewModel.servicesWithConditions.value = service
+                                            navController.navigate(P4pScreens.ServiceInfo.route)
+                                        }
                                         .padding(start = 16.dp, top = 12.dp, end = 4.dp)
                                 ) {
                                     Row(
@@ -145,7 +143,7 @@ fun ProviderServicesScreen(
                                         }
                                     }
                                     service?.conditions?.forEach {
-                                        ListInfo(label = it)
+                                        ListInfo(label = it.name)
                                     }
                                     Spacer(modifier = Modifier.height(12.dp))
                                     if(index != servicesList.size - 1){

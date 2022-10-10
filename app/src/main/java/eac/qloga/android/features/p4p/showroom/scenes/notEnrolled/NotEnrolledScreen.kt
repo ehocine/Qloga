@@ -35,7 +35,7 @@ import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import eac.qloga.android.features.p4p.showroom.shared.components.LeftNavBar
 import eac.qloga.android.features.p4p.showroom.shared.components.MainContent
 import eac.qloga.android.features.p4p.showroom.shared.components.SearchBar
-import eac.qloga.android.features.p4p.showroom.shared.viewModels.AddressViewModel
+import eac.qloga.android.features.p4p.shared.viewmodels.AddressViewModel
 import eac.qloga.android.features.platform.landing.scenes.LandingScreens
 import kotlinx.coroutines.launch
 

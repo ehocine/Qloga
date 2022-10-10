@@ -2,7 +2,6 @@ package eac.qloga.android.features.p4p.shared.scenes.serviceInfo
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
@@ -17,12 +16,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
@@ -33,7 +31,7 @@ import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.theme.gray30
 import eac.qloga.android.core.shared.theme.green1
 import eac.qloga.android.core.shared.utils.CONTAINER_TOP_PADDING
-import eac.qloga.android.features.p4p.shared.scenes.P4pSharedScreens
+import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
 import eac.qloga.android.features.p4p.showroom.shared.components.ExpandableConditionsListItem
 import eac.qloga.android.features.p4p.showroom.shared.components.SelectedListItem
 import eac.qloga.android.features.p4p.showroom.shared.components.StatusButton
@@ -42,13 +40,11 @@ import eac.qloga.android.features.p4p.showroom.shared.components.StatusButton
 @Composable
 fun ServiceInfoScreen(
     navActions: NavigationActions,
-    viewModel: ServiceInfoViewModel = hiltViewModel()
 ) {
-    val selectedService by ServiceInfoViewModel.selectedService
+    val services by ServiceInfoViewModel.servicesWithConditions
 
     val imageWidth = 120.dp
     val containerTopPadding = CONTAINER_TOP_PADDING.dp
-    val conditions = emptyList<String>()
 
     val context = LocalContext.current
     val scrollState = rememberScrollState()
@@ -57,7 +53,7 @@ fun ServiceInfoScreen(
     Scaffold(
         topBar = {
             TitleBar(
-                label = P4pSharedScreens.ServiceInfo.titleName,
+                label = P4pScreens.ServiceInfo.titleName,
                 iconColor = MaterialTheme.colorScheme.primary,
             ) { navActions.upPress() }
         }
@@ -75,8 +71,10 @@ fun ServiceInfoScreen(
             Spacer(modifier = Modifier.height(containerTopPadding))
             Text(
                 modifier = Modifier.fillMaxWidth(),
-                text = selectedService?.name ?: "",
-                style = MaterialTheme.typography.titleMedium
+                text = services?.service?.name ?: "",
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.W600
+                )
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -99,7 +97,7 @@ fun ServiceInfoScreen(
                         Text(
                             modifier = Modifier
                                 .padding(start = 8.dp),
-                            text = "${selectedService?.unit ?: ""}(${selectedService?.unitDescr ?: ""})",
+                            text = "${services?.service?.unit ?: ""}(${services?.service?.unitDescr ?: ""})",
                             style = MaterialTheme.typography.titleMedium,
                             color = gray30,
                         )
@@ -111,16 +109,18 @@ fun ServiceInfoScreen(
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onBackground
                         )
-                        Text(
-                            modifier = Modifier
-                                .alpha(.75f)
-                                .padding(start = 8.dp),
-                            text = "100.0 £",
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontSize = 16.sp
-                            ),
-                            color = gray30,
-                        )
+                        if(services?.unitPrice != null){
+                            Text(
+                                modifier = Modifier
+                                    .alpha(.75f)
+                                    .padding(start = 8.dp),
+                                text = "${services?.unitPrice} £",
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    fontSize = 16.sp
+                                ),
+                                color = gray30,
+                            )
+                        }
                     }
                     Spacer(Modifier.height(8.dp))
                     Row(
@@ -135,7 +135,7 @@ fun ServiceInfoScreen(
                             modifier = Modifier
                                 .alpha(.75f)
                                 .padding(start = 8.dp),
-                            text = "${selectedService?.timeNorm} min",
+                            text = "${services?.service?.timeNorm} min",
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 fontSize = 16.sp
                             ),
@@ -151,9 +151,8 @@ fun ServiceInfoScreen(
                         .width(imageWidth)
                         .padding(start = 8.dp, top = 8.dp, bottom = 8.dp),
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(selectedService?.avatarUrl)
+                        .data(services?.service?.avatarUrl)
                         .crossfade(true)
-//                        .error(R.drawable.account)
                         .build(),
                     contentDescription = null
                 ) {
@@ -162,15 +161,13 @@ fun ServiceInfoScreen(
                             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                                 CircularProgressIndicator(color = green1)
                                 PulsePlaceholder(
-                                    modifier = Modifier.width(imageWidth),
-                                    roundedCornerShape = RoundedCornerShape(8.dp)
+                                    modifier = Modifier.size(imageWidth),
                                 )
                             }
                         }
                         else -> {
                             SubcomposeAsyncImageContent(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(8.dp)),
+                                modifier = Modifier,
                                 contentScale = ContentScale.Crop,
                                 alignment = Alignment.TopCenter
                             )
@@ -180,42 +177,30 @@ fun ServiceInfoScreen(
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-            selectedService?.let {
+            services?.service?.let {
                 SelectedListItem(
                     title = "Description:",
                     label = it.descr
                 )
             }
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = "Conditions: ",
-                style = MaterialTheme.typography.titleMedium
-            )
 
-//            Text(
-//                modifier = Modifier.fillMaxWidth(),
-//                text = "Conditions: ",
-//                style = MaterialTheme.typography.titleMedium
-//            )
-//
-//            Spacer(Modifier.height(8.dp))
-//
-//            conditionsList.forEach {
-//                ExpandableConditionsListItem(
-//                    label = it.name,
-//                    description = it.descr
-//                )
-//                Spacer(Modifier.height(8.dp))
-//            }
-            Spacer(Modifier.height(8.dp))
-            conditions.forEach { _ ->
-                ExpandableConditionsListItem(
-                    label = "",
-                    description = ""
+            if(services?.conditions != null && services!!.conditions?.isNotEmpty() == true){
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = "Conditions: ",
+                    style = MaterialTheme.typography.titleMedium
                 )
                 Spacer(Modifier.height(8.dp))
             }
-            Spacer(Modifier.height(8.dp))
+
+            services?.conditions?.forEach { condition ->
+                ExpandableConditionsListItem(
+                    label = condition.name,
+                    description = condition.descr
+                )
+                Spacer(Modifier.height(4.dp))
+            }
+            Spacer(Modifier.height(32.dp))
             StatusButton(
                 label = "Full service contract",
                 count = "",

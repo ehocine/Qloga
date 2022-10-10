@@ -8,10 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -24,32 +21,32 @@ import eac.qloga.android.features.p4p.customer.scenes.favouriteProviders.Favouri
 import eac.qloga.android.features.p4p.customer.scenes.openRequests.OpenRequestsScreen
 import eac.qloga.android.features.p4p.customer.scenes.orders.CustomerOrdersScreen
 import eac.qloga.android.features.p4p.customer.shared.components.CustomerBottomNavItems
-import eac.qloga.android.features.p4p.customer.shared.components.CustomerInfoDialog
-import eac.qloga.android.features.p4p.customer.shared.viewModels.CustomerNegotiationViewModel
+import eac.qloga.android.features.p4p.customer.shared.viewModels.CustomerDashboardViewModel
+import eac.qloga.android.features.p4p.shared.components.ProfileInfoDialog
+import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
+import eac.qloga.android.features.p4p.shared.scenes.account.AccountViewModel
 import eac.qloga.android.features.p4p.shared.scenes.providerSearch.ProviderSearchScreen
-import eac.qloga.android.features.p4p.shared.viewmodels.ServiceViewModel
+import eac.qloga.android.features.p4p.shared.utils.AccountType
 
 @RequiresApi(Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomerDashboardScreen(
     navController: NavController,
-    viewModel: CustomerNegotiationViewModel = hiltViewModel(),
-    serviceViewModel: ServiceViewModel = hiltViewModel()
-
-    // introViewModel: IntroViewModel,
+    viewModel: CustomerDashboardViewModel = hiltViewModel(),
 ) {
-    val selectedNavItem = viewModel.selectedNavItem.value
+    val selectedNavItem = viewModel.selectNavItem
     val showBottomNavBar = remember { mutableStateOf(true) }
-    val dontShowInfoDialogAgain = viewModel.notShowAgainCustomerInfoDialog.value
-    val showInfoDialog = viewModel.showAccountSwitchInfoDialog.value
+    var showProfileInfoDialog by remember{ mutableStateOf(false) }
+    var alreadyShownProfileInfoDialog by remember{ mutableStateOf(false) }
 
-    LaunchedEffect(Unit){
-        viewModel.onShowAccountSwitchInfoDialog(!dontShowInfoDialogAgain)
+    LaunchedEffect(viewModel.showProfileInfoDialog){
+        if(!alreadyShownProfileInfoDialog){
+            showProfileInfoDialog = viewModel.showProfileInfoDialog
+        }
     }
 
     Scaffold{ paddingValues ->
-
         val titleBarHeight = paddingValues.calculateTopPadding()
 
         Box(modifier = Modifier.fillMaxSize()) {
@@ -88,8 +85,6 @@ fun CustomerDashboardScreen(
                         CustomerBottomNavItems.REQUESTS -> {
                             OpenRequestsScreen(
                                 navController = navController,
-                                viewModel = viewModel,
-                                serviceViewModel = serviceViewModel
                             )
                         }
                     }
@@ -165,20 +160,20 @@ fun CustomerDashboardScreen(
                 }
             }
 
-            if(showInfoDialog && viewModel.showAccountSwitchInfoDialogCount.value < 1){
+            if(showProfileInfoDialog){
+                alreadyShownProfileInfoDialog = true
                 Dialog(
-                    onDismissRequest = {
-                        viewModel.onShowAccountSwitchInfoDialog(false)
-                        viewModel.onAccountSwitchInfoDialogInc()
-                    }
+                    onDismissRequest = { showProfileInfoDialog = false }
                 ) {
-                    CustomerInfoDialog(
-                        showAgain = dontShowInfoDialogAgain,
-                        onCheckShowAgain = { viewModel.toggleNotShowAgainDialog() }
-                    ) {
-                        viewModel.onShowAccountSwitchInfoDialog(false)
-                        viewModel.onAccountSwitchInfoDialogInc()
-                    }
+                    ProfileInfoDialog(
+                        accountType = AccountType.CUSTOMER,
+                        isDontShowAgainChecked = !viewModel.showProfileInfoDialog,
+                        onClickCheckBox = { viewModel.toggleProfileInfoDialogCheck() },
+                        goToProfile = {
+                            AccountViewModel.selectedAccountType = AccountType.CUSTOMER
+                            navController.navigate(P4pScreens.Account.route)
+                        }
+                    )
                 }
             }
         }

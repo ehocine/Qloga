@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import eac.qloga.android.core.shared.utils.QTAG
+import eac.qloga.android.data.shared.models.ServicesWithConditions
 import eac.qloga.android.features.p4p.showroom.shared.utils.CleaningServiceCategory
 import eac.qloga.p4p.lookups.dto.QService
 import javax.inject.Inject
@@ -15,9 +16,8 @@ class ServiceInfoViewModel @Inject constructor() : ViewModel() {
 
     companion object {
         const val TAG = "${QTAG}-ServiceInfoViewModel"
-        val selectedService: MutableState<QService?> = mutableStateOf(null)
+        val servicesWithConditions = mutableStateOf<ServicesWithConditions?>(null)
     }
-
 
     private val _checked = mutableStateOf(false)
     val checked: State<Boolean> = _checked

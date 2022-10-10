@@ -19,7 +19,7 @@ import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.components.address.AddressMapView
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import eac.qloga.android.features.p4p.showroom.scenes.addAddress.AddressEvent
-import eac.qloga.android.features.p4p.showroom.shared.viewModels.AddressViewModel
+import eac.qloga.android.features.p4p.shared.viewmodels.AddressViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)

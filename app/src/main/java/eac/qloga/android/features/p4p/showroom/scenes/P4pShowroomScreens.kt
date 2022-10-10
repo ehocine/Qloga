@@ -10,7 +10,6 @@ sealed class P4pShowroomScreens(
     object AddressOnMap: P4pShowroomScreens("address_on_map", "Address")
     object Categories: P4pShowroomScreens("service_categories", "Service categories")
     object ServiceContract: P4pShowroomScreens("service_contract", "Service contract")
-    object ProviderDetails: P4pShowroomScreens("providers_details", "Provider")
     object PortfolioAlbums: P4pShowroomScreens("portfolio_albums", "Albums")
     object ProviderServices: P4pShowroomScreens("provider_services", "Provider Services")
     object ProviderWorkingSchedule: P4pShowroomScreens("provider_working_schedule", "Working schedule")
@@ -25,8 +24,7 @@ sealed class P4pShowroomScreens(
                 Categories,
                 ProviderWorkingSchedule,
                 ServiceContract,
-                ProviderDetails,
-                PortfolioAlbums
+                PortfolioAlbums,
             )
         }
     }

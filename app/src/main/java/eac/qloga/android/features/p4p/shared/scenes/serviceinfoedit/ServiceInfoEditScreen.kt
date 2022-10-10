@@ -23,7 +23,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
@@ -35,12 +34,8 @@ import eac.qloga.android.core.shared.theme.gray30
 import eac.qloga.android.core.shared.theme.grayTextColor
 import eac.qloga.android.core.shared.theme.green1
 import eac.qloga.android.core.shared.utils.CONTAINER_TOP_PADDING
-import eac.qloga.android.core.shared.viewmodels.ApiViewModel
-import eac.qloga.android.features.p4p.shared.scenes.P4pSharedScreens
+import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
 import eac.qloga.android.features.p4p.shared.scenes.serviceInfo.ServiceInfoViewModel
-import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
-import eac.qloga.android.features.p4p.showroom.scenes.categories.CategoriesViewModel
-import eac.qloga.android.features.p4p.showroom.shared.components.ExpandableConditionsListItem
 import eac.qloga.android.features.p4p.showroom.shared.components.SelectedListItem
 import eac.qloga.android.features.p4p.showroom.shared.components.StatusButton
 import eac.qloga.android.features.service.presentation.components.CountingButton
@@ -52,11 +47,11 @@ fun ServiceInfoEditScreen(
     navActions: NavigationActions,
     viewModel: ServiceInfoViewModel = hiltViewModel(),
 ) {
-    val selectedService by ServiceInfoViewModel.selectedService
+    val service by ServiceInfoViewModel.servicesWithConditions
 
     val containerTopPadding = CONTAINER_TOP_PADDING.dp
     val scrollState = rememberScrollState()
-    val headerText = selectedService?.name
+    val headerText = service?.service?.name
     val imageWidth = 120.dp
 
     val context = LocalContext.current
@@ -65,7 +60,7 @@ fun ServiceInfoEditScreen(
     Scaffold(
         topBar = {
             TitleBar(
-                label = P4pSharedScreens.ServiceInfoEdit.titleName,
+                label = P4pScreens.ServiceInfoEdit.titleName,
                 iconColor = MaterialTheme.colorScheme.primary,
                 actions = {
                     TitleBarDelete {
@@ -124,7 +119,7 @@ fun ServiceInfoEditScreen(
                         Text(
                             modifier = Modifier
                                 .padding(start = 8.dp),
-                            text = "${selectedService!!.unit}(${selectedService!!.unitDescr})",
+                            text = "${service?.service?.unit}(${service?.service?.unitDescr})",
                             style = MaterialTheme.typography.titleMedium,
                             color = gray30,
                         )
@@ -173,7 +168,7 @@ fun ServiceInfoEditScreen(
                             modifier = Modifier
                                 .alpha(.75f)
                                 .padding(start = 8.dp),
-                            text = "${selectedService?.timeNorm} min",
+                            text = "${service?.service?.timeNorm} min",
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 fontSize = 16.sp
                             ),
@@ -189,7 +184,7 @@ fun ServiceInfoEditScreen(
                         .width(imageWidth)
                         .padding(start = 8.dp, top = 8.dp, bottom = 8.dp),
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(selectedService?.avatarUrl)
+                        .data(service?.service?.avatarUrl)
                         .crossfade(true)
 //                        .error(R.drawable.account)
                         .build(),
@@ -214,7 +209,7 @@ fun ServiceInfoEditScreen(
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-            selectedService?.let {
+            service?.service?.let {
                 SelectedListItem(
                     title = "Description:",
                     label = it.descr

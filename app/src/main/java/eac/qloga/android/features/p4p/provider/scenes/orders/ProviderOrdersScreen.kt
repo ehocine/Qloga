@@ -33,15 +33,17 @@ import eac.qloga.android.core.shared.components.Buttons.MapButton
 import eac.qloga.android.core.shared.components.Buttons.ProviderUserButton
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.theme.gray30
-import eac.qloga.android.core.shared.theme.info_sky
 import eac.qloga.android.core.shared.utils.InputFieldState
 import eac.qloga.android.features.p4p.provider.scenes.P4pProviderScreens
 import eac.qloga.android.features.p4p.provider.scenes.inquiresTab.ProviderInquiresTabScreen
 import eac.qloga.android.features.p4p.provider.scenes.ordersTab.ProviderOrdersTabScreen
 import eac.qloga.android.features.p4p.provider.scenes.quotesTab.ProviderQuotesTabScreen
 import eac.qloga.android.features.p4p.provider.shared.utils.ProviderOrdersSearchFilter
-import eac.qloga.android.features.p4p.provider.shared.viewModels.ProviderNegotiationViewModel
+import eac.qloga.android.features.p4p.provider.shared.viewModels.ProviderDashboardViewModel
 import eac.qloga.android.features.p4p.shared.components.OrdersTabRow
+import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
+import eac.qloga.android.features.p4p.shared.scenes.account.AccountViewModel
+import eac.qloga.android.features.p4p.shared.utils.AccountType
 import eac.qloga.android.features.p4p.shared.utils.OrdersTabTypes
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import kotlinx.coroutines.launch
@@ -54,7 +56,7 @@ import kotlinx.coroutines.launch
 fun ProviderOrdersScreen(
     navController: NavController,
     hideNavBar: (Boolean) -> Unit = {},
-    viewModel: ProviderNegotiationViewModel = hiltViewModel()
+    viewModel: ProviderDashboardViewModel = hiltViewModel()
 ) {
     val containerHorizontalPadding = 24.dp
     val isOrdersEmpty = remember{ mutableStateOf(false) }
@@ -120,14 +122,10 @@ fun ProviderOrdersScreen(
                         ProviderUserButton(
                             onClick = {
                                 scope.launch {
-                                   /* navController.navigate(
-                                        Screen.Account.route+"?$ACCOUNT_TYPE_KEY=${AccountType.PROVIDER.label}" +
-                                                "&$PARENT_ROUTE_KEY=${Screen.ProviderNavContainer.route}"
-                                    )
-                                    */
+                                    AccountViewModel.selectedAccountType = AccountType.PROVIDER
+                                    navController.navigate(P4pScreens.Account.route)
                                 }
-                            },
-                            color = info_sky
+                            }
                         )
                     }
                 )

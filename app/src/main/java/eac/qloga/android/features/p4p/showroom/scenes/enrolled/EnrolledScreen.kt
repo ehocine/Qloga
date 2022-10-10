@@ -1,5 +1,6 @@
 package eac.qloga.android.features.p4p.showroom.scenes.enrolled
 
+import P4pCustomerScreens
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -88,11 +89,7 @@ fun EnrolledScreen(
                         when(currentEnrollment){
                             EnrollmentType.CUSTOMER->{
                                 //User is already a customer, we go to customer dashboard
-                                Toast.makeText(
-                                    context,
-                                    "You are already a customer, Customer dashboard not yet implemented",
-                                    Toast.LENGTH_LONG
-                                ).show()
+                                navController.navigate(P4pCustomerScreens.CustomerDashboard.route)
                             }
                             EnrollmentType.PROVIDER->{
                                 //User is already a provider and wants to become a customer
@@ -103,11 +100,7 @@ fun EnrolledScreen(
                             }
                             else->{
                                 //User is already a customer, we go to customer dashboard
-                                Toast.makeText(
-                                    context,
-                                    "You are already a customer, Customer dashboard not yet implemented",
-                                    Toast.LENGTH_LONG
-                                ).show()
+                                navController.navigate(P4pCustomerScreens.CustomerDashboard.route)
                             }
                         }
                     }

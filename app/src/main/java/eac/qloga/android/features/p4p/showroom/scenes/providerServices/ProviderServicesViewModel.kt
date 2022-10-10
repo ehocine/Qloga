@@ -1,37 +1,26 @@
 package eac.qloga.android.features.p4p.showroom.scenes.providerServices
 
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.SavedStateHandle
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import eac.qloga.android.core.shared.utils.LoadingState
-import eac.qloga.android.core.shared.utils.PROVIDER_ID
 import eac.qloga.android.core.shared.viewmodels.ApiViewModel
-import eac.qloga.android.data.p4p.customer.P4pCustomerRepository
-import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
+import eac.qloga.android.data.shared.models.ServicesWithConditions
+import eac.qloga.android.data.shared.models.conditions.ConditionsResponse
 import eac.qloga.p4p.lookups.dto.QService
 import eac.qloga.p4p.lookups.dto.ServiceCategory
-import eac.qloga.p4p.prv.dto.Provider
+import eac.qloga.p4p.lookups.dto.ServiceCondition
 import eac.qloga.p4p.prv.dto.ProviderService
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
 class ProviderServicesViewModel @Inject constructor(): ViewModel() {
 
-//    private val coroutineExceptionHandler = CoroutineExceptionHandler{ _, throwable ->
-//        throwable.printStackTrace()
-//    }
-
     companion object{
-        val prvId = mutableStateOf<Long?>(null)
         val providerServices = mutableStateOf<List<ProviderService>>(emptyList())
     }
 
@@ -39,10 +28,11 @@ class ProviderServicesViewModel @Inject constructor(): ViewModel() {
     val qServices = ApiViewModel.qServices.value
     val conditions = ApiViewModel.conditions.value
 
-    private val _servicesWithConditions = mutableStateOf<List<ServicesWithCondition>>(emptyList())
+    var servicesWithConditions by mutableStateOf<List<ServicesWithConditions>>(emptyList())
+        private set
 
-    private val _servicesWithCategories = mutableStateOf<Map<ServiceCategory, List<ServicesWithCondition?>>>(emptyMap())
-    val serviceWithCategories: State<Map<ServiceCategory, List<ServicesWithCondition?>>> = _servicesWithCategories
+    var servicesWithCategories by mutableStateOf<Map<ServiceCategory, List<ServicesWithConditions?>>>(emptyMap())
+        private set
 
     fun loadServices(){
         viewModelScope.launch {
@@ -72,39 +62,34 @@ class ProviderServicesViewModel @Inject constructor(): ViewModel() {
         val service = qServices.find { it.id == pService.qServiceId }
         val category = service?.let { getCategory(it) }
         val newServiceWithConditions = ArrayList(
-            listOf(_servicesWithConditions.value.find { it.service == service })
+            listOf(servicesWithConditions.find { it.service == service })
         )
+        val previousServices = servicesWithCategories[category]
 
-        val previousServices = _servicesWithCategories.value[category]
         previousServices?.let {
             newServiceWithConditions.addAll(previousServices)
         }
+        val setResult = newServiceWithConditions.toSet() //to remove duplication
 
         if(category != null){
-            _servicesWithCategories.value = _servicesWithCategories.value.plus(
-                mapOf(Pair(category,newServiceWithConditions))
+            servicesWithCategories = servicesWithCategories.plus(
+                mapOf(Pair(category,setResult.toList()))
             )
         }
     }
 
     private fun concatServiceConditions(pService: ProviderService){
-        val sConditions: ArrayList<String> = arrayListOf()
+        val sConditions: ArrayList<ServiceCondition> = arrayListOf()
         pService.conditions.forEach { condId ->
             val condition = conditions.find { it.id == condId }
-            condition?.let { sConditions.add(condition.name) }
+            condition?.let { sConditions.add(condition) }
         }
         val service = qServices.find { it.id == pService.qServiceId }
 
         service?.let {
-            val cloned = ArrayList(_servicesWithConditions.value)
-            cloned.add(ServicesWithCondition(service,pService.unitCost,sConditions))
-            _servicesWithConditions.value = cloned
+            val cloned = ArrayList(servicesWithConditions)
+            cloned.add(ServicesWithConditions(service,pService.unitCost,sConditions))
+            servicesWithConditions = cloned
         }
     }
 }
-
-data class ServicesWithCondition(
-    val service: QService,
-    val unitPrice: Long,
-    val conditions: List<String>
-)

@@ -35,7 +35,10 @@ import eac.qloga.android.core.shared.utils.CONTAINER_TOP_PADDING
 import eac.qloga.android.features.p4p.provider.scenes.P4pProviderScreens
 import eac.qloga.android.features.p4p.provider.shared.components.CustomersMapView
 import eac.qloga.android.features.p4p.provider.shared.components.ProviderBottomSheetCustomers
-import eac.qloga.android.features.p4p.provider.shared.viewModels.ProviderNegotiationViewModel
+import eac.qloga.android.features.p4p.provider.shared.viewModels.ProviderDashboardViewModel
+import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
+import eac.qloga.android.features.p4p.shared.scenes.account.AccountViewModel
+import eac.qloga.android.features.p4p.shared.utils.AccountType
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import eac.qloga.android.features.p4p.showroom.shared.components.IconStatus
 import kotlinx.coroutines.launch
@@ -45,7 +48,7 @@ import kotlinx.coroutines.launch
 fun CustomersScreen(
     navController: NavController,
     hideNavBar: (Boolean) -> Unit = {},
-    viewModel: ProviderNegotiationViewModel = hiltViewModel()
+    viewModel: ProviderDashboardViewModel = hiltViewModel()
     ) {
     val containerTopPadding = CONTAINER_TOP_PADDING.dp
     val isMapShown = viewModel.isShownMap.value
@@ -107,15 +110,9 @@ fun CustomersScreen(
                         }, Color.Black )
                         ProviderUserButton(
                             onClick = {
-                                scope.launch {
-                                    /*navController.navigate(
-                                        Screen.Account.route+"?$ACCOUNT_TYPE_KEY=${AccountType.PROVIDER.label}" +
-                                                "&$PARENT_ROUTE_KEY=${Screen.ProviderNavContainer.route}"
-                                    )
-                                     */
-                                }
-                            },
-                            color = info_sky
+                                AccountViewModel.selectedAccountType = AccountType.PROVIDER
+                                navController.navigate(P4pScreens.Account.route)
+                            }
                         )
                     }
                 ) {

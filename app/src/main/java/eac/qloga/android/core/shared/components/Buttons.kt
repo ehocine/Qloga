@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import eac.qloga.android.R
 import eac.qloga.android.core.shared.theme.gray1
+import eac.qloga.android.core.shared.theme.info_sky
 import eac.qloga.android.core.shared.theme.orange1
 import eac.qloga.android.core.shared.utils.BUTTON_HEIGHT
 
@@ -50,7 +51,7 @@ object Buttons {
     }
 
     @Composable
-    fun ProviderUserButton(onClick: () -> Unit, color: Color) {
+    fun ProviderUserButton(onClick: () -> Unit, color: Color = info_sky) {
         IconButton(onClick = { onClick() }, color = color, iconId = R.drawable.ic_ql_prv_user)
     }
 
@@ -162,6 +163,91 @@ object Buttons {
             }
         }
     }
+
+    @Composable
+    fun AddNewButton(
+        modifier: Modifier = Modifier,
+        onClick: () -> Unit,
+        textStyle: TextStyle = defaultTitleBarBtnTextStyle(),
+        textColor: Color = orange1
+    ) {
+        Box(
+            modifier = modifier
+                .clip(RoundedCornerShape(12.dp))
+                .clickable { onClick() }
+                .padding(4.dp),
+        ) {
+            Text(
+                text = "Add new",
+                color = textColor,
+                style = textStyle,
+                fontWeight = FontWeight.W600
+            )
+        }
+    }
+
+    @Composable
+    fun ByStatusButton(
+        modifier: Modifier = Modifier,
+        onClick: () -> Unit,
+        textStyle: TextStyle = defaultTitleBarBtnTextStyle(),
+        textColor: Color = MaterialTheme.colorScheme.primary
+    ) {
+        Box(
+            modifier = modifier
+                .clip(RoundedCornerShape(12.dp))
+                .clickable { onClick() }
+                .padding(8.dp)
+        ) {
+            Text(
+                text = "By Status",
+                style = textStyle.copy(fontSize = 16.sp),
+                color = textColor,
+            )
+        }
+    }
+
+    @Composable
+    fun AddButton(
+        modifier: Modifier = Modifier,
+        onClick: () -> Unit,
+        textStyle: TextStyle = defaultTitleBarBtnTextStyle(),
+        textColor: Color = orange1
+    ) {
+        Box(
+            modifier = modifier
+                .clip(RoundedCornerShape(12.dp))
+                .clickable { onClick() }
+                .padding(8.dp),
+        ) {
+            Text(
+                text = "Add",
+                color = textColor,
+                style = textStyle
+            )
+        }
+    }
+
+    @Composable
+    fun SaveButton(
+        modifier: Modifier = Modifier,
+        onClick: () -> Unit,
+        textStyle: TextStyle = defaultTitleBarBtnTextStyle(),
+        textColor : Color = orange1
+    ){
+        Box(
+            modifier = modifier
+                .clip(RoundedCornerShape(12.dp))
+                .clickable { onClick() }
+                .padding(8.dp),
+        ) {
+            Text(
+                text = "Save",
+                color = textColor,
+                style = textStyle
+            )
+        }
+    }
 }
 
 @Composable
@@ -208,48 +294,6 @@ fun DoneButton(
 }
 
 @Composable
-fun ByStatusButton(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-    textStyle: TextStyle = defaultTitleBarBtnTextStyle(),
-    textColor: Color = MaterialTheme.colorScheme.primary
-) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
-            .clickable { onClick() }
-            .padding(8.dp)
-    ) {
-        Text(
-            text = "By Status",
-            style = textStyle.copy(fontSize = 16.sp),
-            color = textColor,
-        )
-    }
-}
-
-@Composable
-fun AddButton(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-    textStyle: TextStyle = defaultTitleBarBtnTextStyle(),
-    textColor: Color = orange1
-) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
-            .clickable { onClick() }
-            .padding(8.dp),
-    ) {
-        Text(
-            text = "Add",
-            color = textColor,
-            style = textStyle
-        )
-    }
-}
-
-@Composable
 fun SaveButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
@@ -260,43 +304,15 @@ fun SaveButton(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
             .clickable {
-                if (!isLoading) {
-                    onClick()
-                }
+                if (!isLoading) { onClick() }
             }
             .padding(8.dp),
     ) {
-        val textColor: Color = if (!isLoading) {
-            orange1
-        } else {
-            gray1
-        }
+        val textColor: Color = if (!isLoading) orange1 else gray1
         Text(
             text = "Done",
             color = textColor,
             style = textStyle
-        )
-    }
-}
-
-@Composable
-fun AddNewButton(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-    textStyle: TextStyle = defaultTitleBarBtnTextStyle(),
-    textColor: Color = orange1
-) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
-            .clickable { onClick() }
-            .padding(4.dp),
-    ) {
-        Text(
-            text = "Add new",
-            color = textColor,
-            style = textStyle,
-            fontWeight = FontWeight.W600
         )
     }
 }

@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import eac.qloga.android.NavigationActions
 import eac.qloga.android.core.shared.components.Cards
 import eac.qloga.android.core.shared.components.DividerLines
 import eac.qloga.android.core.shared.components.TitleBar
@@ -25,10 +24,8 @@ import eac.qloga.android.core.shared.utils.CONTAINER_TOP_PADDING
 import eac.qloga.android.core.shared.utils.DateConverter
 import eac.qloga.android.core.shared.utils.TimeConverter
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
-import eac.qloga.android.features.p4p.showroom.scenes.providerDetails.ProviderDetailsViewModel
 import eac.qloga.android.features.p4p.showroom.shared.components.DayWorkingHourItem
 import eac.qloga.android.features.p4p.showroom.shared.components.TimeOffItem
-import eac.qloga.bare.dto.WorkHours
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)

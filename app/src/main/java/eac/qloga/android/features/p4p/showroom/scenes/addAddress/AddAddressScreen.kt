@@ -46,7 +46,7 @@ import eac.qloga.android.core.shared.utils.LoadingState
 import eac.qloga.android.core.shared.viewmodels.ApiViewModel
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import eac.qloga.android.features.p4p.showroom.shared.components.ParkingSelection
-import eac.qloga.android.features.p4p.showroom.shared.viewModels.AddressViewModel
+import eac.qloga.android.features.p4p.shared.viewmodels.AddressViewModel
 import eac.qloga.bare.dto.person.Address
 import eac.qloga.bare.enums.Parking
 import kotlinx.coroutines.launch

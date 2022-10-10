@@ -41,7 +41,7 @@ import eac.qloga.android.core.shared.utils.LoadingState
 import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
 import eac.qloga.android.features.p4p.shared.utils.EnrollmentEvent
 import eac.qloga.android.features.p4p.shared.viewmodels.EnrollmentViewModel
-import eac.qloga.android.features.p4p.showroom.shared.viewModels.AddressViewModel
+import eac.qloga.android.features.p4p.shared.viewmodels.AddressViewModel
 import eac.qloga.bare.dto.person.Address
 import kotlinx.coroutines.launch
 

@@ -62,7 +62,7 @@ fun ServiceContractScreen(
                         factory = { context -> TextView(context) },
                         update = {
                             it.text = HtmlCompat.fromHtml(
-                                ServiceInfoViewModel.selectedService.value!!.contractBareHTML,
+                                ServiceInfoViewModel.servicesWithConditions.value?.service?.contractBareHTML?: "",
                                 HtmlCompat.FROM_HTML_MODE_COMPACT
                             )
                             it.setLineSpacing(20.0f, 1.0f)

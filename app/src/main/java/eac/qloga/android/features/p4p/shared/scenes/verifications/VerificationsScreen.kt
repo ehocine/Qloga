@@ -1,8 +1,6 @@
 package eac.qloga.android.features.p4p.shared.scenes.verifications
 
 import android.app.Application
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -21,7 +19,7 @@ import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.utils.CONTAINER_TOP_PADDING
 import eac.qloga.android.features.p4p.shared.components.VerificationsItemList
 import eac.qloga.android.features.p4p.shared.components.VerificationsStatusButton
-import eac.qloga.android.features.p4p.shared.scenes.P4pSharedScreens
+import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
 import eac.qloga.bare.enums.VerificationHolderType
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,7 +39,7 @@ fun VerificationsScreen(
     Scaffold(
         topBar = {
             TitleBar(
-                label = P4pSharedScreens.Verifications.titleName,
+                label = P4pScreens.Verifications.titleName,
                 iconColor = MaterialTheme.colorScheme.primary,
             ) {
                 navigationActions.upPress()

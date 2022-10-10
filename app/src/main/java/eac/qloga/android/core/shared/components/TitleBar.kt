@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -36,6 +37,18 @@ fun TitleBar(
     onBackPress: () -> Unit = {}
 ) {
     val titleBarHeight = 60.dp
+    val brushBackground = Brush.verticalGradient(
+        listOf(
+            MaterialTheme.colorScheme.background,
+            MaterialTheme.colorScheme.background.copy(.96f),
+            MaterialTheme.colorScheme.background.copy(.96f),
+            MaterialTheme.colorScheme.background.copy(.96f),
+            MaterialTheme.colorScheme.background.copy(.96f),
+            MaterialTheme.colorScheme.background.copy(.96f),
+            Color.Transparent,
+        )
+    )
+
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -46,7 +59,7 @@ fun TitleBar(
                 0.dp,
                 if (showBottomBorder) 1.dp else 0.dp
             )
-            .background(backgroundColor)
+            .background(backgroundColor.copy(.95f))
             .padding(start = 4.dp, end = 4.dp, top = 8.dp, bottom = 4.dp)
         ,
         contentAlignment = Alignment.Center

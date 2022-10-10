@@ -1,5 +1,6 @@
 package eac.qloga.android.features.p4p.provider.scenes.favouriteCustomers
 
+import P4pCustomerScreens
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -23,9 +24,12 @@ import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.theme.info_sky
 import eac.qloga.android.core.shared.utils.AddressConverter
 import eac.qloga.android.features.p4p.provider.scenes.P4pProviderScreens
-import eac.qloga.android.features.p4p.provider.scenes.favouriteCustomer.FavouriteCustomerViewModel
+import eac.qloga.android.features.p4p.customer.scenes.customerProfile.CustomerProfileViewModel
 import eac.qloga.android.features.p4p.provider.shared.components.FavouriteCustomersListItem
 import eac.qloga.android.features.p4p.shared.components.OrdersEmptyStateCard
+import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
+import eac.qloga.android.features.p4p.shared.scenes.account.AccountViewModel
+import eac.qloga.android.features.p4p.shared.utils.AccountType
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import kotlinx.coroutines.launch
 
@@ -61,17 +65,10 @@ fun FavouriteCustomersScreen(
                     ProviderUserButton(
                         onClick = {
                             scope.launch {
-                                /*
-                                navController.navigate(
-                                    Screen.Account.route+"?$ACCOUNT_TYPE_KEY=${AccountType.PROVIDER.label}" +
-                                            "&$PARENT_ROUTE_KEY=${Screen.ProviderNavContainer.route}"
-                                ){
-                                    popUpTo(P4pProviderScreens.ProviderDashboard.route)
-                                }
-                                 */
+                                AccountViewModel.selectedAccountType = AccountType.PROVIDER
+                                navController.navigate(P4pScreens.Account.route)
                             }
-                        },
-                        color = info_sky
+                        }
                     )
                 }
             )
@@ -107,11 +104,11 @@ fun FavouriteCustomersScreen(
                             FavouriteCustomersListItem(
                                 modifier = Modifier
                                     .clickable {
-                                        FavouriteCustomerViewModel.customerId.value = cstId
-                                        FavouriteCustomerViewModel.providerId.value = prvId
-                                        FavouriteCustomerViewModel.customerProfile.value = favouriteCustomer
+                                        CustomerProfileViewModel.customerId.value = cstId
+                                        CustomerProfileViewModel.providerId.value = prvId
+                                        CustomerProfileViewModel.customerProfile.value = favouriteCustomer
                                         navController.navigate(
-                                            P4pProviderScreens.FavouriteCustomer.route
+                                            P4pCustomerScreens.CustomerProfile.route
                                         )
                                     }
                                     .padding(horizontal = containerHorizontalPadding)
