@@ -66,7 +66,7 @@ fun ExpandableText(
                 charRect.left > textLayoutResult.size.width - seeMoreSize.width
             )
             seeMoreOffsetState.value = Offset(charRect.left, charRect.bottom - seeMoreSize.height)
-            cutText = text.substring(startIndex = 0, endIndex = lastCharIndex - 3) + "..."
+            cutText = text.trim().substring(startIndex = 0, endIndex = lastCharIndex - 3) + "..."
         }
     }
 
@@ -75,7 +75,7 @@ fun ExpandableText(
             // invisible text to count total line of text
             Box(modifier = Modifier.alpha(0f).height(16.dp)) {
                 Text(
-                    text = text,
+                    text = text.trim(),
                     modifier = Modifier.alpha(0f),
                     style = textStyle,
                     onTextLayout = { invisibleTextLayoutResultState.value = it},
@@ -84,7 +84,7 @@ fun ExpandableText(
             }
 
             Text(
-                text = cutText ?: text,
+                text = cutText ?: text.trim(),
                 maxLines = if (expanded) Int.MAX_VALUE else minimizedMaxLines,
                 overflow = TextOverflow.Ellipsis,
                 onTextLayout = { textLayoutResultState.value = it },
@@ -113,7 +113,7 @@ fun ExpandableText(
                             cutText = null
                         }
                         .alpha(if (seeMoreOffset != null) 1f else 0f),
-                    style = expandButtonTextStyle,
+                    style = textStyle,
                     color = MaterialTheme.colorScheme.primary,
                 )
             }
@@ -125,7 +125,7 @@ fun ExpandableText(
                     .clickable { expanded = false }
                 ,
                 text = "Show less",
-                style = expandButtonTextStyle,
+                style = textStyle,
                 color = MaterialTheme.colorScheme.primary
             )
         }
@@ -135,5 +135,5 @@ fun ExpandableText(
 @Preview(showBackground = true)
 @Composable
 fun PreviewExpandableText() {
-    ExpandableText(text = "This is text to expand here it goes ".repeat(20))
+    ExpandableText(text = "Yy ")
 }

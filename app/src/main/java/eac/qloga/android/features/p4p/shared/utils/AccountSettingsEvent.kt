@@ -1,15 +1,19 @@
 package eac.qloga.android.features.p4p.shared.utils
 
 import androidx.compose.ui.focus.FocusState
-import eac.qloga.android.core.shared.utils.CountryCode
+import eac.qloga.android.data.shared.models.Language
+import eac.qloga.bare.dto.lookups.Country
 
 sealed class AccountSettingsEvent {
-    data class SelectCountryCode(val countryCode: CountryCode): AccountSettingsEvent()
+    data class SelectCountryCode(val countryCode: Country): AccountSettingsEvent()
     data class SelectBirthday(val date: String): AccountSettingsEvent()
-    data class SelectSpokenLanguage(val language: SpokenLanguage): AccountSettingsEvent()
+    data class SelectSpokenLanguage(val language: Language): AccountSettingsEvent()
+    data class SelectSpokenLanguageProvider(val language: Language): AccountSettingsEvent()
     data class EnterNumber(val number: String): AccountSettingsEvent()
     data class EnterCode(val code: String): AccountSettingsEvent()
     data class EnterEmail(val email: String): AccountSettingsEvent()
+    data class EnterOrgsEmail(val email: String): AccountSettingsEvent()
+    data class FocusOrgsEmail(val focusState: FocusState): AccountSettingsEvent()
     data class EnterNameSurname(val value: String): AccountSettingsEvent()
     data class EnterMiddleName(val value: String): AccountSettingsEvent()
     data class EnterMaidenName(val value: String): AccountSettingsEvent()
@@ -65,4 +69,6 @@ sealed class AccountSettingsEvent {
     data class FocusProviderBuilding(val focusState: FocusState): AccountSettingsEvent()
     data class EnterProviderApartments(val apartments: String): AccountSettingsEvent()
     data class FocusProviderApartments(val focusState: FocusState): AccountSettingsEvent()
+    data class EnterOrgName(val name: String): AccountSettingsEvent()
+    data class FocusOrgName(val focusState: FocusState): AccountSettingsEvent()
 }

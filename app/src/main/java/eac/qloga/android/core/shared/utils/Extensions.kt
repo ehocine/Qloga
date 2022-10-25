@@ -1,4 +1,4 @@
-package eac.qloga.android.business.util
+package eac.qloga.android.core.shared.utils
 
 import android.graphics.Color.parseColor
 import android.graphics.Rect
@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.Dp
@@ -23,6 +24,10 @@ object Extensions {
 
     val String.color
         get() = Color(parseColor(this))
+
+    val Int.toDoubleDigitStr
+            get() = if(this < 10) "0$this" else this.toString()
+
 
     fun Modifier.advancedShadow(
         color: Color = Color.Black,

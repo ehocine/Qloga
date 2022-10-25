@@ -20,6 +20,10 @@ class ProviderDashboardViewModel @Inject constructor(
     private val datastoreRepository: DatastoreRepository
 ): ViewModel() {
 
+    companion object{
+        var alreadyShownProfileInfoDialog by mutableStateOf(false)
+    }
+
     private val _selectNavItem = mutableStateOf(ProviderBottomNavItems.listOfItems[0])
     val selectedNavItem: State<ProviderBottomNavItems> = _selectNavItem
 
@@ -38,6 +42,9 @@ class ProviderDashboardViewModel @Inject constructor(
     var showProviderInfoDialog by mutableStateOf(false)
         private set
 
+    var showProviderInfoDialogCheck by mutableStateOf(true)
+        private set
+
     fun onSelectNavItem(navItems: ProviderBottomNavItems){
         _selectNavItem.value = navItems
     }
@@ -45,10 +52,6 @@ class ProviderDashboardViewModel @Inject constructor(
     init {
         getCustomersCoordinates()
         observePreferences()
-    }
-
-    fun onAccountSwitchInfoDialogInc(){
-        //_showAccountSwitchInfoDialogCount.value = _showAccountSwitchInfoDialogCount.value + 1
     }
 
     private fun observePreferences() {
@@ -59,7 +62,17 @@ class ProviderDashboardViewModel @Inject constructor(
         }
     }
 
-    fun onToggleShowProviderInfoDialog(){
+    fun onClickDialogCheck(){
+        showProviderInfoDialogCheck = !showProviderInfoDialogCheck
+    }
+
+    fun onDismissInfoDialog(){
+        if(showProviderInfoDialogCheck != showProviderInfoDialog){
+            onToggleShowProviderInfoDialog()
+        }
+    }
+
+    private fun onToggleShowProviderInfoDialog(){
         viewModelScope.launch {
             datastoreRepository.toggleProviderProfileInfoDialog()
         }

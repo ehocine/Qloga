@@ -50,7 +50,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(
-    ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class,
+    ExperimentalMaterial3Api::class,
+    ExperimentalComposeUiApi::class,
     ExperimentalMaterialApi::class
 )
 @Composable
@@ -93,18 +94,16 @@ fun VerifyPhoneScreen(
         sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
         sheetState = modalBottomSheetState,
         sheetContent = {
-            viewModel.countryCodes.value?.let { countryCodes ->
-                CountryCodeList(
-                    selectCountryCode = viewModel.selectedCountryCode.value,
-                    countryCodes = countryCodes,
-                    onSelectCountryCode = {
-                        viewModel.onTriggerEvent(EnrollmentEvent.SelectCountryCode(it))
-                        coroutineScope.launch {
-                            modalBottomSheetState.animateTo(ModalBottomSheetValue.Hidden)
-                        }
+            CountryCodeList(
+                selectCountryCode = viewModel.selectedCountryCode,
+                countryCodes = viewModel.countries,
+                onSelectCountryCode = {
+                    viewModel.onTriggerEvent(EnrollmentEvent.SelectCountryCode(it))
+                    coroutineScope.launch {
+                        modalBottomSheetState.animateTo(ModalBottomSheetValue.Hidden)
                     }
-                )
-            }
+                }
+            )
         }
     ) {
         Scaffold(
@@ -213,7 +212,7 @@ fun VerifyPhoneScreen(
                                 modifier = Modifier
                                     .alpha(.5f)
                                     .padding(end = 8.dp),
-                                text = viewModel.selectedCountryCode.value.name + "(${viewModel.selectedCountryCode.value.dialCode})",
+                                text = viewModel.selectedCountryCode.descr + "(${viewModel.selectedCountryCode.dialcode})",
                                 style = MaterialTheme.typography.titleSmall,
                                 color = grayTextColor
                             )

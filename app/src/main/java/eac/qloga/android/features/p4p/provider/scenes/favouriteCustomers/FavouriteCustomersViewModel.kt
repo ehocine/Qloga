@@ -80,14 +80,18 @@ class FavouriteCustomersViewModel @Inject constructor(
 
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             try {
-                val response = mediaRepository.getImageDataUrl(mediaId,null)
-                val bitmap = BitmapFactory.decodeStream(response.byteStream())
-                val avatarListData = ArrayList(_avatarList.value)
-                avatarListData.add(AvatarImage(id = mediaId, bitmap = bitmap))
-                _avatarList.value = avatarListData
+//                val response = mediaRepository.getImageDataUrl(mediaId,null)
+//                if(response.isSuccessful){
+//                    val bitmap = BitmapFactory.decodeStream(response.body()?.byteStream())
+//                    val avatarListData = ArrayList(_avatarList.value)
+//                    avatarListData.add(AvatarImage(id = mediaId, bitmap = bitmap))
+//                    _avatarList.value = avatarListData
+//                }else{
+//                    Log.e(TAG, "getFavCstProfileImage: code = ${response.code()}, err = ${response.errorBody()}")
+//                }
             }catch (e: IOException){
                 e.printStackTrace()
-                Log.e(TAG, "loadFavouriteCustomersMedia: ${e.printStackTrace()}")
+                Log.e(TAG, "loadFavouriteCustomersMedia: ${e.cause}")
             }
         }
     }

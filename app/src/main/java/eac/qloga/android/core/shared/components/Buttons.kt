@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowForwardIos
 import androidx.compose.material.icons.rounded.Sort
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -232,20 +233,27 @@ object Buttons {
     fun SaveButton(
         modifier: Modifier = Modifier,
         onClick: () -> Unit,
+        isLoading: Boolean = false,
         textStyle: TextStyle = defaultTitleBarBtnTextStyle(),
         textColor : Color = orange1
     ){
         Box(
             modifier = modifier
                 .clip(RoundedCornerShape(12.dp))
-                .clickable { onClick() }
+                .clickable(!isLoading) { onClick() }
                 .padding(8.dp),
         ) {
-            Text(
-                text = "Save",
-                color = textColor,
-                style = textStyle
-            )
+            if(isLoading){
+                Box(modifier = Modifier.size(20.dp)){
+                    CircularProgressIndicator(strokeWidth = 1.6.dp)
+                }
+            }else{
+                Text(
+                    text = "Save",
+                    color = textColor,
+                    style = textStyle
+                )
+            }
         }
     }
 }
@@ -304,7 +312,9 @@ fun SaveButton(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
             .clickable {
-                if (!isLoading) { onClick() }
+                if (!isLoading) {
+                    onClick()
+                }
             }
             .padding(8.dp),
     ) {

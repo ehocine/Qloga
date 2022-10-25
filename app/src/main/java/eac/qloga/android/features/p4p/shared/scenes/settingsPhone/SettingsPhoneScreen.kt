@@ -1,5 +1,7 @@
 package eac.qloga.android.features.p4p.shared.scenes.settingsPhone
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -20,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import eac.qloga.android.core.shared.components.Buttons.FullRoundedButton
+import eac.qloga.android.core.shared.components.Cards
 import eac.qloga.android.core.shared.components.DividerLines.DividerLine
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.theme.gray1
@@ -32,6 +35,7 @@ import eac.qloga.android.features.p4p.shared.utils.AccountSettingsEvent
 import eac.qloga.android.features.p4p.shared.viewmodels.AccountSettingsViewModel
 import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(
     ExperimentalMaterial3Api::class,
     ExperimentalComposeUiApi::class
@@ -44,8 +48,9 @@ fun SettingsPhoneScreen(
     val containerHorizontalPadding = Dimensions.ScreenHorizontalPadding.dp
     val containerTopPadding = Dimensions.ScreenTopPadding.dp
     val keyboardController = LocalSoftwareKeyboardController.current
-    val isCodeSent = viewModel.isCodeSent.value
+    val isCodeSent = viewModel.isCodeSent
     val maxCodeLen = 6
+    val phone = AccountSettingsViewModel.phoneNumberFieldState
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -70,46 +75,49 @@ fun SettingsPhoneScreen(
                 Spacer(modifier = Modifier.height(topPadding))
                 Spacer(modifier = Modifier.height(containerTopPadding))
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(16.dp))
-                        .border(1.5.dp, gray1, RoundedCornerShape(16.dp))
-                        .padding(vertical = 4.dp)
-                        .animateContentSize()
-                    ,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    ////number input
-                    PhoneNumberInputField(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        onValueChange = { viewModel.onTriggerEvent(AccountSettingsEvent.EnterNumber(it))},
-                        isFocused = viewModel.numberFieldState.value.isFocused,
-                        onSubmit = { viewModel.onTriggerEvent(AccountSettingsEvent.SendCode) },
-                        hint = viewModel.numberFieldState.value.hint,
-                        value = viewModel.numberFieldState.value.text,
-                        showBottomLine = false,
-                        onFocusedChanged = { viewModel.onTriggerEvent(AccountSettingsEvent.FocusNumberInput(it))}
-                    )
-                    DividerLine(Modifier.padding(start = 44.dp).alpha(.5f))
-                    CodeInputField(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        onValueChange = { viewModel.onTriggerEvent(AccountSettingsEvent.EnterCode(it))},
-                        onSubmit = { viewModel.onTriggerEvent(AccountSettingsEvent.SubmitCode) },
-                        value = viewModel.codeState.value.text,
-                        hint = viewModel.codeState.value.hint,
-                        showBottomLine = false,
-                        maxLength = maxCodeLen,
-                        onFocusedChanged = { viewModel.onTriggerEvent(AccountSettingsEvent.FocusCodeInput(it))}
-                    )
+                Cards.ContainerBorderedCard {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                            .animateContentSize()
+                        ,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        ////number input
+                        PhoneNumberInputField(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            onValueChange = { viewModel.onTriggerEvent(AccountSettingsEvent.EnterNumber(it))},
+                            isFocused = phone.isFocused,
+                            onSubmit = { viewModel.onTriggerEvent(AccountSettingsEvent.SendCode) },
+                            hint = phone.hint,
+                            value = phone.text,
+                            showBottomLine = false,
+                            onFocusedChanged = { viewModel.onTriggerEvent(AccountSettingsEvent.FocusNumberInput(it))}
+                        )
+                        DividerLine(
+                            Modifier
+                                .padding(start = 44.dp)
+                                .alpha(.5f))
+                        CodeInputField(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            onValueChange = { viewModel.onTriggerEvent(AccountSettingsEvent.EnterCode(it))},
+                            onSubmit = { viewModel.onTriggerEvent(AccountSettingsEvent.SubmitCode) },
+                            value = viewModel.codeState.text,
+                            hint = viewModel.codeState.hint,
+                            showBottomLine = false,
+                            maxLength = maxCodeLen,
+                            onFocusedChanged = { viewModel.onTriggerEvent(AccountSettingsEvent.FocusCodeInput(it))}
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 //send code button
                 FullRoundedButton(
                     buttonText = if(!isCodeSent) "Send code" else "Submit code", textColor = Color.White,
                     backgroundColor = orange1,
-                    enabled = viewModel.numberFieldState.value.text.isNotEmpty() || viewModel.codeState.value.text.length == maxCodeLen
+                    enabled = phone.text.isNotEmpty() || viewModel.codeState.text.length == maxCodeLen
                 ) {
                     coroutineScope.launch {
                         if(!isCodeSent) {

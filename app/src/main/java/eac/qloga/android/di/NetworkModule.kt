@@ -25,6 +25,7 @@ import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
+import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -49,6 +50,7 @@ object NetworkModule {
     fun provideQLOGAOkHTTPClient(appInterceptor: ApiInterceptor): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(interceptor)
+            .readTimeout(2,TimeUnit.MINUTES)
             .apply { addInterceptor(appInterceptor) }
             .addInterceptor(interceptor)
             .build()

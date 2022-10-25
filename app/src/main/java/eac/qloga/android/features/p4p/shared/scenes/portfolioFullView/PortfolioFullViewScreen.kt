@@ -8,12 +8,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import eac.qloga.android.features.p4p.shared.viewmodels.PortfolioViewModel
 
 @Composable
-fun FullImageScreen(
-    viewModel: PortfolioViewModel
+fun PortfolioFullViewScreen(
+    viewModel: PortfolioViewModel = hiltViewModel()
 ) {
     val imageId = viewModel.currentImageDisplay?.link
 

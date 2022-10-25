@@ -1,6 +1,5 @@
 package eac.qloga.android.features.p4p.showroom.scenes.providerServices
 
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import eac.qloga.android.core.shared.viewmodels.ApiViewModel
 import eac.qloga.android.data.shared.models.ServicesWithConditions
-import eac.qloga.android.data.shared.models.conditions.ConditionsResponse
 import eac.qloga.p4p.lookups.dto.QService
 import eac.qloga.p4p.lookups.dto.ServiceCategory
 import eac.qloga.p4p.lookups.dto.ServiceCondition

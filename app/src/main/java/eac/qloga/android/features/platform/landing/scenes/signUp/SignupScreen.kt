@@ -93,8 +93,9 @@ fun SignupScreen(
         topBar = {
             TitleBar(
                 label = LandingScreens.Signup.titleName,
+                iconColor = MaterialTheme.colorScheme.primary,
                 backgroundColor = Color.Transparent,
-                iconColor = MaterialTheme.colorScheme.primary
+                opacity = 0f
             ){
                 navController.navigateUp()
             }

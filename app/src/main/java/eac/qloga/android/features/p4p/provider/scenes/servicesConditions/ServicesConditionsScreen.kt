@@ -1,60 +1,66 @@
 package eac.qloga.android.features.p4p.provider.scenes.servicesConditions
 
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.google.accompanist.flowlayout.FlowRow
 import eac.qloga.android.core.shared.components.Chips.SelectedServiceChip
 import eac.qloga.android.core.shared.components.TitleBar
-import eac.qloga.android.core.shared.theme.gray1
 import eac.qloga.android.core.shared.utils.Dimensions
+import eac.qloga.android.core.shared.utils.LoadingState
 import eac.qloga.android.core.shared.viewmodels.ApiViewModel
 import eac.qloga.android.features.p4p.provider.scenes.P4pProviderScreens
-import eac.qloga.android.features.p4p.shared.components.ServiceConditionItem
-import eac.qloga.android.features.p4p.shared.scenes.account.ProfilesEvent
-import eac.qloga.android.features.p4p.shared.scenes.account.ProfilesViewModel
+import eac.qloga.android.features.p4p.shared.components.ServicesListCard
 import eac.qloga.android.features.p4p.showroom.shared.components.DescriptionText
 import eac.qloga.android.features.p4p.showroom.shared.components.TopNavBar
-import eac.qloga.p4p.lookups.dto.ServiceCategory
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ServicesConditionsScreen(
     navController: NavController,
-    viewModel: ProfilesViewModel = hiltViewModel()
+    viewModel: ServicesConditionsViewModel = hiltViewModel(),
+    apiViewModel: ApiViewModel = hiltViewModel()
 ) {
     val containerTopPadding = Dimensions.ScreenTopPadding.dp
     val horizontalContentPadding = Dimensions.ScreenHorizontalPadding.dp
-    val detailText = "Residential cleaning services for all parts of your home. " +
-            "With tasks covering dishwashing, cleaning bathrooms, waste removal," +
-            "furniture cleaning, window cleaning".trimMargin().repeat(2)
 
+    val topNavScrollState = rememberLazyListState()
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
+
+    var catChanged by remember{ mutableStateOf(false ) }
+    val selectedCategory = ServicesConditionsViewModel.selectNavItem
+    val detailText = selectedCategory?.descr?.trimMargin()?.repeat(2)
     val categoriesList = ApiViewModel.categories.value.sortedBy {
         it.sortOrder
     }.sortedBy {
         it.catGroupOrder
     }
 
-    LaunchedEffect(Unit){
-//        viewModel.onSelectedNav(ServiceCategory.Cleaning)
+    LaunchedEffect(key1 = ApiViewModel.providerServices.value ){
+        viewModel.groupServiceCount(ApiViewModel.providerServices.value)
+    }
+
+    LaunchedEffect(key1 = Unit){
+        apiViewModel.getProviderServices()
+        if(categoriesList.isNotEmpty() && selectedCategory == null) viewModel.onChangeCategory(categoriesList[0])
+        categoriesList.indexOf(selectedCategory).apply {
+            if(this >= 0) topNavScrollState.animateScrollToItem(categoriesList.indexOf(selectedCategory))
+        }
     }
 
     Scaffold(
@@ -70,8 +76,7 @@ fun ServicesConditionsScreen(
         val titleBarHeight = paddingValues.calculateTopPadding()
 
         Column(
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
             ,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -81,94 +86,83 @@ fun ServicesConditionsScreen(
             Spacer(modifier = Modifier.height(containerTopPadding))
 
             TopNavBar(
-                onClickItem = { viewModel.onTriggerEvent(ProfilesEvent.SelectTopNavItem(it)) },
-                selectedNav =ServiceCategory(),
+                onClickItem = {
+                    catChanged = !catChanged
+                    coroutineScope.launch {
+                        delay(200)
+                        catChanged = !catChanged
+                    }
+                    viewModel.onChangeCategory(it)
+                },
+                lazyListState = topNavScrollState,
+                selectedNav = selectedCategory,
                 scrollable = true,
                 navList = categoriesList
             )
 
-            Column(
-                modifier = Modifier.verticalScroll(scrollState)
-            ) {
+            Column {
                 Column(
-                    modifier = Modifier.padding(start = horizontalContentPadding, top = 16.dp, end = horizontalContentPadding),
+                    modifier = Modifier.padding(
+                        start = horizontalContentPadding,
+                        top = 16.dp,
+                        end = horizontalContentPadding
+                    ),
                     verticalArrangement = Arrangement.Center
                 ) {
-                    DescriptionText(text = detailText)
+                    DescriptionText(text = detailText ?: "")
                 }
 
                 Spacer(Modifier.height(16.dp))
 
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = horizontalContentPadding)){
-                    Text(
-                        text = "Selected",
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    FlowRow(modifier = Modifier.fillMaxWidth()) {
-                        SelectedServiceChip(label = "Cleaning", count = 3)
-                        SelectedServiceChip(label = "Pets", count = 3)
-                        SelectedServiceChip(label = "Gas", count = 3)
-                        SelectedServiceChip(label = "Handyman", count = 5)
-                        SelectedServiceChip(label = "Care", count = 2)
-                    }
-                }
-
-                Spacer(Modifier.height(14.dp))
-
-                //list card
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding( start = horizontalContentPadding, end = 16.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .border(1.5.dp, gray1, shape = RoundedCornerShape(16.dp))
-                ) {
-                    ServiceConditionItem(
-                        title = "Complete home cleaning",
-                        value = "$160.00"
-                    ){
-                        coroutineScope.launch {
-//                            navController.navigate(Screen.ProvidedService.route){
-//                                launchSingleTop = true
-//                            }
+                if(viewModel.serviceCount.isNotEmpty()){
+                    Column(
+                        modifier = Modifier
+                            .background(MaterialTheme.colorScheme.background.copy(.92f))
+                    ) {
+                        Row(modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = horizontalContentPadding)
+                        ){
+                            Text(
+                                text = "Selected",
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
+                            FlowRow(modifier = Modifier.fillMaxWidth()) {
+                                viewModel.serviceCount.forEach { (name, count) ->
+                                    SelectedServiceChip(
+                                        label = name,
+                                        count = count,
+                                        onClick = {
+                                            coroutineScope.launch {
+                                                val serviceCategory = categoriesList.find { it.name == name }
+                                                val index = categoriesList.indexOf(serviceCategory)
+                                                topNavScrollState.animateScrollToItem(index)
+                                                ApiViewModel.categories.value.find { it.name == name }
+                                                    ?.let { viewModel.onChangeCategory(it) }
+                                            }
+                                        }
+                                    )
+                                }
+                            }
                         }
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
-
-                    ServiceConditionItem(
-                        title = "Bathroom and toilet cleaning",
-                    ){}
-
-                    ServiceConditionItem(
-                        title = "Kitchen cleaning",
-                        value = "$40.00"
-                    ){}
-
-                    ServiceConditionItem(
-                        title = "Bedroom or living room cleaning",
-                    ){}
-
-                    ServiceConditionItem(
-                        title = "Clothes laundry and ironing",
-                    ){}
-
-                    ServiceConditionItem(
-                        title = "Garrage cleaning",
-                    ){}
-
-                    ServiceConditionItem(
-                        title = "Swimming pool cleaning",
-                    ){}
-
-                    ServiceConditionItem(
-                        title = "Owen cleaning",
-                        showDivider = false,
-                    ){}
                 }
-                Spacer(Modifier.height(16.dp))
+                Column(
+                    modifier = Modifier.verticalScroll(scrollState)
+                ) {
+                    selectedCategory?.let {
+                        ServicesListCard(
+                            navController = navController,
+                            listOfServices = it.services,
+                            expandableItem = false,
+                            providerServices = ApiViewModel.providerServices.value,
+                            catChanged = catChanged
+                        )
+                    }
+                    Spacer(Modifier.height(16.dp))
+                }
             }
         }
     }

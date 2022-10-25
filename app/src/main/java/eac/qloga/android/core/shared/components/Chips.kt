@@ -75,8 +75,10 @@ object Chips {
         label: String,
         count: Int,
         borderColor: Color = gray30,
+        showCrossBtn: Boolean = false,
         backgroundColor: Color = Color.Transparent,
         contentColor: Color = MaterialTheme.colorScheme.onBackground,
+        onClick: () -> Unit,
         onClear: () -> Unit = {}
     ){
         val visible = remember{ mutableStateOf(false) }
@@ -91,9 +93,10 @@ object Chips {
         ) {
             Row(
                 modifier = modifier
-                    .clip(CircleShape)
                     .padding(vertical = 2.dp, horizontal = 4.dp)
+                    .clip(CircleShape)
                     .border(1.dp, borderColor, CircleShape)
+                    .clickable { onClick() }
                     .background(backgroundColor)
                     .padding(horizontal = 8.dp, vertical = 2.dp)
                 ,
@@ -114,7 +117,7 @@ object Chips {
                     color = info_sky.copy(alpha = .5f)
                 )
 
-                if(count > 0){
+                if(count > 0 && showCrossBtn){
                     Box(
                         modifier = Modifier
                             .padding(start = 8.dp)

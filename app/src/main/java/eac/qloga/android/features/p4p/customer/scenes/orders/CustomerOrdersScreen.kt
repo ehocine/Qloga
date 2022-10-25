@@ -41,7 +41,6 @@ import eac.qloga.android.features.p4p.shared.utils.OrdersTabTypes
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import kotlinx.coroutines.launch
 
-@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(
     ExperimentalMaterial3Api::class,
     ExperimentalMaterialApi::class,
@@ -57,7 +56,6 @@ fun CustomerOrdersScreen(
     val isQuotesEmpty = remember{ mutableStateOf(false) }
     val isInquiresEmpty = remember{ mutableStateOf(false) }
     val isTodayEmpty = remember{ mutableStateOf(true) }
-    val containerHorizontalPadding = 24.dp
     val fromDate = remember{ mutableStateOf("")}
     val toDate = remember{ mutableStateOf("")}
 

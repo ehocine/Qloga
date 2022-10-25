@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,20 +29,23 @@ import eac.qloga.android.core.shared.theme.gray30
 import eac.qloga.android.core.shared.theme.orange1
 
 @Composable
-fun CategoryList(
+fun ServicesListItem(
     modifier: Modifier = Modifier,
     title: String,
     showDivider: Boolean = true,
     summery: String,
+    value: String? = null,
+    isSelected : Boolean,
     onClick: () -> Unit,
     onShowProviders: () -> Unit,
+    expandable: Boolean = true,
+    onClickItem: () -> Unit = {},
     catChanged: Boolean
 ) {
     val buttonHeight = 40.dp
     val infoHeight = 32.dp
     var expanded by remember { mutableStateOf(false) }
     if (catChanged) expanded = false
-//    expanded = t
     val animatedFloat = animateFloatAsState(targetValue = if (expanded) 90f else 0f)
 
     Column(
@@ -51,7 +55,13 @@ fun CategoryList(
                     durationMillis = 600
                 )
             )
-            .clickable { expanded = !expanded }
+            .clickable {
+                if(expandable){
+                    expanded = !expanded
+                }else{
+                    onClickItem()
+                }
+            }
     ) {
         Row(
             modifier = Modifier
@@ -63,20 +73,35 @@ fun CategoryList(
             Text(
                 modifier = Modifier.weight(9f),
                 text = title,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = if (isSelected) FontWeight.W600 else FontWeight.W500
+                ),
+                color = MaterialTheme.colorScheme.onBackground,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1
             )
-            Icon(
-                modifier = Modifier
-                    .rotate(animatedFloat.value)
-                    .size(17.dp)
-                    .clip(CircleShape)
-                    .weight(1f),
-                imageVector = Icons.Rounded.ArrowForwardIos,
-                contentDescription = "forward arrow",
-                tint = MaterialTheme.colorScheme.primary
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if(!value.isNullOrEmpty()){
+                    Text(
+                        modifier = Modifier.padding(horizontal = 4.dp),
+                        text = "$value",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = gray30
+                    )
+                }
+                Icon(
+                    modifier = Modifier
+                        .rotate(animatedFloat.value)
+                        .size(17.dp)
+                        .clip(CircleShape)
+                    ,
+                    imageVector = Icons.Rounded.ArrowForwardIos,
+                    contentDescription = "forward arrow",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
         }
 
         if (expanded) {

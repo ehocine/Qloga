@@ -1,8 +1,8 @@
 package eac.qloga.android.core.shared.utils
 
 object Dimensions{
-    const val ScreenHorizontalPadding = 24
-    const val ScreenTopPadding = 16
+    const val ScreenHorizontalPadding = 20
+    const val ScreenTopPadding = 12
     const val PaddingSm = 8
     const val PaddingMd = 12
     const val PaddingLg = 16

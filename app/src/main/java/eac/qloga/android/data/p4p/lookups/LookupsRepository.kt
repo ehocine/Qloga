@@ -1,5 +1,6 @@
 package eac.qloga.android.data.p4p.lookups
 
+import eac.qloga.android.data.shared.utils.apiHandler
 import eac.qloga.android.di.PrivateQLOGAApiService
 import javax.inject.Inject
 
@@ -12,6 +13,6 @@ class LookupsRepository(@PrivateQLOGAApiService private val lookupsApi: LookupsA
     suspend fun getConditions() = lookupsApi.getConditions()
 
     //Get QServices
-    suspend fun getServices() = lookupsApi.getServices()
+    suspend fun getServices() = apiHandler { lookupsApi.getServices() }
 
 }

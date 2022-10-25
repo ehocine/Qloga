@@ -19,9 +19,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import eac.qloga.android.business.util.Extensions.advancedShadow
+import eac.qloga.android.core.shared.utils.Extensions.advancedShadow
 import eac.qloga.android.core.shared.components.Buttons.SortButton
-import eac.qloga.android.data.shared.models.MediaSize
 
 @Composable
 fun TitleBar(
@@ -30,6 +29,7 @@ fun TitleBar(
     iconColor: Color = Color.Black,
     titleTextStyle: TextStyle = MaterialTheme.typography.titleMedium,
     showBottomBorder: Boolean = false,
+    opacity: Float = .92f,
     showBackPressButton: Boolean = true,
     backgroundColor: Color = MaterialTheme.colorScheme.background,
     leadingActions: @Composable (() -> Unit) = {},
@@ -37,17 +37,6 @@ fun TitleBar(
     onBackPress: () -> Unit = {}
 ) {
     val titleBarHeight = 60.dp
-    val brushBackground = Brush.verticalGradient(
-        listOf(
-            MaterialTheme.colorScheme.background,
-            MaterialTheme.colorScheme.background.copy(.96f),
-            MaterialTheme.colorScheme.background.copy(.96f),
-            MaterialTheme.colorScheme.background.copy(.96f),
-            MaterialTheme.colorScheme.background.copy(.96f),
-            MaterialTheme.colorScheme.background.copy(.96f),
-            Color.Transparent,
-        )
-    )
 
     Box(
         modifier = modifier
@@ -59,7 +48,7 @@ fun TitleBar(
                 0.dp,
                 if (showBottomBorder) 1.dp else 0.dp
             )
-            .background(backgroundColor.copy(.95f))
+            .background(backgroundColor.copy(opacity))
             .padding(start = 4.dp, end = 4.dp, top = 8.dp, bottom = 4.dp)
         ,
         contentAlignment = Alignment.Center

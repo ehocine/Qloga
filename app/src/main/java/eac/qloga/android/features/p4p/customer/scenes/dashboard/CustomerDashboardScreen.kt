@@ -1,11 +1,8 @@
 package eac.qloga.android.features.p4p.customer.scenes.dashboard
 
 import P4pCustomerScreens
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
@@ -27,8 +24,8 @@ import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
 import eac.qloga.android.features.p4p.shared.scenes.account.AccountViewModel
 import eac.qloga.android.features.p4p.shared.scenes.providerSearch.ProviderSearchScreen
 import eac.qloga.android.features.p4p.shared.utils.AccountType
+import kotlinx.coroutines.launch
 
-@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomerDashboardScreen(
@@ -37,14 +34,8 @@ fun CustomerDashboardScreen(
 ) {
     val selectedNavItem = viewModel.selectNavItem
     val showBottomNavBar = remember { mutableStateOf(true) }
-    var showProfileInfoDialog by remember{ mutableStateOf(false) }
-    var alreadyShownProfileInfoDialog by remember{ mutableStateOf(false) }
-
-    LaunchedEffect(viewModel.showProfileInfoDialog){
-        if(!alreadyShownProfileInfoDialog){
-            showProfileInfoDialog = viewModel.showProfileInfoDialog
-        }
-    }
+    val alreadyShownProfileInfoDialog = CustomerDashboardViewModel.alreadyShownProfileInfoDialog
+    val scope = rememberCoroutineScope()
 
     Scaffold{ paddingValues ->
         val titleBarHeight = paddingValues.calculateTopPadding()
@@ -160,18 +151,22 @@ fun CustomerDashboardScreen(
                 }
             }
 
-            if(showProfileInfoDialog){
-                alreadyShownProfileInfoDialog = true
+            if(viewModel.showProfileInfoDialog && !alreadyShownProfileInfoDialog){
                 Dialog(
-                    onDismissRequest = { showProfileInfoDialog = false }
+                    onDismissRequest = {
+                        viewModel.onDismissInfoDialog()
+                    }
                 ) {
                     ProfileInfoDialog(
                         accountType = AccountType.CUSTOMER,
-                        isDontShowAgainChecked = !viewModel.showProfileInfoDialog,
-                        onClickCheckBox = { viewModel.toggleProfileInfoDialogCheck() },
+                        isDontShowAgainChecked = !viewModel.showProfileInfoDialogCheck,
+                        onClickCheckBox = { viewModel.toggleProfileInfoDialogCheck()},
                         goToProfile = {
-                            AccountViewModel.selectedAccountType = AccountType.CUSTOMER
-                            navController.navigate(P4pScreens.Account.route)
+                            scope.launch{
+                                AccountViewModel.selectedAccountType = AccountType.CUSTOMER
+                                navController.navigate(P4pScreens.Account.route)
+                                viewModel.onDismissInfoDialog()
+                            }
                         }
                     )
                 }

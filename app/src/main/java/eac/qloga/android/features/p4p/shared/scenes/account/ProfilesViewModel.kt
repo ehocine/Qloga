@@ -12,7 +12,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import eac.qloga.android.core.shared.utils.ACCOUNT_TYPE_KEY
 import eac.qloga.android.core.shared.utils.InputFieldState
-import eac.qloga.android.data.shared.models.FaQuestion
+import eac.qloga.android.data.shared.models.faq.FaQuestion
 import eac.qloga.android.features.p4p.shared.utils.AccountType
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -59,15 +59,11 @@ class ProfilesViewModel @Inject constructor(
     private val _showGotoDialogAgain = mutableStateOf(true)
     val showGotoDialogAgain: State<Boolean> = _showGotoDialogAgain
 
-    var faQuestions by mutableStateOf<List<FaQuestion>>(emptyList())
-        private set
-
     var accountType by mutableStateOf(AccountType.PROVIDER)
         private set
 
     init{
         getConditionsSwitchCount()
-        getGeneralQuestions()
         _paramsAccountType.value?.let {
             getAccountTypeByParam(it)?.let { type -> accountType = type }
         }
@@ -118,42 +114,10 @@ class ProfilesViewModel @Inject constructor(
 //        _timeOffList.value = timeOff
     }
 
-    private fun onFocusTimeNorm(focusState: FocusState) {
-//        _timeNormInputField.value = timeNormInputField.value.copy(
-//            isFocused = focusState.isFocused
-//        )
-    }
-
-    private fun onTimeNorm(timeNorm: String) {
-//        _timeNormInputField.value = timeNormInputField.value.copy(
-//            text = timeNorm
-//        )
-    }
-
-    private fun onFocusPrice(focusState: FocusState) {
-//        _priceInputField.value = priceInputField.value.copy(
-//            isFocused =  focusState.isFocused
-//        )
-    }
-
-    private fun onPrice(price: String) {
-//        _priceInputField.value = priceInputField.value.copy(
-//            text = price
-//        )
-    }
-
     private fun onAddTimeOff(){
 //        val timeOff = ArrayList<TimeOffState>(_timeOffList.value)
 //        timeOff.add(TimeOffState("","","",""))
 //        _timeOffList.value = timeOff
-    }
-
-    fun onGotoProfileDialog(value: Boolean){
-        _showGotoProfileDialog.value = value
-    }
-
-    fun onShowGotoDialogAgain(value: Boolean){
-        _showGotoDialogAgain.value = value
     }
 
 //    private fun onRemoveWorkingHour(type: WorkingHoursType, index: Int) {
@@ -414,28 +378,6 @@ class ProfilesViewModel @Inject constructor(
 //    fun onSelectedNav(selectedNavItem: ServiceCategory){
 //        _selectedNav.value = selectedNavItem
 //    }
-
-    private fun getGeneralQuestions(){
-        // simulate api calls here to get general questions list
-        faQuestions = listOf(
-            FaQuestion(
-                question = "How will QLOGA use my data?",
-                answer = "QLOGA will never share any user data " +
-                        "with third parties that are not directly related " +
-                        "to QLOGA provided services. QLOGA will never share or " +
-                        "sell any user data with third parties without" +
-                        " explicit consent from the users."
-            ),
-            FaQuestion(
-                question = "What if I don't add any relatives?",
-                answer = "QLOGA will never share any user data " +
-                        "with third parties that are not directly related " +
-                        "to QLOGA provided services. QLOGA will never share or " +
-                        "sell any user data with third parties without" +
-                        " explicit consent from the users."
-            )
-        )
-    }
 
     fun getAccountTypeByParam(accTypeString: String): AccountType?{
         Log.d(TAG, "getAccountTypeByParam: $accTypeString")

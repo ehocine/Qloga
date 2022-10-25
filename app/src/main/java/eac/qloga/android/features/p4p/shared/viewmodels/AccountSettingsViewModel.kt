@@ -1,194 +1,215 @@
 package eac.qloga.android.features.p4p.shared.viewmodels
 
 import android.util.Log
-import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.focus.FocusState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
-import eac.qloga.android.QlogaApplication
-import eac.qloga.android.R
+import eac.qloga.android.core.shared.interactors.GetCountry
+import eac.qloga.android.core.shared.interactors.GetLanguage
 import eac.qloga.android.core.shared.utils.*
+import eac.qloga.android.core.shared.viewmodels.ApiViewModel
+import eac.qloga.android.data.p4p.lookups.StaticResourcesRepository
+import eac.qloga.android.data.p4p.provider.P4pProviderRepository
+import eac.qloga.android.data.qbe.OrgsRepository
+import eac.qloga.android.data.qbe.PlatformRepository
+import eac.qloga.android.data.shared.models.Language
 import eac.qloga.android.features.p4p.shared.utils.AccountSettingsEvent
 import eac.qloga.android.features.p4p.shared.utils.AccountSettingsEvent.*
 import eac.qloga.android.features.p4p.shared.utils.AccountType
-import eac.qloga.android.features.p4p.shared.utils.SpokenLanguage
+import eac.qloga.bare.dto.Org
+import eac.qloga.bare.dto.lookups.Country
+import eac.qloga.bare.dto.person.Person
+import eac.qloga.p4p.prv.dto.Provider
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
 class AccountSettingsViewModel @Inject constructor(
-    private val application: QlogaApplication
+    private val platformRepository: PlatformRepository,
+    private val p4pProviderRepository: P4pProviderRepository,
+    private val orgsRepository: OrgsRepository,
+    private val staticResourcesRepository: StaticResourcesRepository
 ): ViewModel(){
 
-    private val _accountType = mutableStateOf(AccountType.PROVIDER)
-    val accountType: State<AccountType> = _accountType
+    private val coroutineExceptionHandler = CoroutineExceptionHandler{ _, throwable ->
+        throwable.printStackTrace()
+    }
 
-    private val _numberFieldState = mutableStateOf(InputFieldState(hint = "Number"))
-    val numberFieldState: State<InputFieldState> = _numberFieldState
-
-    private val _codeState = mutableStateOf(InputFieldState(hint = "Enter 6-digits code"))
-    val codeState: State<InputFieldState> = _codeState
-
-    private val _emailInputFieldState = mutableStateOf(InputFieldState(hint = "Enter you email"))
-    val emailInputFieldState: State<InputFieldState> = _emailInputFieldState
-
-    private val _selectedCountryCode = mutableStateOf(CountryCode("Nepal","+977","NP"))
-    val selectedCountryCode: State<CountryCode> = _selectedCountryCode
-
-    private val _isCodeSent = mutableStateOf(false)
-    val isCodeSent: State<Boolean> = _isCodeSent
-
-    private val _selectedAddressIndex = mutableStateOf(0)
-    val selectedAddressIndex = _selectedAddressIndex
-
-    private val _countryCodes = mutableStateOf<CountryCodes?>(null)
-    val countryCodes: State<CountryCodes?> = _countryCodes
-
-    private val _spokenLanguageState= mutableStateOf<List<SpokenLanguage>>(emptyList())
-    val spokenLanguageState: State<List<SpokenLanguage>> = _spokenLanguageState
-
-    private val _birthday = mutableStateOf("")
-    val birthday: State<String> = _birthday
-
-    private val _nameSurname = mutableStateOf(
-        InputFieldState(hint = "Name and surname", text = "Duncan McCleod Cleaning")
-    )
-    val nameSurname: State<InputFieldState> = _nameSurname
-
-    private val _customerFirstName = mutableStateOf(
-        InputFieldState(hint = "First name", text = "Duncan McCleod Cleaning")
-    )
-    val customerFirstName: State<InputFieldState> = _customerFirstName
-
-    private val _customerLastName = mutableStateOf(InputFieldState(hint = "Last name", text = "Potter"))
-    val customerLastName: State<InputFieldState> = _customerLastName
-
-    private val _middleName = mutableStateOf(InputFieldState(hint = "Middle name"))
-    val middleName: State<InputFieldState> = _middleName
-
-    private val _maidenName = mutableStateOf(InputFieldState(hint = "Maiden name"))
-    val maidenName: State<InputFieldState> = _maidenName
-
-    private val _cancellationPeriod = mutableStateOf(InputFieldState(hint = "Cancellation period (hours)"))
-    val cancellationPeriod: State<InputFieldState> = _cancellationPeriod
-
-    private val _coverageZone = mutableStateOf(InputFieldState(hint = "Coverage zone (miles)"))
-    val coverageZone: State<InputFieldState> = _coverageZone
-
-    private val _website = mutableStateOf(InputFieldState(hint = "Website"))
-    val website: State<InputFieldState> = _website
-
-    private val _registrationDetailsState = mutableStateOf(
-        InputFieldState(
-            hint = "Please enter Company House registration and date or any other registration info"
+    companion object{
+        const val TAG = "$QTAG-AccStngsViewModel"
+        var accountType by mutableStateOf<AccountType?>(null)
+        var spokenLanguageState by mutableStateOf<List<Language?>>(emptyList())
+        var spokenLanguageProvider by mutableStateOf<List<Language?>>(emptyList())
+        val optionLanguages =  MutableStateFlow<List<Language?>>(emptyList())
+        var registrationDetailsState by mutableStateOf(
+            InputFieldState(
+                hint = "Please enter Company House registration and date or any other registration info"
+            )
         )
-    )
-    val registrationDetailsState: State<InputFieldState> = _registrationDetailsState
+        var businessInsuranceState by mutableStateOf(InputFieldState())
+        var businessDescriptionState by mutableStateOf(InputFieldState())
+        var phoneNumberFieldState by mutableStateOf(InputFieldState(hint = "Number"))
+        var emailInputFieldState by mutableStateOf(InputFieldState(hint = "Enter you email"))
+        var orgEmailInputFieldState by mutableStateOf(InputFieldState(hint = "Enter you email"))
+    }
 
-    private val _businessInsuranceState = mutableStateOf(
-        InputFieldState(hint = "Name of your insurer, policy number, policy expiry date")
-    )
-    val businessInsuranceState: State<InputFieldState> = _businessInsuranceState
+    var birthday by mutableStateOf("")
+        private set
 
-    private val _businessDescriptionState = mutableStateOf(
-        InputFieldState(hint = "This text can differentiate your business when shown to the customers")
-    )
-    val businessDescriptionState: State<InputFieldState> = _businessDescriptionState
+    var fName by mutableStateOf(InputFieldState(hint = "First name", text = ""))
+        private set
 
-    private val _phoneSwitch = mutableStateOf(false)
-    val phoneSwitch: State<Boolean> = _phoneSwitch
+    var orgName by mutableStateOf(InputFieldState(hint=""))
+        private set
 
-    private val _activeSwitch = mutableStateOf(true)
-    val activeSwitch: State<Boolean> = _activeSwitch
+    var lastName by mutableStateOf(InputFieldState(hint = "Last name", text = "Potter"))
+        private set
 
-    private val _timeOffSwitch = mutableStateOf(false)
-    val timeOffSwitch: State<Boolean> = _timeOffSwitch
+    var middleName by mutableStateOf(InputFieldState(hint = "Middle name"))
+        private set
 
-    private val _hideAll = mutableStateOf(false)
-    val hideAll: State<Boolean> = _hideAll
+    var maidenName by mutableStateOf(InputFieldState(hint = "Maiden name"))
+        private set
 
-    private val _calloutChargeSwitch = mutableStateOf(false)
-    val calloutChargeSwitch: State<Boolean> = _calloutChargeSwitch
+    var cancellationPeriod by mutableStateOf(InputFieldState(hint = "Cancellation period (hours)"))
+        private set
 
+    var coverageZone by mutableStateOf(InputFieldState(hint = "Coverage zone (miles)"))
+        private set
+
+    var website by mutableStateOf(InputFieldState(hint = "Website"))
+        private set
+
+    var activeSwitch by mutableStateOf(true)
+        private set
+
+    var calloutChargeSwitch by mutableStateOf(false)
+        private set
+
+    var verifications by mutableStateOf("")
+        private set
+
+    var orgVerifications by mutableStateOf("")
+        private set
+
+    var codeState by mutableStateOf(InputFieldState(hint = "Enter 6-digits code"))
+        private set
+
+    var selectedCountryCode by mutableStateOf(Country())
+        private set
+
+    var isCodeSent by mutableStateOf(false)
+        private set
+
+    var selectedAddressIndex by mutableStateOf(0)
+        private set
+
+    var countries by mutableStateOf<List<Country>>(emptyList())
+        private set
+
+    var languages by mutableStateOf<List<Language>>(emptyList())
+        private set
+
+    var addressInputFieldState by mutableStateOf(InputFieldState())
+        private set
+
+    var initStatesFlag by mutableStateOf(false)
+        private set
 
     /**** Address section states ****/
-    private val _addressInputFieldState = mutableStateOf(
-        InputFieldState(hint = "Enter your address or postcode"))
-    val addressInputFieldState: State<InputFieldState> = _addressInputFieldState
 
-    private val _parkingType = mutableStateOf<ParkingType>(ParkingType.FreeType)
-    val parkingType: State<ParkingType> = _parkingType
+    var parkingType by mutableStateOf<ParkingType>(ParkingType.FreeType)
+        private set
 
-    private val _listOfAddress = mutableStateOf<List<String>>(emptyList())
-    val listOfAddress: State<List<String>> = _listOfAddress
+    var listOfAddress by mutableStateOf<List<String>>(emptyList())
+        private set
 
-    private val _addressOrPostcode = mutableStateOf("")
-    val addressOrPostcode: State<String> = _addressOrPostcode
+    var addressOrPostcode by mutableStateOf("")
+        private set
 
-    private val _addressState = mutableStateOf(AddressState())
-    val addressState: State<AddressState> = _addressState
+    var addressState by mutableStateOf(AddressState())
+        private set
 
-    private val _isBusinessOnly = mutableStateOf(false)
-    val isBusinessOnly: State<Boolean> = _isBusinessOnly
+    var isBusinessOnly by mutableStateOf(false)
+        private set
 
-    private val _customerPostCodeState = mutableStateOf(InputFieldState(hint = "Postcode"))
-    val customerPostCodeState: State<InputFieldState> = _customerPostCodeState
+    var customerPostCodeState by mutableStateOf(InputFieldState(hint = "Postcode"))
+        private set
 
-    private val _customerTownState = mutableStateOf(InputFieldState(hint = "Town"))
-    val customerTownState: State<InputFieldState> = _customerTownState
+    var customerTownState by mutableStateOf(InputFieldState(hint = "Town"))
+        private set
 
-    private val _customerStreetState = mutableStateOf(InputFieldState(hint = "Street"))
-    val customerStreetState: State<InputFieldState> = _customerStreetState
+    var customerStreetState by mutableStateOf(InputFieldState(hint = "Street"))
+        private set
 
-    private val _customerBuildingState = mutableStateOf(InputFieldState(hint = "Building"))
-    val customerBuildingState: State<InputFieldState> = _customerBuildingState
+    var customerBuildingState by mutableStateOf(InputFieldState(hint = "Building"))
+        private set
 
-    private val _customerApartmentsState = mutableStateOf(InputFieldState(hint ="Apartments"))
-    val customerApartmentsState: State<InputFieldState> = _customerApartmentsState
+    var customerApartmentsState by mutableStateOf(InputFieldState(hint ="Apartments"))
+        private set
 
-    private val _providerPostCodeState = mutableStateOf(InputFieldState(hint = "Postcode"))
-    val providerPostCodeState: State<InputFieldState> = _providerPostCodeState
+    var providerPostCodeState by mutableStateOf(InputFieldState(hint = "Postcode"))
+        private set
 
-    private val _providerTownState = mutableStateOf(InputFieldState(hint ="Town"))
-    val providerTownState: State<InputFieldState> = _providerTownState
+    var providerTownState by mutableStateOf(InputFieldState(hint ="Town"))
+        private set
 
-    private val _providerStreetState = mutableStateOf(InputFieldState(hint = "Street"))
-    val providerStreetState: State<InputFieldState> = _providerStreetState
+    var providerStreetState by mutableStateOf(InputFieldState(hint = "Street"))
+        private set
 
-    private val _providerBuildingState = mutableStateOf(InputFieldState(hint ="Building"))
-    val providerBuildingState: State<InputFieldState> = _providerBuildingState
+    var providerBuildingState by mutableStateOf(InputFieldState(hint ="Building"))
+        private set
 
-    private val _providerApartmentsState = mutableStateOf(InputFieldState(hint ="Apartments"))
-    val providerApartmentsState: State<InputFieldState> = _providerApartmentsState
+    var providerApartmentsState by mutableStateOf(InputFieldState(hint ="Apartments"))
+        private set
     /**** Address section states ****/
+
+    private val _savingState = MutableStateFlow(LoadingState.IDLE)
+    val savingState = _savingState.asStateFlow()
+
+    private val _eventFlow = MutableSharedFlow<UiEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
 
     init {
-        getCountryCodes()
+        preLoadCalls()
+    }
+
+    fun preLoadCalls(){
         getAddresses()
-        getSpokenLanguages()
     }
 
     fun onTriggerEvent(event: AccountSettingsEvent){
         try {
             viewModelScope.launch {
                 when(event){
-                    is EnterCode -> { enterCode(event.code)}
-                    is EnterEmail -> { enterEmail(event.email)}
-                    is EnterNumber -> { enterNumber(event.number)}
-                    is FocusCodeInput -> { onFocusCodeInput(event.focusState)}
-                    is FocusEmailInput -> { onFocusEmailInput(event.focusState)}
-                    is FocusNumberInput -> { onFocusNumberInput(event.focusState)}
-                    is SelectCountryCode -> { _selectedCountryCode.value = event.countryCode }
+                    is EnterCode -> { codeState = codeState.copy(text = event.code)}
+                    is EnterEmail -> { emailInputFieldState = emailInputFieldState.copy(text = event.email)}
+                    is EnterOrgsEmail -> { orgEmailInputFieldState = orgEmailInputFieldState.copy(text = event.email)}
+                    is FocusOrgsEmail -> { orgEmailInputFieldState = orgEmailInputFieldState.copy(isFocused = event.focusState.isFocused)}
+                    is EnterNumber -> { phoneNumberFieldState = phoneNumberFieldState.copy(text = event.number)}
+                    is FocusCodeInput -> { codeState = codeState.copy(isFocused = event.focusState.isFocused)}
+                    is FocusEmailInput -> { emailInputFieldState = emailInputFieldState.copy(isFocused = event.focusState.isFocused) }
+                    is FocusNumberInput -> { phoneNumberFieldState = phoneNumberFieldState.copy(isFocused = event.focusState.isFocused)}
+                    is SelectCountryCode -> { selectedCountryCode = event.countryCode }
                     is SelectSpokenLanguage -> { onSelectSpokenLang(event.language) }
+                    is SelectSpokenLanguageProvider -> { onSelectSpokenLangPrv(event.language) }
                     is SelectBirthday -> { onSelectBirthday(event.date) }
                     is SendCode -> { sendCode() }
                     is SubmitCode -> { submitCode() }
                     is SubmitEmail -> { submitEmail() }
-                    is SaveCustomerAccountSettings -> {}
-                    is SaveProviderAccountSettings -> {}
+                    is SaveCustomerAccountSettings -> { updatePerson() }
+                    is SaveProviderAccountSettings -> {savePrvSettings()}
                     is EnterAddress -> { enterAddress(event.text)}
                     is ClearAddressInput -> { clearInputState() }
                     is FocusAddressInput -> { focusAddressInput(event.focusState)}
@@ -196,7 +217,7 @@ class AccountSettingsViewModel @Inject constructor(
                     is ToggleBusinessOnly -> { onToggleBusinessOnly() }
                     is EnterCancellationPeriod -> { onCancellationPeriod(event.value)}
                     is EnterCoverageZone -> { onCoverageZone(event.value)}
-                    is EnterWebsite -> { onWebsite(event.value)}
+                    is EnterWebsite -> { onWebsite(event.value) }
                     is EnterNameSurname -> { onNameSurname(event.value) }
                     is FocusNameSurname -> { onFocusNameSurname(event.focusState) }
                     is EnterRegistrationDetails -> { onRegistrationDetails(event.value)}
@@ -221,50 +242,52 @@ class AccountSettingsViewModel @Inject constructor(
                     is EnterCustomerTown -> { onCustomerTown(event.town) }
                     is FocusCustomerTown -> { onFocusCustomerTown(event.focusState)}
                     is EnterCustomerStreet -> { onCustomerStreet(event.street)}
+                    is EnterOrgName -> { orgName = orgName.copy(text = event.name) }
+                    is FocusOrgName -> { orgName = orgName.copy(isFocused = event.focusState.isFocused)}
                     is FocusCustomerStreet -> {
-                        _customerStreetState.value = _customerStreetState.value.copy(isFocused = event.focusState.isFocused)
+                        customerStreetState = customerStreetState.copy(isFocused = event.focusState.isFocused)
                     }
                     is EnterCustomerBuilding -> {
-                        _customerBuildingState.value = _customerBuildingState.value.copy(text = event.building )
+                        customerBuildingState = customerBuildingState.copy(text = event.building )
                     }
                     is FocusCustomerBuilding -> {
-                        _customerBuildingState.value = _customerBuildingState.value.copy(isFocused = event.focusState.isFocused)
+                        customerBuildingState = customerBuildingState.copy(isFocused = event.focusState.isFocused)
                     }
                     is EnterCustomerApartments -> {
-                        _customerApartmentsState.value = _customerApartmentsState.value.copy(text = event.apartments)
+                        customerApartmentsState = customerApartmentsState.copy(text = event.apartments)
                     }
                     is FocusCustomerApartments -> {
-                        _customerApartmentsState.value = _customerApartmentsState.value.copy(isFocused = event.focusState.isFocused)
+                        customerApartmentsState = customerApartmentsState.copy(isFocused = event.focusState.isFocused)
                     }
                     is EnterProviderPostcode -> {
-                        _providerPostCodeState.value = _providerPostCodeState.value.copy(text = event.postCode)
+                        providerPostCodeState = providerPostCodeState.copy(text = event.postCode)
                     }
                     is FocusProviderPostcode -> {
-                        _providerPostCodeState.value = _providerPostCodeState.value.copy(isFocused = event.focusState.isFocused)
+                        providerPostCodeState = providerPostCodeState.copy(isFocused = event.focusState.isFocused)
                     }
                     is EnterProviderTown -> {
-                        _providerTownState.value = _providerTownState.value.copy(text = event.town)
+                        providerTownState = providerTownState.copy(text = event.town)
                     }
                     is FocusProviderTown -> {
-                        _providerTownState.value = _providerTownState.value.copy(isFocused = event.focusState.isFocused)
+                        providerTownState = providerTownState.copy(isFocused = event.focusState.isFocused)
                     }
                     is EnterProviderStreet -> {
-                        _providerStreetState.value = _providerStreetState.value.copy(text = event.street)
+                        providerStreetState = providerStreetState.copy(text = event.street)
                     }
                     is FocusProviderStreet -> {
-                        _providerStreetState.value = _providerStreetState.value.copy(isFocused = event.focusState.isFocused)
+                        providerStreetState = providerStreetState.copy(isFocused = event.focusState.isFocused)
                     }
                     is EnterProviderBuilding -> {
-                        _providerBuildingState.value = _providerBuildingState.value.copy(text = event.building)
+                        providerBuildingState = providerBuildingState.copy(text = event.building)
                     }
                     is FocusProviderBuilding -> {
-                        _providerBuildingState.value = _providerBuildingState.value.copy(isFocused = event.focusState.isFocused)
+                        providerBuildingState = providerBuildingState.copy(isFocused = event.focusState.isFocused)
                     }
                     is EnterProviderApartments -> {
-                        _providerApartmentsState.value = _providerApartmentsState.value.copy(text = event.apartments)
+                        providerApartmentsState = providerApartmentsState.copy(text = event.apartments)
                     }
                     is FocusProviderApartments -> {
-                        _providerApartmentsState.value = _providerApartmentsState.value.copy(isFocused = event.focusState.isFocused)
+                        providerApartmentsState = providerApartmentsState.copy(isFocused = event.focusState.isFocused)
                     }
                 }
             }
@@ -273,282 +296,391 @@ class AccountSettingsViewModel @Inject constructor(
         }
     }
 
-    fun onPhoneSwitch(){
-        _phoneSwitch.value = !_phoneSwitch.value
-    }
-
-    fun onTimeOffSwitch(){
-        _timeOffSwitch.value = !_timeOffSwitch.value
-    }
-
-    fun onActiveSwitch(){
-        _activeSwitch.value = !_activeSwitch.value
-    }
-
-    fun onCalloutChargeSwitch(){
-        _calloutChargeSwitch.value = !_calloutChargeSwitch.value
-    }
-
-    fun onHideAll(){
-        _hideAll.value = !_hideAll.value
-        if(_hideAll.value){
-            _phoneSwitch.value = false
-            _timeOffSwitch.value = false
-        }else{
-            _phoneSwitch.value = true
-            _timeOffSwitch.value = true
+    private fun savePrvSettings(){
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+            updateOrg()
+            updateProvider()
         }
     }
 
+    private fun updatePerson(){
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+            _savingState.emit(LoadingState.LOADING)
+
+            val userProfile: Person = ApiViewModel.userProfile.value
+            val dob = DateConverter.stringToLocalDate(birthday)
+            val phoneNumber = phoneNumberFieldState.text
+
+            //TODO address and phone update
+
+            userProfile.contacts.email = emailInputFieldState.text
+            userProfile.madenname = maidenName.text.ifEmpty { " " }
+            userProfile.mname = middleName.text.ifEmpty { " " }
+            userProfile.fname = fName.text
+            userProfile.langs = spokenLanguageState.map { it?.code }.toTypedArray()
+            userProfile.sname = lastName.text
+            userProfile.dob = dob ?: userProfile.dob
+
+            val response = platformRepository.updateUser(userProfile)
+            if(response.isSuccessful){
+                _eventFlow.emit(UiEvent.ShowToast("saved successfully!"))
+                _eventFlow.emit(UiEvent.NavigateBack)
+                _savingState.emit(LoadingState.LOADED)
+            }else{
+                _savingState.emit(LoadingState.LOADED)
+                _eventFlow.emit(UiEvent.ShowToast("Something went wrong!"))
+                Log.e(TAG, "updatePerson: failed to update ,${response.code()} ${response.errorBody()}")
+            }
+        }
+    }
+
+    private fun updateOrg(){
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+            val org = ApiViewModel.orgs[0]
+            _savingState.emit(LoadingState.LOADING)
+
+            //TODO update org.contacts.address
+            //TODO update org.contacts.phoneNumber
+            org.contacts.email = orgEmailInputFieldState.text
+            org.descr = businessDescriptionState.text
+            org.active = activeSwitch
+            org.website = website.text
+            org.name = orgName.text
+            org.offTime = null
+            org.workingHours = null
+            org.settings = null
+            org.regDetails = registrationDetailsState.text
+            org.insurance = businessInsuranceState.text
+            org.langs = spokenLanguageProvider.map { it?.code }.toTypedArray()
+
+            val response = orgsRepository.update(org)
+            if(response.isSuccessful){
+                _eventFlow.emit(UiEvent.ShowToast("Saved!"))
+                _eventFlow.emit(UiEvent.NavigateBack)
+                _savingState.emit(LoadingState.LOADED)
+            }else{
+                Log.e(TAG, "updateOrg: code = ${response.code()}, error = ${response.errorBody()}")
+                _eventFlow.emit(UiEvent.ShowToast("Failed!"))
+                _savingState.emit(LoadingState.ERROR)
+            }
+        }
+    }
+
+    private fun updateProvider(){
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler){
+            try {
+                val provider = ApiViewModel.provider ?: Provider()
+                provider.active = activeSwitch
+                provider.calloutCharge = calloutChargeSwitch
+                if(cancellationPeriod.text.isNotEmpty()) provider.cancelHrs = cancellationPeriod.text.toInt()
+                if(coverageZone.text.isNotEmpty()) provider.coverageZone = coverageZone.text.toLong()
+
+                p4pProviderRepository.update(provider)
+            }catch (e: IOException){
+                Log.e(TAG, "updateProvider: ${e.cause}")
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private suspend fun getOptionLanguages(spokenLanguages: List<Language?>) {
+        val codes = listOf("en","ar","nl","fr") //TODO update options
+        optionLanguages.emit(codes.map { getLangByCode(it) })
+        val cloned = ArrayList(spokenLanguages)
+        optionLanguages.value.forEach {
+            if(it !in cloned) cloned.add(it)
+        }
+        optionLanguages.emit(cloned)
+    }
+
+    private suspend fun getLangByCode(code: String): Language?{
+        if(languages.isEmpty()){
+            languages = GetLanguage(staticResourcesRepository).invoke()
+        }
+        //val langs = GetLanguage(staticResourcesRepository).invoke()
+        return languages.find { it.code?.lowercase() == code.lowercase() }
+    }
+
+    fun setInitialStates(){
+        viewModelScope.launch {
+            if(initStatesFlag) return@launch
+            val org = if(ApiViewModel.orgs.isNotEmpty()) ApiViewModel.orgs[0] else Org()
+            val provider = ApiViewModel.provider ?: Provider()
+            val userProfile = ApiViewModel.userProfile.value
+
+            orgVerifications = VerificationConverter.verificationToString(org.verifications)
+            activeSwitch = org.active ?: false
+            website.text = org.website?.trim() ?: ""
+            orgName.text = org.name ?: ""
+            calloutChargeSwitch = provider.calloutCharge ?: false
+            cancellationPeriod.text = (provider.cancelHrs ?: "").toString()
+            coverageZone.text = (provider.coverageZone ?: "").toString()
+            fName.text = userProfile.fname?.trim() ?: ""
+            addressInputFieldState.text = AddressConverter.addressToString(userProfile.contacts?.address)
+            maidenName.text = userProfile.madenname?.trim() ?: ""
+            middleName.text = userProfile.mname?.trim() ?: ""
+            lastName.text = userProfile.sname?.trim() ?: ""
+            verifications = VerificationConverter.verificationToString(userProfile.verifications)
+            birthday = DateConverter.toTextDMY(userProfile.dob.toString())
+            orgEmailInputFieldState.text = org.contacts?.email ?: ""
+            emailInputFieldState.text = userProfile.contacts?.email ?: ""
+            businessDescriptionState.text = org.descr?.trim() ?: ""
+            businessInsuranceState.text = org.insurance?.trim() ?: ""
+            registrationDetailsState.text = org.regDetails?.trim() ?: ""
+            spokenLanguageState = userProfile.langs?.toList()?.map { getLangByCode(it) } ?: emptyList()
+            spokenLanguageProvider = org.langs?.toList()?.map { getLangByCode(it) } ?: emptyList()
+            // phoneNumberFieldState.text =  getDialCodeByCountryName(userProfile.contacts?.phoneCountry) +
+            //            " " + userProfile.contacts?.phoneNumber?.toString()
+            phoneNumberFieldState.text = userProfile.contacts?.phoneNumber?.toString() ?: ""
+            getOptionLanguages(spokenLanguageState)
+            getOptionLanguages(spokenLanguageProvider)
+            initStatesFlag = true
+        }
+    }
+
+    private fun getDialCodeByCountryName(iso2: String?): String{
+        if(iso2 == null) return ""
+        return countries.find { it.iso2?.lowercase() == iso2.lowercase() }?.dialcode ?: ""
+    }
+
+    fun onActiveSwitch(){
+        activeSwitch = !activeSwitch
+    }
+
+    fun onCalloutChargeSwitch(){
+        calloutChargeSwitch = !calloutChargeSwitch
+    }
+
     private fun onCustomerStreet(street: String) {
-        _customerStreetState.value = _customerStreetState.value.copy(
+        customerStreetState = customerStreetState.copy(
             text = street
         )
     }
 
     private fun onFocusCustomerTown(focusState: FocusState) {
-        _customerTownState.value = _customerTownState.value.copy(
+        customerTownState = customerTownState.copy(
             isFocused = focusState.isFocused
         )
     }
 
     private fun onCustomerTown(town: String) {
-        _customerTownState.value = _customerTownState.value.copy(
+        customerTownState = customerTownState.copy(
             text = town
         )
     }
 
     private fun onFocusCustomerPostcode(focusState: FocusState) {
-        _customerPostCodeState.value = _customerPostCodeState.value.copy(
+        customerPostCodeState = customerPostCodeState.copy(
             isFocused = focusState.isFocused
         )
     }
 
     private fun onCustomerPostcode(postCode: String) {
-        _customerPostCodeState.value = _customerPostCodeState.value.copy(
+        customerPostCodeState = customerPostCodeState.copy(
             text = postCode
         )
     }
 
     private fun onFocusCustomerLastName(focusState: FocusState) {
-        _customerLastName.value = _customerLastName.value.copy(
+        lastName = lastName.copy(
             isFocused = focusState.isFocused
         )
     }
 
     private fun onCustomerLastName(name: String) {
-        _customerLastName.value = _customerLastName.value.copy(
+        lastName = lastName.copy(
             text = name
         )
     }
 
     private fun onFocusCustomerFirstName(focusState: FocusState) {
-        _customerFirstName.value = _customerFirstName.value.copy(
+        fName = fName.copy(
             isFocused = focusState.isFocused
         )
     }
 
     private fun onCustomerFirstName(name: String) {
-        _customerFirstName.value = _customerFirstName.value.copy(
+        fName = fName.copy(
             text = name
         )
     }
 
     private fun onNameSurname(value: String) {
-        _nameSurname.value = _nameSurname.value.copy(
+        fName = fName.copy(
             text = value
         )
     }
 
     private fun onFocusNameSurname(focusState: FocusState){
-        _nameSurname.value = _nameSurname.value.copy(
+        fName = fName.copy(
             isFocused = focusState.isFocused
         )
     }
 
     private fun onMaidenName(value: String) {
-        _maidenName.value = maidenName.value.copy(
+        maidenName = maidenName.copy(
             text = value
         )
     }
 
     private fun onFocusMaidenName(focusState: FocusState) {
-        _maidenName.value = maidenName.value.copy(
+        maidenName = maidenName.copy(
             isFocused = focusState.isFocused
         )
     }
 
     private fun onFocusMiddleName(focusState: FocusState) {
-        _middleName.value = middleName.value.copy(
+        middleName = middleName.copy(
             isFocused = focusState.isFocused
         )
     }
 
     private fun onMiddleName(value: String) {
-        _middleName.value = middleName.value.copy(
+        middleName = middleName.copy(
             text = value
         )
     }
 
     private fun focusDescription(focusState: FocusState) {
-        _businessDescriptionState.value = businessDescriptionState.value.copy(
+        businessDescriptionState = businessDescriptionState.copy(
             isFocused = focusState.isFocused
         )
     }
 
     private fun focusBusinessInsurance(focusState: FocusState) {
-        _businessInsuranceState.value = businessInsuranceState.value.copy(
+        businessInsuranceState = businessInsuranceState.copy(
             isFocused = focusState.isFocused
         )
     }
 
     private fun focusRegistrationDetails(focusState: FocusState) {
-        _registrationDetailsState.value = registrationDetailsState.value.copy(
+        registrationDetailsState = registrationDetailsState.copy(
             isFocused = focusState.isFocused
         )
     }
 
     private fun focusWebsite(focusState: FocusState) {
-        _website.value = website.value.copy(
+        website = website.copy(
             isFocused = focusState.isFocused
         )
     }
 
     private fun focusCoverageZone(focusState: FocusState) {
-        _coverageZone.value = coverageZone.value.copy(
+        coverageZone = coverageZone.copy(
             isFocused = focusState.isFocused
         )
     }
 
     private fun onDescription(value: String) {
-        _businessDescriptionState.value  = _businessDescriptionState.value.copy(
+        businessDescriptionState  = businessDescriptionState.copy(
             text = value
         )
     }
 
     private fun onBusinessInsurance(value: String) {
-        _businessInsuranceState.value = businessInsuranceState.value.copy(
+        businessInsuranceState = businessInsuranceState.copy(
             text = value
         )
     }
 
     private fun onRegistrationDetails(value: String) {
-        _registrationDetailsState.value = registrationDetailsState.value.copy(
+        registrationDetailsState = registrationDetailsState.copy(
             text = value
         )
     }
 
     private fun onCoverageZone(value: String) {
-        _coverageZone.value = coverageZone.value.copy(
+        coverageZone = coverageZone.copy(
             text = value
         )
     }
 
     private fun onWebsite(value: String) {
-        _website.value = website.value.copy(
+        website = website.copy(
             text = value
         )
     }
 
     private fun focusCancellationPeriod(focusState: FocusState) {
-        _cancellationPeriod.value = cancellationPeriod.value.copy(
+        cancellationPeriod = cancellationPeriod.copy(
             isFocused = focusState.isFocused
         )
     }
 
     private fun onCancellationPeriod(value: String) {
-        _cancellationPeriod.value = cancellationPeriod.value.copy(
+        cancellationPeriod = cancellationPeriod.copy(
             text = value
         )
     }
 
     private fun onToggleBusinessOnly() {
-        _isBusinessOnly.value = !isBusinessOnly.value
+        isBusinessOnly = !isBusinessOnly
     }
 
     private fun focusAddressInput(focusState: FocusState) {
-        _addressInputFieldState.value = addressInputFieldState.value.copy(
-            isFocused = focusState.isFocused
-        )
-    }
-
-    private fun enterNumber(number: String){
-        _numberFieldState.value = numberFieldState.value.copy(
-            text = number
-        )
-    }
-
-    private fun enterCode(code: String){
-        _codeState.value = codeState.value.copy(
-            text = code
-        )
-    }
-
-    private fun enterEmail(email: String){
-        _emailInputFieldState.value = emailInputFieldState.value.copy(
-            text = email
-        )
-    }
-
-    private fun onFocusNumberInput(focusState: FocusState){
-        _numberFieldState.value = numberFieldState.value.copy(
-            isFocused = focusState.isFocused
-        )
-    }
-
-    private fun onFocusCodeInput(focusState: FocusState){
-        _codeState.value = codeState.value.copy(
-            isFocused = focusState.isFocused
-        )
-    }
-
-    private fun onFocusEmailInput(focusState: FocusState){
-        _emailInputFieldState.value = emailInputFieldState.value.copy(
+        addressInputFieldState = addressInputFieldState.copy(
             isFocused = focusState.isFocused
         )
     }
 
     private fun sendCode(){
-        _isCodeSent.value = true
-        _numberFieldState.value = numberFieldState.value.copy(
+        isCodeSent = true
+        phoneNumberFieldState = phoneNumberFieldState.copy(
             text = "",
             isFocused = false
         )
     }
 
     private fun submitCode(){
-        _codeState.value = codeState.value.copy(
+        codeState = codeState.copy(
             text = "",
             isFocused = false
         )
     }
 
     private fun submitEmail(){
-        _emailInputFieldState.value = emailInputFieldState.value.copy(
+        emailInputFieldState = emailInputFieldState.copy(
             text = "",
             isFocused = false
         )
     }
 
-    private fun onSelectSpokenLang(language: SpokenLanguage){
-        _spokenLanguageState.value = spokenLanguageState.value.map {
-            if(it.id == language.id){
-                SpokenLanguage(id = it.id, title = it.title , isSelected  = !it.isSelected)
-            }else {
-                it
-            }
+    fun submitOrgEmail(){
+        orgEmailInputFieldState = orgEmailInputFieldState.copy(
+            text = "",
+            isFocused = false
+        )
+    }
+
+    private fun onSelectSpokenLang(language: Language){
+        val cloned = ArrayList(spokenLanguageState)
+        if(language in spokenLanguageState){
+            cloned.remove(language)
+        }else{
+            cloned.add(language)
         }
+        spokenLanguageState = cloned
+    }
+
+    private fun onSelectSpokenLangPrv(language: Language){
+        val cloned = ArrayList(spokenLanguageProvider)
+        if(language in spokenLanguageProvider){
+            cloned.remove(language)
+        }else{
+            cloned.add(language)
+        }
+        spokenLanguageProvider = cloned
     }
 
     private fun onSelectBirthday(date: String){
-        _birthday.value = date
+        birthday = date
     }
 
     private fun getAddresses(){
         /***
          *  Simulating the raw data as a address . Later fetch from server
          * **/
-        _listOfAddress.value = listOf(
+        listOfAddress = listOf(
             "09 Princes Street, Edinburgh, GB",
             "3 Lupus St, Pimlico, London, GB",
             "Barnett House 53, Fountain Street, Manchester, GB",
@@ -560,71 +692,46 @@ class AccountSettingsViewModel @Inject constructor(
         )
     }
 
-    private fun getCountryCodes(){
-        val countryCodesJson = application.resources.openRawResource(R.raw.country_codes).bufferedReader().use { it.readText() }
-        val gson = Gson()
-        val countryCodes = gson.fromJson(countryCodesJson, CountryCodes::class.java)
-        _countryCodes.value = countryCodes
+    fun getCountries(){
+        viewModelScope.launch {
+            countries = GetCountry(staticResourcesRepository).invoke()
+        }
     }
 
-    fun setAccountType(accountType: AccountType){
-        _accountType.value = accountType
-    }
-
-    private fun getSpokenLanguages(){
-//        _spokenLanguageState.value = listOf(
-//            SpokenLanguage(id = "1", "English",true),
-//            SpokenLanguage(id = "2", "French",false),
-//            SpokenLanguage(id = "3", "Germany",false),
-//            SpokenLanguage(id = "4", "Detch",false),
-//            SpokenLanguage(id = "5", "Spain",false),
-//            SpokenLanguage(id = "6", "Hebrow",false),
-//        )
+    fun setAccType(accType: AccountType){
+        accountType = accType
     }
 
     private fun onSearchAddress() {
-        _addressOrPostcode.value = addressInputFieldState.value.text
-        _addressInputFieldState.value = addressInputFieldState.value.copy(text = "")
+        addressOrPostcode = addressInputFieldState.text
+        addressInputFieldState = addressInputFieldState.copy(text = "")
     }
 
-    fun onClickParkingType(parkingType: ParkingType){
-        _parkingType.value = parkingType
-    }
-
-    fun setAddressState(){
-        _addressState.value = addressState.value.copy(
-            postCode = "EH2 2ER",
-            town = "Edinburgh",
-            street = "Princess Street",
-            building = "9",
-            apartments = "12"
-        )
+    fun onClickParkingType(type: ParkingType){
+        parkingType = type
     }
 
     private fun clearInputState(){
-        _addressInputFieldState.value = addressInputFieldState.value.copy(
+        addressInputFieldState = addressInputFieldState.copy(
             text = ""
         )
     }
 
     fun clearAddressState(){
-        _addressState.value = AddressState()
+        addressState = AddressState()
         clearInputState()
     }
 
     fun enterAddress(value: String){
-        _addressInputFieldState.value = addressInputFieldState.value.copy(
+        addressInputFieldState = addressInputFieldState.copy(
             text = value
         )
-        //getAddresses()
     }
 
-    fun onSelectAddress(index: Int){
-        _selectedAddressIndex.value = index
-    }
-
-    fun spokenLanguageString(spokenLanguage: List<SpokenLanguage>): String {
+    fun spokenLanguageString(spokenLanguage: List<Language?>): String {
+        if(spokenLanguage.isEmpty()) return ""
         val first3 = if(spokenLanguage.size > 3) spokenLanguage.subList(0,3) else spokenLanguage
-        return first3.joinToString(", ") { it.title } + if (spokenLanguage.size > 3) " +${spokenLanguage.size - 3}" else ""
+        return first3.joinToString(", ") { it?.descr ?: "" } +
+                if (spokenLanguage.size > 3) " +${spokenLanguage.size - 3}" else ""
     }
 }

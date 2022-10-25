@@ -17,6 +17,7 @@ import androidx.core.text.HtmlCompat
 import androidx.navigation.NavController
 import eac.qloga.android.core.shared.components.Cards.ContainerBorderedCard
 import eac.qloga.android.core.shared.components.TitleBar
+import eac.qloga.android.core.shared.utils.Dimensions
 import eac.qloga.android.features.p4p.shared.scenes.serviceInfo.ServiceInfoViewModel
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 
@@ -25,8 +26,8 @@ import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 fun ServiceContractScreen(
     navController: NavController,
 ) {
-    val containerHorizontalPadding = 24.dp
-    val containerTopPadding = 16.dp
+    val containerHorizontalPadding = Dimensions.ScreenHorizontalPadding.dp
+    val containerTopPadding = Dimensions.ScreenTopPadding.dp
 
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()

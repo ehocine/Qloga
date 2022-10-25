@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import eac.qloga.android.R
-import eac.qloga.android.business.util.Extensions.rememberIsKeyboardOpen
+import eac.qloga.android.core.shared.utils.Extensions.rememberIsKeyboardOpen
 import eac.qloga.android.core.shared.components.Buttons.FullRoundedButton
 import eac.qloga.android.core.shared.components.Cards.ContainerBorderedCard
 import eac.qloga.android.core.shared.components.Containers.BottomButtonContainer

@@ -1,5 +1,6 @@
 package eac.qloga.android.data.p4p.customer
 
+import eac.qloga.android.data.shared.utils.apiHandler
 import eac.qloga.android.data.shared.utils.listToString
 import eac.qloga.android.data.shared.utils.toJsonString
 import eac.qloga.android.di.QLOGAApiService
@@ -22,7 +23,7 @@ import javax.inject.Inject
 class P4pCustomerRepository(@QLOGAApiService private val apiService: P4pCustomerApi) {
     //Customer
     suspend fun create() = apiService.create()
-    suspend fun get() = apiService.get()
+    suspend fun get() = apiHandler { apiService.get() }
     suspend fun update(customer: Customer) = apiService.update(customer)
     suspend fun delete() = apiService.delete()
     suspend fun getReviews() = apiService.getReviews()

@@ -6,6 +6,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,8 +27,10 @@ import eac.qloga.android.core.shared.components.Containers.BottomButtonContainer
 import eac.qloga.android.core.shared.components.HeartIconButton
 import eac.qloga.android.core.shared.components.PulsePlaceholder
 import eac.qloga.android.core.shared.components.TitleBar
+import eac.qloga.android.core.shared.theme.Red10
 import eac.qloga.android.core.shared.theme.gray30
 import eac.qloga.android.core.shared.utils.*
+import eac.qloga.android.core.shared.viewmodels.ApiViewModel
 import eac.qloga.android.features.p4p.provider.scenes.P4pProviderScreens
 import eac.qloga.android.features.p4p.shared.scenes.contactDetails.ContactDetailsViewModel
 import eac.qloga.android.features.p4p.shared.scenes.ratingDetails.RatingDetailsViewModel
@@ -39,23 +42,26 @@ import eac.qloga.android.features.p4p.showroom.scenes.providerWorkingSchedule.Pr
 import eac.qloga.android.features.p4p.showroom.shared.components.ExpandableText
 import eac.qloga.android.features.p4p.showroom.shared.components.ProfileCategoryList
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import retrofit2.http.GET
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProviderProfileScreen(
     navController: NavController,
     viewModel: ProviderProfileViewModel = hiltViewModel(),
-    navigationActions: NavigationActions
+    navigationActions: NavigationActions,
+    apiViewModel: ApiViewModel = hiltViewModel()
 ) {
     val imageHeight = 96.dp
     val containerTopPadding = 8.dp
-    val provider = viewModel.provider.value
-    val providerId = viewModel.providerID.value
+    val provider by ProviderProfileViewModel.provider.collectAsState()
+    val loadingStateAvatar by viewModel.avatarState.collectAsState()
     val profileImage = viewModel.avatarBitmap.value
     val name = provider.org?.name
-    val type = if(viewModel.provider.value.org?.individual == true) "Individual" else ""
+    val type = if(provider.org?.individual == true) "Individual" else ""
     val cancellationCount = provider.cancellations ?: 0
-    val distanceCount = 12.5 //calculate using lat lng and current location
+    val distanceCount = provider.coverageZone
     val descriptionText = provider.org?.descr
     val isActive = provider.active?: false
     val servicesCount = if(provider.services != null) provider.services.size else null
@@ -67,7 +73,6 @@ fun ProviderProfileScreen(
         RatingConverter.ratingToNorm(provider.rating?.toFloat()) else null
     val contacts = if(provider.org?.contacts != null)
         AddressConverter.addressToString(provider.org?.contacts?.address) else null
-    val loadingStateAvatar by viewModel.avatarState.collectAsState()
     val providerState by viewModel.providerState.collectAsState()
 
     val scope = rememberCoroutineScope()
@@ -75,6 +80,7 @@ fun ProviderProfileScreen(
 
     LaunchedEffect(Unit){
         viewModel.preCallsLoad()
+        apiViewModel.getProvider()
     }
 
     Scaffold(
@@ -126,10 +132,10 @@ fun ProviderProfileScreen(
                     ) {
 
                         val painterImage = rememberAsyncImagePainter(
-                            model = profileImage
+                            model = profileImage ?: R.drawable.prv_default_ava
                         )
 
-                        if(loadingStateAvatar == LoadingState.LOADING && profileImage == null){
+                        if(loadingStateAvatar == LoadingState.LOADING && provider.org?.avatarId != null ) {
                             PulsePlaceholder(
                                 modifier = Modifier.size(imageHeight),
                                 roundedCornerShape = RoundedCornerShape(4.dp)
@@ -201,6 +207,7 @@ fun ProviderProfileScreen(
                             }
                         }
                         Spacer(modifier= Modifier.height(8.dp))
+
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -214,16 +221,22 @@ fun ProviderProfileScreen(
                                 fontWeight = FontWeight.W400,
                                 color = gray30
                             )
-
-                            if(provider.calloutCharge){
-                                Box(
-                                    Modifier.clip(CircleShape)
-                                ){
+                            Box(
+                                Modifier.clip(CircleShape)
+                            ){
+                                if(provider.calloutCharge){
                                     Icon(
                                         modifier = Modifier.size(18.dp),
                                         imageVector = Icons.Rounded.Check,
                                         contentDescription = "",
                                         tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }else{
+                                    Icon(
+                                        modifier = Modifier.size(18.dp),
+                                        imageVector = Icons.Rounded.Close,
+                                        contentDescription = "",
+                                        tint = Red10
                                     )
                                 }
                             }
@@ -273,8 +286,10 @@ fun ProviderProfileScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
-                ExpandableText(text = descriptionText ?: "")
+                if(!descriptionText.isNullOrEmpty()){
+                    Spacer(modifier = Modifier.height(16.dp))
+                    ExpandableText(text = descriptionText)
+                }
                 Spacer(modifier = Modifier.height(24.dp))
 
                 ContainerBorderedCard {
@@ -304,10 +319,12 @@ fun ProviderProfileScreen(
                             }
                         }
 
-                        ProfileCategoryList(title = "Working hours & off time",value="", iconId = R.drawable.ic_ql_watch) {
-                            PrvWorkingScheduleViewModel.workingHours.value = provider.org.workingHours
-                            PrvWorkingScheduleViewModel.offTime.value = provider.org.offTime
-                            navigationActions.goToProviderWorkingSchedule()
+                        if(provider.org.workingHours.isNotEmpty() || provider.org.offTime.isNotEmpty()){
+                            ProfileCategoryList(title = "Working hours & off time", value="", iconId = R.drawable.ic_ql_watch) {
+                                PrvWorkingScheduleViewModel.workingHours.value = provider.org.workingHours
+                                PrvWorkingScheduleViewModel.offTimes = provider.org.offTime
+                                navigationActions.goToProviderWorkingSchedule()
+                            }
                         }
 
                         if(verifications != null && verifications.isNotEmpty()){
@@ -336,19 +353,21 @@ fun ProviderProfileScreen(
             }
 
             //inquiry button
-            BottomButtonContainer(
-                modifier = Modifier.align(Alignment.BottomCenter)
-            ) {
-                FullRoundedButton(
-                    backgroundColor = MaterialTheme.colorScheme.primary,
-                    buttonText = "Direct Inquiry"
+            if(ProviderProfileViewModel.providerId != ApiViewModel.orgs[0].id){
+                BottomButtonContainer(
+                    modifier = Modifier.align(Alignment.BottomCenter)
                 ) {
-                    scope.launch {
-                        /*
-                        navController.navigate(
-                            Screen.Services.route+"?$PARENT_ROUTE_KEY=${Screen.ProviderDetails.route}"
-                        )
-                        */
+                    FullRoundedButton(
+                        backgroundColor = MaterialTheme.colorScheme.primary,
+                        buttonText = "Direct Inquiry"
+                    ) {
+                        scope.launch {
+                            /*
+                            navController.navigate(
+                                Screen.Services.route+"?$PARENT_ROUTE_KEY=${Screen.ProviderDetails.route}"
+                            )
+                            */
+                        }
                     }
                 }
             }

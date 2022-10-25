@@ -1,5 +1,6 @@
 package eac.qloga.android.features.p4p.shared.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowForwardIos
@@ -9,17 +10,23 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.SvgDecoder
+import coil.request.ImageRequest
+import coil.size.Size
 import eac.qloga.android.R
 import eac.qloga.android.core.shared.components.DividerLines.DividerLine
 
 @Composable
 fun FAQItem(
     modifier: Modifier = Modifier,
-    iconId: Int? = null ,
     question: String,
+    image: String? = null,
     expandable: Boolean = true,
 ) {
     val iconSize = 24.dp
@@ -32,15 +39,23 @@ fun FAQItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        iconId?.let {
-            Box(modifier = Modifier.padding(end = 16.dp)){
-                Icon(
-                    modifier = Modifier.size(iconSize),
-                    painter = painterResource(id = it),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
+        Box(modifier = Modifier.padding(end = 16.dp)) {
+            val painter = rememberAsyncImagePainter(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .decoderFactory(SvgDecoder.Factory())
+                    .data(image)
+                    .size(Size.ORIGINAL)
+                    .build()
+            )
+
+            Image(
+                modifier = Modifier.size(iconSize),
+                painter = painter,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.Center,
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
+            )
         }
         Box(
             modifier = Modifier
@@ -76,6 +91,6 @@ fun FAQItem(
 
 @Preview
 @Composable
-fun PreviwewFAQItem() {
-    FAQItem(iconId = R.drawable.ic_ql_prv_faq, question = "Provider F.A.Q.")
+fun PreviewFAQItem() {
+    FAQItem( question = "Provider F.A.Q.")
 }

@@ -10,6 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -24,6 +25,7 @@ fun EmailInputField(
     onSubmit: () -> Unit,
     value : String = "",
     hint : String = "",
+    borderColor: Color,
     isFocused: Boolean = false,
     onFocusedChanged: (FocusState) -> Unit
 ) {
@@ -41,8 +43,8 @@ fun EmailInputField(
             placeholder = hint,
             inputFieldPadding = PaddingValues(8.dp),
             minHeight = inputBarHeight,
-            borderColor = if(isFocused) MaterialTheme.colorScheme.primary else gray1,
-            borderSize = if(isFocused) 2.dp else 1.dp,
+            borderColor = borderColor,
+            borderSize = if(isFocused) 1.4.dp else 1.dp,
             shape = RoundedCornerShape(12.dp),
             textStyle = MaterialTheme.typography.titleMedium,
             onValueChange = { onValueChange(it)},

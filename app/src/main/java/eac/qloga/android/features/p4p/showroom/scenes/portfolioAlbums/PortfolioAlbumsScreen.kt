@@ -37,6 +37,7 @@ import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.theme.gray1
 import eac.qloga.android.core.shared.utils.BottomSheetType
 import eac.qloga.android.core.shared.utils.DateConverter
+import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import eac.qloga.android.features.p4p.showroom.shared.components.*
 import eac.qloga.bare.enums.AccessLevel
@@ -205,6 +206,7 @@ fun PortfolioAlbumsScreen(
                                 onLongPress = { viewModel.onTriggerEvent(AlbumEvent.LongPressFolder)},
                                 onSelect = { viewModel.onTriggerEvent(AlbumEvent.SelectFolder(listOf(folder)))},
                                 onClick = {
+                                    navController.navigate(P4pScreens.MediaView.route)
                                     /*
                                     if(parentRoute.value == Screen.Account.route){
                                         scope.launch {

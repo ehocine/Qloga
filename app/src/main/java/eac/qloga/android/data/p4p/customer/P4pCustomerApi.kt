@@ -24,7 +24,7 @@ interface P4pCustomerApi {
     ): Response<Customer>
 
     @GET("p4p/cst")
-    suspend fun get(): Customer
+    suspend fun get(): Response<Customer>
 
     @PATCH("p4p/cst")
     suspend fun update(
@@ -54,7 +54,7 @@ interface P4pCustomerApi {
     @GET("p4p/cst/favs")
     suspend fun getFavPrvs(
         @Query("fields") fields: List<String>?
-    ): List<Provider>
+    ): Response<List<Provider>>
 
     @DELETE("p4p/cst/favs")
     suspend fun deleteFavPrv(
@@ -144,11 +144,11 @@ interface P4pCustomerApi {
     @GET("p4p/cst/providers/{prvId}")
     suspend fun getProviderInfo(
         @Path("prvId") prvId: Long
-    ): Provider
+    ): Response<Provider>
 
     @GET("p4p/cst/providers/{prvId}/reviews")
     suspend fun getProviderReviews(
         @Path("prvId") prvId: Long
-    ): List<OrderReview>
+    ): Response<List<OrderReview>>
 
 }

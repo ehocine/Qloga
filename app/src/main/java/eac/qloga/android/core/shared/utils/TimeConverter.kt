@@ -64,11 +64,16 @@ object TimeConverter {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun zonedDateTimeToStringTime(zonedDateTime: ZonedDateTime): String {
-        return DateTimeFormatter.ofPattern("hh:mm").format(zonedDateTime)
+        return DateTimeFormatter.ofPattern("HH:mm").format(zonedDateTime)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun localTimeToTimeString(localTime: LocalTime): String{
-        return DateTimeFormatter.ofPattern("hh:mm").format(localTime)
+        return DateTimeFormatter.ofPattern("HH:mm").format(localTime)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun stringToLocalTime(time: String): LocalTime{
+        return LocalTime.parse(time)
     }
 }

@@ -4,8 +4,7 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.ZonedDateTime
+import java.time.*
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -27,18 +26,35 @@ enum class Months(val month: String){
 private const val TAG = "${QTAG}-DateConverter"
 
 object DateConverter {
-    private val simpleDateFormat = SimpleDateFormat("MMMM d, yyyy")
+    private val simpleDateFormat = SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH)
     private val calendar: Calendar = Calendar.getInstance()
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun stringToLocalDate(stringDate: String?): LocalDate? {
-        val formatter = DateTimeFormatter.ofPattern("d/M/yyyy")
+        val formatter = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            DateTimeFormatter.ofPattern("d, MMM yyyy")
+        } else {
+            TODO("VERSION.SDK_INT < O")
+        }
         var result: LocalDate? = null
-
         try {
             result = LocalDate.parse(stringDate, formatter)
         }catch (e: Exception){
             Log.e(TAG, "stringToLocalDate: ${e.printStackTrace()}")
+        }
+        return result
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun localDateToString(localDate: LocalDate?): String? {
+        var result = ""
+        if(localDate == null) return null
+        try {
+            val formatter1 = DateTimeFormatter.ofPattern("yyyy-m-d")
+            val localDate2 = LocalDate.parse(localDate.toString(), formatter1)
+            val formatter2 = DateTimeFormatter.ofPattern("d/m/yyyy")
+            result = localDate2.format(formatter2)
+        }catch (e: Exception){
+            Log.e(TAG, "localDateToString: ${e.printStackTrace()}")
         }
         return result
     }
@@ -79,7 +95,25 @@ object DateConverter {
     {
         try {
             val textMonth = getTextMonth(month.toInt())
-            return "$day ${textMonth.substring(0,3)}, $year"
+            return "$day, ${textMonth.substring(0,3)} $year"
+        }catch (e: Exception){
+            Log.e(TAG, "toTextMonth: ${e.printStackTrace()}")
+        }
+        return ""
+    }
+
+    fun dayMonthYear(date: String): String
+    {
+        // date format d/m/yyyy
+        //return d, m yyyy eg 23, Oct 2022
+        try {
+            val splited = date.split("/")
+            val month = splited[1]
+            val day = splited[0]
+            val y = splited[2]
+
+            val textMonth = getTextMonth(month.toInt())
+            return "$day ${textMonth.substring(0,3)}, $y"
         }catch (e: Exception){
             Log.e(TAG, "toTextMonth: ${e.printStackTrace()}")
         }
@@ -116,6 +150,18 @@ object DateConverter {
         val textMonth = getTextMonth(dateArr[1].toInt())
         val day = dateArr[2]
         return  "$textMonth $day"
+    }
+
+    // accepts format 2022-02-13
+    // return format 13, Feb 2022
+    fun toTextDMY(date: String): String{
+        val sdf1 = SimpleDateFormat("yyyy-m-d", Locale.ENGLISH)
+        val sdf2 = SimpleDateFormat("dd, MMM yyyy", Locale.ENGLISH)
+
+        val d1 = sdf1.parse(date)
+        val d2 = d1?.let { sdf2.format(it) }
+
+        return d2 ?: ""
     }
 
     private fun getTextMonth(month: Int): String
@@ -269,18 +315,45 @@ object DateConverter {
         return DateTimeFormatter.ofPattern("dd/MM/yyyy").format(zonedDateTime)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun stringDateTimeToZonedDateTime(date: String, time: String): ZonedDateTime {
+        val result: ZonedDateTime
+
+        try {
+            val f2 = DateTimeFormatter.ofPattern("d/M/yyyy HH:mm")
+            val cDate = LocalDateTime.parse("$date $time", f2)
+
+            val zonedDateTime = cDate.atZone(ZoneOffset.UTC)
+//            val localDateTime = LocalDateTime.parse("$date $time", f2)
+//                .atZone(ZoneId.systemDefault())
+//                .toInstant()
+
+//            val zonedDateTime: ZonedDateTime = LocalDateTime.parse("$date $time",f2)
+//                .atZone(ZoneId.systemDefault())
+
+
+//            val zoned: ZonedDateTime = ZonedDateTime.of("$data", ZoneId.systemDefault())
+            result  = zonedDateTime
+        }catch (e: Exception){
+            e.printStackTrace()
+            throw Exception("Error converting date time ")
+        }
+        return result
+    }
+
     fun getDateFormat1(data: String): String{
         // parameter format 'yyyy-MM-dd'T'hh:0mm:ssZ'
         // return format yyyy/MM/dd
         var result: String = ""
-        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssZ")
-        val outputFormat = SimpleDateFormat("dd/MM/yyyy")
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssZ", Locale.ENGLISH)
+        val outputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
 
         try {
             val inputDate = inputFormat.parse(data)?.toString() ?: ""
             result = outputFormat.format(inputDate)
         }catch (e: Exception) {
-            Log.e(TAG, "getDateFormat1: ${e.message}")
+            Log.e(TAG, "getDateFormat1: ${e.cause}")
+            throw Exception("Error converting date ")
         }
         return result
     }

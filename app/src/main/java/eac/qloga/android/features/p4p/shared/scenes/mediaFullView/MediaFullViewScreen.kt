@@ -25,6 +25,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import eac.qloga.android.R
 import eac.qloga.android.core.shared.components.TitleBar
@@ -46,7 +47,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MediaFullViewScreen(
     navController: NavController,
-    viewModel: MediaViewModel,
+    viewModel: MediaViewModel = hiltViewModel(),
     mediaMetaId: String? = null,
 ) {
     val currentFolder = viewModel.currentFolder.value

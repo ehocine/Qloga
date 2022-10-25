@@ -1,6 +1,7 @@
 package eac.qloga.android.data.qbe
 
 
+import eac.qloga.android.data.shared.utils.apiHandler
 import eac.qloga.android.di.QLOGAApiService
 import eac.qloga.bare.dto.OffTime
 import eac.qloga.bare.dto.Org
@@ -8,7 +9,7 @@ import eac.qloga.bare.dto.WorkHours
 import javax.inject.Inject
 
 class OrgsRepository(@QLOGAApiService private val apiService: OrgsApi) {
-    suspend fun getOrgs() = apiService.getOrgs()
+    suspend fun getOrgs() = apiHandler { apiService.getOrgs() }
     suspend fun update(org: Org) = apiService.update(org)
     suspend fun add(org: Org) = apiService.add(org)
     suspend fun deleteOrg(oid: Long) = apiService.deleteOrg(oid)

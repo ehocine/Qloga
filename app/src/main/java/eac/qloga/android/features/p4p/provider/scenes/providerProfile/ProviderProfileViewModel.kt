@@ -11,10 +11,15 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import eac.qloga.android.core.services.OktaManager
 import eac.qloga.android.core.shared.utils.LoadingState
 import eac.qloga.android.core.shared.utils.PROVIDER_ID
+import eac.qloga.android.core.shared.viewmodels.ApiViewModel
+import eac.qloga.android.data.ApiInterceptor
 import eac.qloga.android.data.p4p.customer.P4pCustomerRepository
 import eac.qloga.android.data.qbe.MediaRepository
+import eac.qloga.android.data.shared.models.MediaSize
+import eac.qloga.android.data.shared.utils.NetworkResult
 import eac.qloga.android.features.p4p.shared.scenes.reviews.ReviewsViewModel
 import eac.qloga.p4p.order.dto.OrderReview
 import eac.qloga.p4p.prv.dto.Provider
@@ -29,7 +34,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProviderProfileViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
     private val p4pCustomerRepository: P4pCustomerRepository,
     private val mediaRepository: MediaRepository
 ): ViewModel() {
@@ -40,14 +44,10 @@ class ProviderProfileViewModel @Inject constructor(
 
     companion object{
         const val TAG = "PvrDetailsViewModel"
+        var providerId by mutableStateOf<Long?>(null)
         var showHeartBtn by mutableStateOf(true)
+        val provider = MutableStateFlow<Provider>(Provider())
     }
-
-    private val _providerID = mutableStateOf<Long?>(null)
-    val providerID: State<Long?> = _providerID
-
-    private val _provider = mutableStateOf(Provider())
-    val provider: State<Provider> = _provider
     
     private val _providerState  = MutableStateFlow(LoadingState.IDLE)
     val providerState = _providerState.asStateFlow()
@@ -69,35 +69,32 @@ class ProviderProfileViewModel @Inject constructor(
 
     init {
         preCallsLoad()
-        // get arguments direct in viewModel
-        // TODO remove 1001 id later
-        val paramProviderID = savedStateHandle.get<Long>(PROVIDER_ID)?: 1001
-        if(paramProviderID != -1L){
-            _providerID.value = paramProviderID
-        }
     }
 
     fun preCallsLoad(){
         loadProvider()
         getFavouriteProviders()
         getReviews()
+        provider.value.org.avatarId?.let{ getAvatar(it) }
     }
 
     private fun loadProvider(){
         viewModelScope.launch(coroutineExceptionHandler) {
-            try {
-                _providerState.emit(LoadingState.LOADING)
-                providerID.value?.let {
-                    val response = p4pCustomerRepository.getProviderInfo(prvId = it)
-                    _provider.value = response
-                    Log.d(TAG, "loadProvider verifications: ${response.org.verifications}")
-                    getAvatar(response.org.avatarId)
+            _providerState.emit(LoadingState.LOADING)
+            providerId?.let {
+                p4pCustomerRepository.get()
+                val response = p4pCustomerRepository.getProviderInfo(prvId = it)
+                if(response.isSuccessful){
+                    provider.emit(Provider())
+                    provider.emit(response.body()!!)
+                    provider.value.org.avatarId?.let { getAvatar(provider.value.org.avatarId) }
+                    _providerState.emit(LoadingState.LOADED)
+                }else{
+                    _providerState.emit(LoadingState.ERROR)
+                    Log.e(TAG, "loadProvider: code = ${response.code()}")
                 }
-                _providerState.emit(LoadingState.LOADED)
-            }catch (e: IOException){
-                _providerState.emit(LoadingState.ERROR)
-                e.printStackTrace()
             }
+            _providerState.emit(LoadingState.LOADED)
         }
     }
 
@@ -105,14 +102,20 @@ class ProviderProfileViewModel @Inject constructor(
         viewModelScope.launch( coroutineExceptionHandler) {
             try {
                 _reviewsState.emit(LoadingState.LOADING)
-                providerID.value?.let { id ->
+                providerId?.let { id ->
                     val response = p4pCustomerRepository.getProviderReviews(prvId = id)
-                    _reviews.value = response
-                    Log.d(ReviewsViewModel.TAG, "getProviderReviews:$response ")
+                    if(response.isSuccessful){
+                        _reviews.value = emptyList()
+                        _reviews.value = response.body()!!
+                        _reviewsState.emit(LoadingState.LOADED)
+                    }else{
+                        _reviewsState.emit(LoadingState.ERROR)
+                    }
                 }
                 _reviewsState.emit(LoadingState.LOADED)
             }catch (e: IOException){
                 _reviewsState.emit(LoadingState.ERROR)
+                Log.e(TAG, "getReviews: ${e.cause}")
                 e.printStackTrace()
             }
         }
@@ -121,8 +124,10 @@ class ProviderProfileViewModel @Inject constructor(
     private fun getFavouriteProviders(){
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             try {
-                p4pCustomerRepository.getFavPrvs(listOf(PrvFields.ID)).apply {
-                    _favouriteProviders.value = this.toSet()
+                val response = p4pCustomerRepository.getFavPrvs(listOf(PrvFields.ID))
+                if(response.isSuccessful){
+                    _favouriteProviders.value = emptySet()
+                    _favouriteProviders.value = response.body()!!.toSet()
                 }
             }catch (e: IOException){
                 e.printStackTrace()
@@ -135,9 +140,9 @@ class ProviderProfileViewModel @Inject constructor(
             try {
                 val response = p4pCustomerRepository.addFavPrv(providerId)
                 if(response.isSuccessful){
+                    getFavouriteProviders()
                     Log.d(TAG, "onAddFavouriteProvider: Favourite Added Successfully!")
                 }
-                getFavouriteProviders()
             }catch (e: IOException){
                 e.printStackTrace()
                 Log.e(TAG, "onAddFavouriteProvider: ${e.message}")
@@ -150,9 +155,9 @@ class ProviderProfileViewModel @Inject constructor(
             try {
                 val response = p4pCustomerRepository.deleteFavPrv(providerId)
                 if(response.isSuccessful){
+                    getFavouriteProviders()
                     Log.d(TAG, "onDeleteFavouriteProvider: Favourite Deleted Successfully!")
                 }
-                getFavouriteProviders()
             }catch (e: IOException){
                 e.printStackTrace()
                 Log.e(TAG, "onDeleteFavouriteProvider: ${e.message}")
@@ -162,15 +167,27 @@ class ProviderProfileViewModel @Inject constructor(
 
     fun getAvatar(id: Long){
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            try {
-                _avatarState.emit(LoadingState.LOADING)
-                val response = mediaRepository.getImageDataUrl(id,null)
-                val bitmap = BitmapFactory.decodeStream(response.byteStream())
-                _avatarBitmap.value = bitmap
-                _avatarState.emit(LoadingState.LOADED)
-            }catch (e: IOException){
-                _avatarState.emit(LoadingState.ERROR)
-                e.printStackTrace()
+            if(ApiViewModel.bitmapImages[id] != null){
+                _avatarBitmap.value = ApiViewModel.bitmapImages[id]
+                return@launch
+            }
+
+            _avatarState.emit(LoadingState.LOADING)
+            when(val response = mediaRepository.getImageDataUrl(id,MediaSize.Sz150x150)){
+                is NetworkResult.Success -> {
+                    val bitmap = BitmapFactory.decodeStream(response.data.byteStream())
+                    ApiViewModel.bitmapImages[id] = bitmap
+                    _avatarBitmap.value = bitmap
+                    _avatarState.emit(LoadingState.LOADED)
+                }
+                is NetworkResult.Error -> {
+                    Log.e(TAG, "getAvatar: code = ${response.code}, error = ${response.message}")
+                    _avatarState.emit(LoadingState.ERROR)
+                }
+                is NetworkResult.Exception -> {
+                    response.e.printStackTrace()
+                    _avatarState.emit(LoadingState.ERROR)
+                }
             }
         }
     }
@@ -181,11 +198,11 @@ class ProviderProfileViewModel @Inject constructor(
             val result = ArrayList(_favouriteProviders.value)
             result.remove(provider.value)
             _favouriteProviders.value = result.toSet()
-            return onDeleteFavouriteProvider(providerID.value!!)
+            return onDeleteFavouriteProvider(providerId!!)
         }
         val result = ArrayList(_favouriteProviders.value)
         result.add(provider.value)
         _favouriteProviders.value = result.toSet()
-        onAddFavouriteProvider(providerID.value!!)
+        onAddFavouriteProvider(providerId!!)
     }
 }

@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
@@ -30,7 +31,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SelectAlbumsScreen(
     navController: NavController,
-    viewModel: MediaViewModel,
+    viewModel: MediaViewModel = hiltViewModel(),
 ) {
     val selectedFolder = viewModel.selectedFolder.value
     val scope = rememberCoroutineScope()
@@ -47,8 +48,8 @@ fun SelectAlbumsScreen(
                             .clickable {
                                 scope.launch {
                                     viewModel.onTriggerEvent(MediaEvent.Move)
-                                    navController.navigate(P4pScreens.MediaView.route){
-                                        popUpTo(P4pScreens.SelectAlbum.route){
+                                    navController.navigate(P4pScreens.MediaView.route) {
+                                        popUpTo(P4pScreens.SelectAlbum.route) {
                                             inclusive = true
                                         }
                                     }

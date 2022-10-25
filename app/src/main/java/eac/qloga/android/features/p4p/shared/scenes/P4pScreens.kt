@@ -50,7 +50,7 @@ sealed class P4pScreens (
     object OrderMapGps: P4pScreens("order_map_gps", "Order")
     object OrderAddrMapView: P4pScreens("order_address_map_view", "Address")
     object Portfolio: P4pScreens("portfolio", "Portfolio")
-    object PortfolioFullView: P4pScreens("portfolio", "Portfolio")
+    object PortfolioFullView: P4pScreens("portfolio_full_view", "")
     object Tracking: P4pScreens("tracking", "Tracking")
     object SearchedAddrResult: P4pScreens("searched_address_result", "Address")
     object SelectAlbum: P4pScreens("select_album", "Select to move")

@@ -58,16 +58,14 @@ fun AddPrvAddressScreen(
             if(bottomSheetType.value == BottomSheetType.PARKING_TYPE){
                 ParkingSelection(
                     onSelect = { viewModel.onClickParkingType(it) },
-                    selected = viewModel.parkingType.value
+                    selected = viewModel.parkingType
                 )
             }else{
-                viewModel.countryCodes.value?.let { countryCodes ->
-                    CountryCodeList(
-                        selectCountryCode = viewModel.selectedCountryCode.value,
-                        countryCodes = countryCodes,
-                        onSelectCountryCode = { viewModel.onTriggerEvent(AccountSettingsEvent.SelectCountryCode(it))}
-                    )
-                }
+                CountryCodeList(
+                    selectCountryCode = viewModel.selectedCountryCode,
+                    countryCodes = viewModel.countries,
+                    onSelectCountryCode = { viewModel.onTriggerEvent(AccountSettingsEvent.SelectCountryCode(it))}
+                )
             }
         }
     ) {
@@ -111,12 +109,12 @@ fun AddPrvAddressScreen(
                             modifier = Modifier.weight(1f)
                         ){
                             AddressSearchBar(
-                                value = viewModel.addressInputFieldState.value.text,
-                                hint = viewModel.addressInputFieldState.value.hint,
-                                isFocused = viewModel.addressInputFieldState.value.isFocused,
+                                value = viewModel.addressInputFieldState.text,
+                                hint = viewModel.addressInputFieldState.hint,
+                                isFocused = viewModel.addressInputFieldState.isFocused,
                                 onValueChange = { viewModel.onTriggerEvent(AccountSettingsEvent.EnterAddress(it))},
                                 onSubmit = {
-                                    if(viewModel.addressInputFieldState.value.text.isNotEmpty()){
+                                    if(viewModel.addressInputFieldState.text.isNotEmpty()){
                                         coroutineScope.launch {
                                             navController.navigate(P4pScreens.SearchedAddrResult.route)
                                         }
@@ -138,13 +136,13 @@ fun AddPrvAddressScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
                     AddPrvAddressCard(
-                        parkingType = viewModel.parkingType.value,
-                        checkBusinessOnly = viewModel.isBusinessOnly.value,
-                        postcodeState = viewModel.providerPostCodeState.value,
-                        streetState = viewModel.providerStreetState.value,
-                        apartmentsState = viewModel.providerApartmentsState.value,
-                        townState = viewModel.providerTownState.value,
-                        buildingState = viewModel.providerBuildingState.value,
+                        parkingType = viewModel.parkingType,
+                        checkBusinessOnly = viewModel.isBusinessOnly,
+                        postcodeState = viewModel.providerPostCodeState,
+                        streetState = viewModel.providerStreetState,
+                        apartmentsState = viewModel.providerApartmentsState,
+                        townState = viewModel.providerTownState,
+                        buildingState = viewModel.providerBuildingState,
                         onChangePostcode = { viewModel.onTriggerEvent( AccountSettingsEvent.EnterProviderPostcode(it)) },
                         onChangeStreet = { viewModel.onTriggerEvent( AccountSettingsEvent.EnterProviderStreet(it)) },
                         onChangeBuilding = { viewModel.onTriggerEvent( AccountSettingsEvent.EnterProviderBuilding(it)) },
@@ -155,7 +153,7 @@ fun AddPrvAddressScreen(
                         onFocusBuilding = { viewModel.onTriggerEvent( AccountSettingsEvent.FocusProviderBuilding(it)) },
                         onFocusTown = { viewModel.onTriggerEvent( AccountSettingsEvent.FocusProviderTown(it))},
                         onFocusApartments = { viewModel.onTriggerEvent( AccountSettingsEvent.FocusProviderApartments(it))},
-                        countryCode = viewModel.selectedCountryCode.value.name + "(${viewModel.selectedCountryCode.value.dialCode})",
+                        countryCode = viewModel.selectedCountryCode.descr + "(${viewModel.selectedCountryCode.dialcode})",
                         onSelectCountryCode ={
                             coroutineScope.launch {
                                 bottomSheetType.value = BottomSheetType.COUNTY_TYPE

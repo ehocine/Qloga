@@ -1,10 +1,8 @@
 package eac.qloga.android.features.p4p.showroom.scenes.providerServices
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import android.text.style.BackgroundColorSpan
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -13,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -97,10 +96,11 @@ fun ProviderServicesScreen(
                                     modifier = Modifier
                                         .height(32.dp)
                                         .width(32.dp)
+                                        .background(Color.Transparent)
                                     ,
                                     painter = painter,
                                     contentDescription = null,
-                                    contentScale = ContentScale.Crop
+                                    contentScale = ContentScale.Crop,
                                 )
                                 Spacer(modifier = Modifier.width(16.dp))
                                 Text(text = serviceCategory.name, style = MaterialTheme.typography.titleLarge)
@@ -125,6 +125,7 @@ fun ProviderServicesScreen(
                                         verticalAlignment = Alignment.CenterVertically
                                     ){
                                         Text(
+                                            modifier = Modifier.weight(1f),
                                             text = service?.service?.name ?: "",
                                             style = MaterialTheme.typography.titleMedium,
                                             maxLines = 1,

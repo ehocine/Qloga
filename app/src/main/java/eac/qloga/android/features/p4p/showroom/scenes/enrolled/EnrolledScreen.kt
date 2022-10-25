@@ -50,7 +50,7 @@ fun EnrolledScreen(
         it.catGroupOrder
     }
     val currentEnrollment by EnrollmentViewModel.currentEnrollmentType
-    Log.d("Tag", "currentEnrollment: $currentEnrollment")
+    Log.i("Tag", "currentEnrollment: $currentEnrollment")
 
     Scaffold { paddingValues ->
 

@@ -1,14 +1,11 @@
 package eac.qloga.android.features.p4p.customer.shared.components
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState
 import eac.qloga.android.core.shared.components.BottomSheets
 import eac.qloga.android.core.shared.utils.InputFieldState
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CustomerOrdersSearchFilter(
     modifier: Modifier = Modifier,

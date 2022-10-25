@@ -19,7 +19,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import eac.qloga.android.business.util.Extensions.clearFocusOnKeyboardDismiss
+import eac.qloga.android.core.shared.utils.Extensions.clearFocusOnKeyboardDismiss
 import eac.qloga.android.core.shared.theme.gray1
 
 @OptIn(ExperimentalComposeUiApi::class)

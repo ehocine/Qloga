@@ -26,6 +26,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.theme.gray30
@@ -37,7 +38,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun PortfolioScreen(
     navController: NavController,
-    viewModel: PortfolioViewModel
+    viewModel: PortfolioViewModel = hiltViewModel()
 ) {
     val listImageSize = 62.dp
     val images = viewModel.images
@@ -84,7 +85,9 @@ fun PortfolioScreen(
                         imageId = it.link,
                         fullText = viewModel.showFullTextDetails,
                         imageDescription = it.description,
-                        onClickImage = { navController.navigate(P4pScreens.PortfolioFullView.route) }
+                        onClickImage = {
+                            navController.navigate(P4pScreens.PortfolioFullView.route)
+                        }
                     )
                 }
 
@@ -166,7 +169,7 @@ private fun ImageContainer(
                     interactionSource = interactionSource,
                     indication = null
                 ) {
-                  onClickImage()
+                    onClickImage()
                 }
             ,
             painter = painterResource(id = imageId),

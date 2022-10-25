@@ -57,7 +57,7 @@ fun QuestionItem(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).padding(end = 4.dp),
                         text = question,
                         style = MaterialTheme.typography.titleMedium
                     )

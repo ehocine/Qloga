@@ -17,7 +17,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import eac.qloga.android.business.util.Extensions.advancedShadow
+import eac.qloga.android.core.shared.utils.Extensions.advancedShadow
 import eac.qloga.android.core.shared.theme.gray1
 import eac.qloga.android.core.shared.theme.gray30
 

@@ -15,11 +15,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.size.Dimension
 import com.google.accompanist.web.AccompanistWebViewClient
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.rememberWebViewState
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.theme.gray1
+import eac.qloga.android.core.shared.utils.Dimensions
 import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
 import eac.qloga.android.features.p4p.shared.utils.AccountType
 import eac.qloga.android.features.p4p.shared.utils.CustomerTabsType
@@ -30,9 +32,9 @@ import eac.qloga.android.features.p4p.shared.utils.ProvidersTabsType
 fun PrvCstTCScreen(
     navController: NavController,
 ) {
-    val roundedCornerRadius = 16.dp
-    val containerHorizontalPadding = 24.dp
-    val containerTopPadding = 16.dp
+    val roundedCornerRadius = 12.dp
+    val containerHorizontalPadding = Dimensions.ScreenHorizontalPadding.dp
+    val containerTopPadding = Dimensions.ScreenTopPadding.dp
     val tabHeight = 60.dp
     val accountType = PrvCstTCViewModel.accountType
     val selectedTabIndex = remember{ mutableStateOf(0) }

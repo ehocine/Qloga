@@ -38,8 +38,8 @@ interface MediaApi {
     @GET("qbe/images/{mid}")
     suspend fun getImageDataUrl(
         @Path("mid") mid: Long,
-        @Query("ms") size: MediaSize?
-    ): ResponseBody
+        @Query("ms") size: Int?
+    ): Response<ResponseBody>
 
     @DELETE("qbe/images/{mid}")
     suspend fun deleteMedia(

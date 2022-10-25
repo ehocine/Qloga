@@ -39,7 +39,6 @@ object PickerDialog {
         ).show()
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun showDatePickerDialog(
         context: Context,
         onSetDate: (date: String) -> Unit,
@@ -51,10 +50,10 @@ object PickerDialog {
             R.style.DateTimePickerDialogTheme,
             { _, year: Int, month: Int, day: Int ->
                 val m = month + 1
-                // date format is 23 Feb 2022
                 val date: String = if(numberFormat){
-                    "$day/$m/$year"
+                    "$day/$m/$year" //date format eg 23/4/2022
                 }else {
+                    // date format is 23 Feb 2022
                     DateConverter.dayMonthYear(
                         year = year.toString(),
                         month = m.toString(),

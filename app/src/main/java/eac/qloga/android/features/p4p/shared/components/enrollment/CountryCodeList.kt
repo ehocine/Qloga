@@ -16,20 +16,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import eac.qloga.android.core.shared.theme.gray1
 import eac.qloga.android.core.shared.theme.orange1
-import eac.qloga.android.core.shared.utils.CountryCode
-import eac.qloga.android.core.shared.utils.CountryCodes
+import eac.qloga.bare.dto.lookups.Country
 
 @Composable
 fun CountryCodeList(
     modifier: Modifier = Modifier,
-    selectCountryCode: CountryCode,
-    countryCodes: CountryCodes,
-    onSelectCountryCode: (CountryCode) -> Unit,
+    selectCountryCode: Country,
+    countryCodes: List<Country>,
+    onSelectCountryCode: (Country) -> Unit,
 ) {
     val containerHorizontalPadding = 20.dp
     val lazyColumnState = rememberLazyListState()
-
-//    val materialDatePicker = MaterialDatePicker.Builder()
 
     Column(
         modifier = modifier
@@ -52,7 +49,7 @@ fun CountryCodeList(
             modifier = Modifier.fillMaxHeight(),
             state = lazyColumnState,
         ){
-            items(countryCodes.countryCodes, key = {it.code} ){ countryCode ->
+            items(countryCodes, key = {it.dialcode} ){ countryCode ->
                 val isSelected = selectCountryCode == countryCode
                 Row(
                     modifier = Modifier
@@ -65,12 +62,12 @@ fun CountryCodeList(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = countryCode.name,
+                        text = countryCode.descr,
                         style = MaterialTheme.typography.titleMedium,
                         color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
                     )
                     Text(
-                        text = countryCode.dialCode,
+                        text = countryCode.dialcode,
                         style = MaterialTheme.typography.titleMedium,
                         color = if (isSelected) MaterialTheme.colorScheme.primary else orange1
                     )

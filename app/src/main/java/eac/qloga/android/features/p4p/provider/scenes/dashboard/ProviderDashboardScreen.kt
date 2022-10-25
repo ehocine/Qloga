@@ -32,15 +32,8 @@ fun ProviderDashboardScreen(
 ) {
     val showBottomNavBar = remember{ mutableStateOf(true) }
     val selectedNavItem = viewModel.selectedNavItem.value
-    var showProfileInfoDialog by remember{ mutableStateOf(false) }
-    var alreadyShownProfileInfoDialog by remember{ mutableStateOf(false) }
-
-    LaunchedEffect(viewModel.showProviderInfoDialog){
-        if(!alreadyShownProfileInfoDialog){
-            // fetch from datastore only for first time when composition
-            showProfileInfoDialog = viewModel.showProviderInfoDialog
-        }
-    }
+    val alreadyShownProfileInfoDialog  = ProviderDashboardViewModel.alreadyShownProfileInfoDialog
+    var showDialog = remember{ mutableStateOf(false) }
 
     Scaffold{ paddingValues ->
 
@@ -131,20 +124,22 @@ fun ProviderDashboardScreen(
                     }
                 }
             }
-            if(showProfileInfoDialog){
-                alreadyShownProfileInfoDialog = true
+            if(viewModel.showProviderInfoDialog && !alreadyShownProfileInfoDialog){
                 Dialog(
                     onDismissRequest = {
-                        showProfileInfoDialog = false
+                        ProviderDashboardViewModel.alreadyShownProfileInfoDialog = true
+                        viewModel.onDismissInfoDialog()
                     }
                 ) {
                     ProfileInfoDialog(
                         accountType = AccountType.PROVIDER,
-                        isDontShowAgainChecked = !viewModel.showProviderInfoDialog,
-                        onClickCheckBox = { viewModel.onToggleShowProviderInfoDialog() },
+                        isDontShowAgainChecked = !viewModel.showProviderInfoDialogCheck,
+                        onClickCheckBox = { viewModel.onClickDialogCheck() },
                         goToProfile = {
                             AccountViewModel.selectedAccountType = AccountType.PROVIDER
                             navController.navigate(P4pScreens.Account.route)
+                            ProviderDashboardViewModel.alreadyShownProfileInfoDialog = true
+                            viewModel.onDismissInfoDialog()
                         }
                     )
                 }

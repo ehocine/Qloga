@@ -18,7 +18,7 @@ object Cards{
         modifier: Modifier = Modifier,
         borderWidth: Dp = 1.5.dp,
         borderColor: Color = gray1,
-        cornerRadius: Dp = 16.dp,
+        cornerRadius: Dp = 12.dp,
         content: @Composable (() -> Unit)
     ) {
         Box(modifier = modifier

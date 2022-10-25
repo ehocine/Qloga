@@ -21,6 +21,7 @@ import eac.qloga.android.R
 import eac.qloga.android.core.shared.components.Cards
 import eac.qloga.android.core.shared.components.Items
 import eac.qloga.android.core.shared.components.TitleBar
+import eac.qloga.android.data.qbe.PlatformRepository
 import eac.qloga.android.features.p4p.shared.components.OrderActions
 import eac.qloga.android.features.p4p.shared.components.OrderSummery
 import eac.qloga.android.features.p4p.shared.components.OrderTypeStatus
@@ -30,14 +31,16 @@ import eac.qloga.android.features.p4p.shared.utils.AccountType
 import eac.qloga.android.features.p4p.shared.utils.OrderCategory
 import eac.qloga.android.features.p4p.shared.viewmodels.OrderViewModel
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
+import eac.qloga.bare.dto.person.Person
 import kotlinx.coroutines.launch
+import retrofit2.Response
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomerOrderScreen(
     navController: NavController,
     viewModel: OrderViewModel = hiltViewModel(),
-    orderType: String? = null
+    orderType: String? = null,
 ) {
     val containerTopPadding = 16.dp
     val containerHorizontalPadding = 24.dp

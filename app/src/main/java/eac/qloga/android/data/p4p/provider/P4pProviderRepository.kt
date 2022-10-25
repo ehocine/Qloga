@@ -1,5 +1,6 @@
 package eac.qloga.android.data.p4p.provider
 
+import eac.qloga.android.data.shared.utils.apiHandler
 import eac.qloga.android.data.shared.utils.listToString
 import eac.qloga.android.data.shared.utils.toJsonString
 import eac.qloga.android.data.shared.utils.toJsonStringWithDate
@@ -40,7 +41,7 @@ class P4pProviderRepository(@QLOGAApiService private val apiService: P4pProvider
 
     suspend fun delete(prvId: Long) = apiService.delete(prvId)
     suspend fun deactivate(prvId: Long) = apiService.deactivate(prvId)
-    suspend fun getProvider(prvId: Long) = apiService.getProvider(prvId)
+    suspend fun getProvider(prvId: Long) = apiHandler { apiService.getProvider(prvId) }
     suspend fun getPrvReviews(prvId: Long) = apiService.getPrvReviews(prvId)
     suspend fun getCustomerInfo(prvId: Long, cstId: Long) = apiService.getCustomerInfo(prvId, cstId)
     suspend fun getPrvRequestById(prvId: Long, rqid: Long) =
@@ -112,7 +113,7 @@ class P4pProviderRepository(@QLOGAApiService private val apiService: P4pProvider
         selector?.toJsonString()
     )
 
-    suspend fun getServices(prvId: Long) = apiService.getServices(prvId)
+    suspend fun getServices(prvId: Long) = apiHandler { apiService.getServices(prvId) }
     suspend fun addServiceConditions(
         prvId: Long,
         linkParam: Long,

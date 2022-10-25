@@ -1,18 +1,18 @@
 package eac.qloga.android.features.p4p.provider.scenes.accountSettings
 
-import androidx.compose.foundation.clickable
+import android.os.Build
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -23,35 +23,62 @@ import eac.qloga.android.core.shared.components.Cards.ContainerBorderedCard
 import eac.qloga.android.core.shared.components.DividerLines.LightDividerLine
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.theme.gray1
-import eac.qloga.android.core.shared.theme.gray30
 import eac.qloga.android.core.shared.utils.Dimensions
+import eac.qloga.android.core.shared.utils.LoadingState
+import eac.qloga.android.core.shared.utils.UiEvent
+import eac.qloga.android.core.shared.viewmodels.ApiViewModel
 import eac.qloga.android.features.p4p.provider.scenes.P4pProviderScreens
 import eac.qloga.android.features.p4p.shared.components.AccSettingsListItem
 import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
+import eac.qloga.android.features.p4p.shared.scenes.verifications.VerificationsViewModel
 import eac.qloga.android.features.p4p.shared.utils.AccountSettingsEvent
-import eac.qloga.android.features.p4p.shared.utils.AccountSettingsEvent.EnterRegistrationDetails
+import eac.qloga.android.features.p4p.shared.utils.AccountSettingsEvent.SaveProviderAccountSettings
+import eac.qloga.android.features.p4p.shared.utils.AccountType
 import eac.qloga.android.features.p4p.shared.viewmodels.AccountSettingsViewModel
-import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProviderAccountSettingsScreen(
     navController: NavController,
     viewModel: AccountSettingsViewModel = hiltViewModel(),
+    apiViewModel: ApiViewModel = hiltViewModel()
 ) {
     val containerHorizontalPadding = Dimensions.ScreenHorizontalPadding.dp
     val containerTopPadding = Dimensions.ScreenTopPadding.dp
-    val phoneSwitch = viewModel.phoneSwitch.value
-    val timeOffSwitch = viewModel.timeOffSwitch.value
-    val activeSwitch = viewModel.activeSwitch.value
+    val activeSwitch = viewModel.activeSwitch
     val calloutChargeSwitch = viewModel.calloutChargeSwitch
-    val hideAll = viewModel.hideAll.value
-    val spokenLanguages = viewModel.spokenLanguageState.value
+    val spokenLanguages = AccountSettingsViewModel.spokenLanguageProvider
     val focusManager = LocalFocusManager.current
+    val savingState by viewModel.savingState.collectAsState()
 
+    val context = LocalContext.current
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(key1 = true ){
+        viewModel.eventFlow.collectLatest { event ->
+            when(event){
+                is UiEvent.ShowToast -> {
+                    Toast.makeText(context, event.msg, Toast.LENGTH_LONG).show()
+                }
+                is UiEvent.NavigateBack -> { navController.navigateUp()}
+                else -> {}
+            }
+        }
+    }
+
+    LaunchedEffect(key1 = Unit, key2 = savingState){
+        viewModel.setInitialStates()
+        viewModel.getCountries()
+        if(savingState != LoadingState.LOADING){
+            apiViewModel.getOrgs()
+            apiViewModel.getUserProfile()
+            apiViewModel.getProvider()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -61,12 +88,10 @@ fun ProviderAccountSettingsScreen(
                 actions =  {
                     Buttons.SaveButton(
                         onClick = {
-                            coroutineScope.launch {
-                                navController.navigateUp()
-                                //viewModel.onTriggerEvent(SaveProviderAccountSettings)
-                            }
+                            viewModel.onTriggerEvent(SaveProviderAccountSettings)
                         },
-                        textColor = MaterialTheme.colorScheme.primary
+                        textColor = MaterialTheme.colorScheme.primary,
+                        isLoading = savingState == LoadingState.LOADING
                     )
                 },
                 onBackPress = { navController.navigateUp() }
@@ -119,8 +144,8 @@ fun ProviderAccountSettingsScreen(
                                 )
                                 Switch(
                                     modifier = Modifier.height(24.dp),
-                                    checked = false,
-                                    onCheckedChange = { /*viewModel.onActiveSwitch()*/ },
+                                    checked = activeSwitch,
+                                    onCheckedChange = { viewModel.onActiveSwitch() },
                                     colors = SwitchDefaults.colors(
                                         uncheckedBorderColor = gray1,
                                         uncheckedTrackColor = MaterialTheme.colorScheme.background
@@ -131,53 +156,25 @@ fun ProviderAccountSettingsScreen(
                         }
 
                         AccSettingsListItem(
-                            hint = viewModel.nameSurname.value.hint,
-                            value = viewModel.nameSurname.value.text,
+                            hint = viewModel.orgName.hint,
+                            value = viewModel.orgName.text,
                             editable = true,
                             keyboardType = KeyboardType.Text,
-                            onValueChange = { viewModel.onTriggerEvent(
-                                AccountSettingsEvent.EnterNameSurname(
-                                    it
+                            onValueChange = {
+                                viewModel.onTriggerEvent(
+                                    AccountSettingsEvent.EnterOrgName(it)
                                 )
-                            ) },
-                            onFocusChange = { viewModel.onTriggerEvent(
-                                AccountSettingsEvent.FocusNameSurname(
-                                    it
-                                )
-                            ) }
-                        )
-
-                        AccSettingsListItem(
-                            title = "Description",
-                            value = viewModel.businessDescriptionState.value.text.ifEmpty {
-                                viewModel.businessDescriptionState.value.hint
                             },
-                            editable = false,
-                            clickable = true,
-                            onClick = {
-                                coroutineScope.launch {
-//                                    navController.navigate(Screen.BusinessDetails.route){
-//                                        launchSingleTop = true
-//                                        popUpTo(Screen.ProviderAccountSettings.route)
-//                                    }
-                                }
-                            },
-                            keyboardType = KeyboardType.Text,
-                            onValueChange = { viewModel.onTriggerEvent(
-                                AccountSettingsEvent.EnterDescription(
-                                    it
+                            onFocusChange = {
+                                viewModel.onTriggerEvent(
+                                    AccountSettingsEvent.FocusOrgName(it)
                                 )
-                            ) },
-                            onFocusChange = { viewModel.onTriggerEvent(
-                                AccountSettingsEvent.FocusDescription(
-                                    it
-                                )
-                            ) }
+                            }
                         )
 
                         AccSettingsListItem(
                             title = "Phone",
-                            value = "+44 123456789",
+                            value = AccountSettingsViewModel.phoneNumberFieldState.text,
                             clickable = true,
                             onClick = {
                                 coroutineScope.launch {
@@ -187,7 +184,7 @@ fun ProviderAccountSettingsScreen(
                         )
                         AccSettingsListItem(
                             title = "Email",
-                            value = "orgpork@gmail.com",
+                            value = AccountSettingsViewModel.orgEmailInputFieldState.text,
                             clickable = true,
                             onClick = {
                                 coroutineScope.launch {
@@ -197,7 +194,7 @@ fun ProviderAccountSettingsScreen(
                         )
                         AccSettingsListItem(
                             title = "Address",
-                            value = viewModel.listOfAddress.value[viewModel.selectedAddressIndex.value],
+                            value = viewModel.listOfAddress[viewModel.selectedAddressIndex],
                             clickable = true,
                             onClick = {
                                 coroutineScope.launch {
@@ -207,7 +204,7 @@ fun ProviderAccountSettingsScreen(
                         )
                         AccSettingsListItem(
                             title = "Spoken language",
-                            value = viewModel.spokenLanguageString(spokenLanguages.filter { it.isSelected }),
+                            value = viewModel.spokenLanguageString(spokenLanguages),
                             clickable = true,
                             onClick = {
                                 coroutineScope.launch {
@@ -237,7 +234,7 @@ fun ProviderAccountSettingsScreen(
                                 )
                                 Switch(
                                     modifier = Modifier.height(24.dp),
-                                    checked = calloutChargeSwitch.value,
+                                    checked = calloutChargeSwitch,
                                     onCheckedChange = { viewModel.onCalloutChargeSwitch()},
                                     colors = SwitchDefaults.colors(
                                         uncheckedBorderColor = gray1,
@@ -249,58 +246,64 @@ fun ProviderAccountSettingsScreen(
                         }
 
                         AccSettingsListItem(
-                            title = if(viewModel.cancellationPeriod.value.text.isNotEmpty()){
-                                viewModel.cancellationPeriod.value.hint
+                            title = if(viewModel.cancellationPeriod.text.isNotEmpty()){
+                                viewModel.cancellationPeriod.hint
                             }else null,
-                            hint = viewModel.cancellationPeriod.value.hint,
-                            value = viewModel.cancellationPeriod.value.text,
+                            hint = viewModel.cancellationPeriod.hint,
+                            value = viewModel.cancellationPeriod.text,
                             editable = true,
                             keyboardType = KeyboardType.Number,
-                            onValueChange = { viewModel.onTriggerEvent(
-                                AccountSettingsEvent.EnterCancellationPeriod(
-                                    it
+                            onValueChange = {
+                                viewModel.onTriggerEvent(
+                                    AccountSettingsEvent.EnterCancellationPeriod( it )
                                 )
-                            ) },
-                            onFocusChange = { viewModel.onTriggerEvent(
-                                AccountSettingsEvent.FocusCancellationPeriod(
-                                    it
+                            },
+                            onFocusChange = {
+                                viewModel.onTriggerEvent(
+                                    AccountSettingsEvent.FocusCancellationPeriod( it )
                                 )
-                            ) }
-                        )
-
-                        AccSettingsListItem(
-                            title = if(viewModel.coverageZone.value.text.isNotEmpty()){
-                                viewModel.coverageZone.value.hint
-                            }else null,
-                            hint = viewModel.coverageZone.value.hint,
-                            value = viewModel.coverageZone.value.text,
-                            editable = true,
-                            keyboardType = KeyboardType.Number,
-                            onValueChange = { viewModel.onTriggerEvent(
-                                AccountSettingsEvent.EnterCoverageZone(it)
-                            ) },
-                            onFocusChange = { viewModel.onTriggerEvent(
-                                AccountSettingsEvent.FocusCoverageZone(it)
-                            ) }
-                        )
-
-                        AccSettingsListItem(
-                            title = "Verifications",
-                            value = "ID, Phone, Address, Insurance",
-                            clickable = true,
-                            onClick = {
-                                coroutineScope.launch {
-                                    navController.navigate(P4pScreens.Verifications.route)
-                                }
                             }
                         )
 
                         AccSettingsListItem(
-                            title = if(viewModel.website.value.text.isNotEmpty()){
-                                viewModel.website.value.hint
+                            title = if(viewModel.coverageZone.text.isNotEmpty()){
+                                viewModel.coverageZone.hint
                             }else null,
-                            hint = viewModel.website.value.hint,
-                            value = viewModel.website.value.text,
+                            hint = viewModel.coverageZone.hint,
+                            value = viewModel.coverageZone.text,
+                            editable = true,
+                            keyboardType = KeyboardType.Number,
+                            onValueChange = {
+                                viewModel.onTriggerEvent(
+                                    AccountSettingsEvent.EnterCoverageZone(it)
+                                )
+                            },
+                            onFocusChange = {
+                                viewModel.onTriggerEvent(
+                                    AccountSettingsEvent.FocusCoverageZone(it)
+                                )
+                            }
+                        )
+
+                        if(viewModel.orgVerifications.isNotEmpty()){
+                            AccSettingsListItem(
+                                title = "Verifications",
+                                value = viewModel.orgVerifications,
+                                clickable = true,
+                                onClick = {
+                                    VerificationsViewModel.accountType = AccountType.PROVIDER
+                                    VerificationsViewModel.verifications.value = ApiViewModel.orgs[0].verifications
+                                    navController.navigate(P4pScreens.Verifications.route)
+                                }
+                            )
+                        }
+
+                        AccSettingsListItem(
+                            title = if(viewModel.website.text.isNotEmpty()){
+                                viewModel.website.hint
+                            }else null,
+                            hint = viewModel.website.hint,
+                            value = viewModel.website.text,
                             editable = true,
                             keyboardType = KeyboardType.Text,
                             onValueChange = { viewModel.onTriggerEvent(
@@ -312,37 +315,15 @@ fun ProviderAccountSettingsScreen(
                         )
 
                         AccSettingsListItem(
-                            editable = false,
-                            clickable = true,
-                            title = "Registration detials",
-                            value = viewModel.registrationDetailsState.value.text.ifEmpty {
-                                viewModel.registrationDetailsState.value.hint
-                            },
-                            keyboardType = KeyboardType.Text,
-                            onClick = {
-                                coroutineScope.launch {
-                                    navController.navigate(P4pScreens.BusinessDetails.route)
-                                }
-                            },
-                            onValueChange = { viewModel.onTriggerEvent(EnterRegistrationDetails(it)
-                            ) },
-                            onFocusChange = {
-                                viewModel.onTriggerEvent(
-                                    AccountSettingsEvent.FocusRegistrationDetails(it)
-                                )
-                            }
-                        )
-
-                        AccSettingsListItem(
-                            title = "Business insurance details",
-                            value = viewModel.businessInsuranceState.value.text.ifEmpty {
-                                viewModel.businessInsuranceState.value.hint
-                            },
+                            title = "Business details",
+                            value = "Description, Registration Details",
                             editable = false,
                             clickable = true,
                             onClick = {
                                 coroutineScope.launch {
-                                    navController.navigate(P4pScreens.BusinessDetails.route)
+                                    navController.navigate(P4pScreens.BusinessDetails.route){
+                                        popUpTo(P4pProviderScreens.ProviderAccountSettings.route)
+                                    }
                                 }
                             },
                             keyboardType = KeyboardType.Text,
@@ -357,106 +338,6 @@ fun ProviderAccountSettingsScreen(
                                 )
                             }
                         )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 14.dp, vertical = 4.dp)
-                    ,
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ){
-                    Text(
-                        text = "VISIBLE DETAILS",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = gray30
-                    )
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(12.dp))
-                            .clickable { viewModel.onHideAll() }
-                            .padding(4.dp)
-                    ) {
-                        Text(
-                            text = if(!hideAll) "HIDE ALL" else "VISIBLE ALL",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = gray30
-                        )
-                    }
-                }
-                ContainerBorderedCard {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                        ,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        ){
-                            Row(
-                                modifier= Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp, vertical = 14.dp)
-                                ,
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ){
-                                Text(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(end = 4.dp),
-                                    text = "Phone",
-                                    style = MaterialTheme.typography.titleMedium
-                                )
-                                Switch(
-                                    modifier = Modifier.height(24.dp),
-                                    checked = phoneSwitch,
-                                    onCheckedChange = { viewModel.onPhoneSwitch() },
-                                    colors = SwitchDefaults.colors(
-                                        uncheckedBorderColor = gray1,
-                                        uncheckedTrackColor = MaterialTheme.colorScheme.background
-                                    )
-                                )
-                            }
-                            LightDividerLine(Modifier.padding(start = 16.dp))
-                        }
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        ){
-                            Row(
-                                modifier= Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp, vertical = 14.dp)
-                                ,
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ){
-                                Text(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(end = 4.dp),
-                                    text = "Off-time",
-                                    style = MaterialTheme.typography.titleMedium
-                                )
-                                Switch(
-                                    modifier = Modifier.height(24.dp),
-                                    checked = timeOffSwitch,
-                                    onCheckedChange = { viewModel.onTimeOffSwitch()},
-                                    colors = SwitchDefaults.colors(
-                                        uncheckedBorderColor = gray1,
-                                        uncheckedTrackColor = MaterialTheme.colorScheme.background
-                                    )
-                                )
-                            }
-                        }
                     }
                 }
                 Spacer(Modifier.height(containerTopPadding))

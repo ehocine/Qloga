@@ -20,6 +20,7 @@ import eac.qloga.android.core.shared.utils.CONTAINER_TOP_PADDING
 import eac.qloga.android.features.p4p.shared.components.VerificationsItemList
 import eac.qloga.android.features.p4p.shared.components.VerificationsStatusButton
 import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
+import eac.qloga.android.features.p4p.shared.utils.AccountType
 import eac.qloga.bare.enums.VerificationHolderType
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,6 +32,7 @@ fun VerificationsScreen(
     val containerHorizontalPadding = 24.dp
     val containerTopPadding = CONTAINER_TOP_PADDING.dp
     val verifications = viewModel.groupedVerification.value
+    val accountLabel = if(VerificationsViewModel.accountType == AccountType.CUSTOMER) "Customer" else "Provider"
 
     LaunchedEffect(key1 = Unit, key2 = VerificationsViewModel.verifications.value){
         viewModel.groupVerifications()
@@ -62,7 +64,7 @@ fun VerificationsScreen(
                 if(holderType == VerificationHolderType.ORG){
                     VerificationsStatusButton(
                         iconId = R.drawable.ic_verification,
-                        label = "Provider verifications"
+                        label = "$accountLabel verifications"
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     vrfs.forEach {  verification ->
@@ -76,7 +78,7 @@ fun VerificationsScreen(
                 }else{
                     VerificationsStatusButton(
                         iconId = R.drawable.ic_verification,
-                        label = "Provider admin verifications"
+                        label = "$accountLabel admin verifications"
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     vrfs.forEach { verification ->

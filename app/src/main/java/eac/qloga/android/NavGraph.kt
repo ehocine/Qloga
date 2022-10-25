@@ -82,15 +82,20 @@ import eac.qloga.android.features.p4p.showroom.scenes.addressOnMap.MapViewScreen
 import eac.qloga.android.features.p4p.showroom.scenes.categories.CategoriesScreen
 import eac.qloga.android.features.p4p.shared.scenes.displayVisits.DisplayVisitsScreen
 import eac.qloga.android.features.p4p.shared.scenes.editVisits.EditVisitsScreen
+import eac.qloga.android.features.p4p.shared.scenes.mediaFullView.MediaFullViewScreen
+import eac.qloga.android.features.p4p.shared.scenes.mediaView.MediaViewScreen
 import eac.qloga.android.features.p4p.showroom.scenes.enrolled.EnrolledScreen
 import eac.qloga.android.features.p4p.showroom.scenes.notEnrolled.NotEnrolledScreen
 import eac.qloga.android.features.p4p.shared.scenes.orderAddrMapView.OrderAddrMapViewScreen
 import eac.qloga.android.features.p4p.shared.scenes.orderMapGps.OrderMapGpsScreen
 import eac.qloga.android.features.p4p.shared.scenes.paymentTracking.PaymentTrackingScreen
+import eac.qloga.android.features.p4p.shared.scenes.portfolio.PortfolioScreen
+import eac.qloga.android.features.p4p.shared.scenes.portfolioFullView.PortfolioFullViewScreen
 import eac.qloga.android.features.p4p.showroom.scenes.portfolioAlbums.PortfolioAlbumsScreen
 import eac.qloga.android.features.p4p.showroom.scenes.providerServices.ProviderServicesScreen
 import eac.qloga.android.features.p4p.showroom.scenes.providerWorkingSchedule.ProviderWorkingScheduleScreen
 import eac.qloga.android.features.p4p.shared.scenes.searchedAddrResult.SearchedAddrResultScreen
+import eac.qloga.android.features.p4p.shared.scenes.selectAlbum.SelectAlbumsScreen
 import eac.qloga.android.features.p4p.showroom.scenes.serviceContract.ServiceContractScreen
 import eac.qloga.android.features.p4p.shared.scenes.showLocatioMapView.ShowLocationMapViewScreen
 import eac.qloga.android.features.p4p.shared.scenes.tracking.TrackingScreen
@@ -426,13 +431,7 @@ fun NavGraphBuilder.providersDetails(
     actions: NavigationActions
 ){
     composable(
-        P4pProviderScreens.ProviderProfile.route+"?$PROVIDER_ID={$PROVIDER_ID}",
-        arguments = listOf(
-            navArgument(name = PROVIDER_ID){
-                type = NavType.LongType
-                defaultValue = -1L
-            }
-        ),
+        P4pProviderScreens.ProviderProfile.route,
         enterTransition = { enterTransition()},
         popEnterTransition = { popEnterTransition() },
         popExitTransition = { popExitTransition() },
@@ -548,22 +547,7 @@ fun NavGraphBuilder.favouriteCustomer(
     navController: NavController
 ) {
     composable(
-        route = P4pCustomerScreens.CustomerProfile.route+
-                "?$CUSTOMER_ID={$CUSTOMER_ID}&&$PROVIDER_ID={$PROVIDER_ID}",
-        arguments = listOf(
-            navArgument(
-                name = CUSTOMER_ID
-            ) {
-                type = NavType.LongType
-                defaultValue = -1
-            },
-            navArgument(
-                name = PROVIDER_ID
-            ) {
-                type = NavType.LongType
-                defaultValue = -1
-            }
-        ),
+        route = P4pCustomerScreens.CustomerProfile.route,
         enterTransition = { enterTransition()},
         popEnterTransition = { popEnterTransition() },
         popExitTransition = { popExitTransition() },
@@ -944,6 +928,7 @@ fun NavGraphBuilder.openRequests(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.account(
     navController: NavController,
@@ -961,6 +946,7 @@ fun NavGraphBuilder.account(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.providerAccountSettings(
     navController: NavController,
@@ -1303,6 +1289,7 @@ fun NavGraphBuilder.servicesConditions(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.workingScheduleEdit(
     navController: NavController,
@@ -1572,6 +1559,83 @@ fun NavGraphBuilder.orderAddrMapview(
         OrderAddrMapViewScreen(
             navController = navController,
         )
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.portfolio(
+    navController: NavController,
+){
+    composable(
+        route = P4pScreens.Portfolio.route,
+        enterTransition = { enterTransition()},
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){
+        PortfolioScreen(
+            navController = navController,
+        )
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.selectAlbum(
+    navController: NavController,
+){
+    composable(
+        route = P4pScreens.SelectAlbum.route,
+        enterTransition = { enterTransition()},
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){
+        SelectAlbumsScreen(navController = navController)
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.mediaView(
+    navController: NavController,
+){
+    composable(
+        route = P4pScreens.MediaView.route,
+        enterTransition = { enterTransition()},
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){
+        MediaViewScreen(navController = navController)
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.mediaFullView(
+    navController: NavController,
+){
+    composable(
+        route = P4pScreens.MediaFullView.route,
+        enterTransition = { enterTransition()},
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){
+        MediaFullViewScreen(navController = navController)
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.portfolioFullView(
+    navController: NavController,
+){
+    composable(
+        route = P4pScreens.PortfolioFullView.route,
+        enterTransition = { enterTransition()},
+        popEnterTransition = { popEnterTransition() },
+        popExitTransition = { popExitTransition() },
+        exitTransition = { exitTransition() }
+    ){
+        PortfolioFullViewScreen()
     }
 }
 

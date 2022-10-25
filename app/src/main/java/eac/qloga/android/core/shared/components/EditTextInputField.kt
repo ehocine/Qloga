@@ -23,7 +23,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import eac.qloga.android.business.util.Extensions.clearFocusOnKeyboardDismiss
+import androidx.compose.ui.text.style.TextAlign
+import eac.qloga.android.core.shared.utils.Extensions.clearFocusOnKeyboardDismiss
 import eac.qloga.android.core.shared.theme.gray30
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -35,6 +36,7 @@ fun EditTextInputField(
     singleLine: Boolean = true,
     onSubmit: () -> Unit = {},
     hint: String? = null,
+    hintAlign: TextAlign = TextAlign.Start,
     keyboardType: KeyboardType = KeyboardType.Text,
     textStyle: TextStyle = TextStyle(),
     onFocusChange: (FocusState) -> Unit
@@ -80,10 +82,11 @@ fun EditTextInputField(
         if(visibleHint.value || value.isNullOrEmpty())
         {
             Text(
-                modifier = Modifier.alpha(.75f),
+                modifier = Modifier.alpha(.75f).fillMaxWidth(),
                 color = gray30,
                 text = hint?.trim() ?: "",
                 style = textStyle,
+                textAlign = hintAlign
             )
         }
     }

@@ -22,6 +22,10 @@ class CustomerDashboardViewModel @Inject constructor(
     private val datastoreRepository: DatastoreRepository
 ): ViewModel() {
 
+    companion object{
+        var alreadyShownProfileInfoDialog by mutableStateOf(false)
+    }
+
     var selectNavItem by mutableStateOf(CustomerBottomNavItems.listOfItems[0])
         private set
 
@@ -41,6 +45,9 @@ class CustomerDashboardViewModel @Inject constructor(
         private set
 
     var showProfileInfoDialog by mutableStateOf(false)
+        private set
+
+    var showProfileInfoDialogCheck by mutableStateOf(true)
         private set
 
     init {
@@ -67,6 +74,21 @@ class CustomerDashboardViewModel @Inject constructor(
             copyList.add(index)
         }
         selectedStatus= copyList
+    }
+
+    fun onAlreadyShowProfileInfoDialog(value: Boolean){
+        alreadyShownProfileInfoDialog = value
+    }
+
+    fun onDismissInfoDialog(){
+        alreadyShownProfileInfoDialog = true
+        if(showProfileInfoDialogCheck != showProfileInfoDialog){
+            toggleProfileInfoDialogCheck()
+        }
+    }
+
+    fun onProfileInfoDialogCheck(){
+        showProfileInfoDialogCheck = !showProfileInfoDialogCheck
     }
 
     fun toggleProfileInfoDialogCheck(){

@@ -1,6 +1,7 @@
 package eac.qloga.android.features.p4p.showroom.scenes.categories
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -12,19 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import eac.qloga.android.core.shared.components.Cards.ContainerBorderedCard
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.utils.CONTAINER_TOP_PADDING
 import eac.qloga.android.core.shared.utils.SCREEN_HORIZONTAL_PADDING
 import eac.qloga.android.core.shared.viewmodels.ApiViewModel
-import eac.qloga.android.data.shared.models.ServicesWithConditions
-import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
+import eac.qloga.android.features.p4p.shared.components.ServicesListCard
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
-import eac.qloga.android.features.p4p.shared.scenes.serviceInfo.ServiceInfoViewModel
-import eac.qloga.android.features.p4p.showroom.shared.components.CategoryList
 import eac.qloga.android.features.p4p.showroom.shared.components.DescriptionText
 import eac.qloga.android.features.p4p.showroom.shared.components.TopNavBar
-import eac.qloga.p4p.lookups.dto.QService
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -41,6 +37,8 @@ fun CategoriesScreen(
     val containerTopPadding = CONTAINER_TOP_PADDING.dp
     val horizontalContentPadding = SCREEN_HORIZONTAL_PADDING.dp
     val detailText = selectedCategory?.descr?.trimMargin()?.repeat(2)
+
+    val topNavLazyListState = rememberLazyListState()
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
     val categoriesList = ApiViewModel.categories.value.sortedBy {
@@ -50,9 +48,12 @@ fun CategoriesScreen(
     }
 
     var catChanged by remember { mutableStateOf(false) }
-//    LaunchedEffect(Unit) {
-//        viewModel.onNavClick(ServiceCategory.Cleaning)
-//    }
+
+    LaunchedEffect(Unit) {
+        categoriesList.indexOf(selectedCategory).apply {
+            if(this >= 0) topNavLazyListState.animateScrollToItem(categoriesList.indexOf(selectedCategory))
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -85,6 +86,7 @@ fun CategoriesScreen(
                         catChanged = !catChanged
                     }
                 },
+                lazyListState = topNavLazyListState,
                 selectedNav = CategoriesViewModel.selectedNav.value,
                 navList = categoriesList
             )
@@ -113,60 +115,7 @@ fun CategoriesScreen(
                     ServicesListCard(
                         navController = navController,
                         listOfServices = it.services,
-                        parentRoute = parentRoute ?: "",
                         catChanged = catChanged
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun ServicesListCard(
-    modifier: Modifier = Modifier,
-    navController: NavController,
-    listOfServices: List<QService>,
-    parentRoute: String?,
-    catChanged: Boolean
-) {
-    val coroutineScope = rememberCoroutineScope()
-    val paddingHorizontal = 24.dp
-
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = paddingHorizontal, vertical = 28.dp)
-    ) {
-        ContainerBorderedCard {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                listOfServices.forEach { service ->
-                    CategoryList(
-                        title = service.name,
-                        summery = service.descr,
-                        catChanged = catChanged,
-                        onClick = {
-                            ServiceInfoViewModel.servicesWithConditions.value =
-                                ServicesWithConditions(service,null,null)
-                            coroutineScope.launch {
-                                navController.navigate(P4pScreens.ServiceInfo.route)
-                            }
-                        },
-                        onShowProviders = {
-                            /*
-                            if(parentRoute == Screen.CustomerNavContainer.route){
-                                navController.navigateUp()
-                            }else{
-                                coroutineScope.launch {
-                                    // navController.navigate(Screen.Providers.route+"?$PARENT_ROUTE_KEY=$parentRoute")
-                                }
-                            }
-
-                             */
-                        }
                     )
                 }
             }

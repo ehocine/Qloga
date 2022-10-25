@@ -13,6 +13,7 @@ import eac.qloga.android.data.p4p.customer.P4pCustomerApi
 import eac.qloga.android.data.p4p.customer.P4pCustomerRepository
 import eac.qloga.android.data.p4p.lookups.LookupsApi
 import eac.qloga.android.data.p4p.lookups.LookupsRepository
+import eac.qloga.android.data.p4p.lookups.StaticResourcesRepository
 import eac.qloga.android.data.p4p.provider.P4pProviderApi
 import eac.qloga.android.data.p4p.provider.P4pProviderRepository
 import eac.qloga.android.data.qbe.*
@@ -69,10 +70,18 @@ object RepositoryModule {
 
     @Singleton
     @Provides
-    fun provideLookupsApi(
+    fun provideLookupsRepository(
         @PrivateQLOGAApiService lookupsApi: LookupsApi
     ): LookupsRepository {
         return LookupsRepository(lookupsApi)
+    }
+
+    @Singleton
+    @Provides
+    fun provideStaticResourcesRepository(
+        @PrivateQLOGAApiService lookupsApi: LookupsApi
+    ): StaticResourcesRepository {
+        return StaticResourcesRepository(lookupsApi)
     }
 
     @Singleton

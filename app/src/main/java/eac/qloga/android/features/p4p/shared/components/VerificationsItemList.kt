@@ -24,7 +24,7 @@ fun VerificationsItemList(
         verticalAlignment = Alignment.Top
     ) {
         Box(
-            modifier = Modifier.padding(top = 2.dp)
+            modifier = Modifier.padding(top = 6.dp)
         ) {
             Icon(
                 modifier = Modifier

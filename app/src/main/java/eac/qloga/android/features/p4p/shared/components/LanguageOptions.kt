@@ -17,14 +17,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import eac.qloga.android.core.shared.components.Cards
 import eac.qloga.android.core.shared.theme.gray1
 import eac.qloga.android.core.shared.theme.gray30
+import eac.qloga.android.data.shared.models.Language
 import eac.qloga.android.features.p4p.shared.utils.SpokenLanguage
 
 @Composable
 fun LanguageOptions(
-    spokenLanguageState: List<SpokenLanguage>,
-    onSelect: (SpokenLanguage) -> Unit
+    spokenLanguageState: List<Language?>,
+    languagesOptions: List<Language?>,
+    onSelect: (Language) -> Unit
 ){
     Column(
         modifier = Modifier
@@ -33,21 +36,24 @@ fun LanguageOptions(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
-                .border(1.5.dp, gray1, RoundedCornerShape(16.dp))
                 .background(MaterialTheme.colorScheme.background)
-                .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
-
-            Column(modifier = Modifier.fillMaxWidth()) {
-                spokenLanguageState.forEach {
-                    OptionItem(
-                        label = it.title,
-                        isSelected  = it.isSelected
-                    ) {
-                        onSelect(it)
+            Cards.ContainerBorderedCard {
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(vertical = 8.dp, horizontal = 16.dp)
+                ) {
+                    languagesOptions.forEach {
+                        OptionItem(
+                            label = it?.descr ?: "",
+                            isSelected  = it in spokenLanguageState
+                        ) {
+                            if (it != null) {
+                                onSelect(it)
+                            }
+                        }
+                        Spacer(Modifier.height(8.dp))
                     }
-                    Spacer(Modifier.height(8.dp))
                 }
             }
         }
@@ -64,6 +70,9 @@ private fun OptionItem(
         modifier= Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
+            .clickable {
+                onSelect()
+            }
             .padding(vertical = 4.dp)
         ,
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -82,11 +91,12 @@ private fun OptionItem(
             modifier = Modifier
                 .size(22.dp)
                 .clip(CircleShape)
-                .clickable {
-                    onSelect()
-                }
                 .background(if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent)
-                .border(1.dp, if(isSelected) MaterialTheme.colorScheme.primary else gray1, CircleShape)
+                .border(
+                    1.dp,
+                    if (isSelected) MaterialTheme.colorScheme.primary else gray1,
+                    CircleShape
+                )
             ,
             contentAlignment = Alignment.Center
         ) {

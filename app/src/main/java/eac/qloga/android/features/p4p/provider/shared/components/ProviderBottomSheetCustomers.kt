@@ -13,7 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import eac.qloga.android.business.util.Extensions.roundToRating
+import eac.qloga.android.core.shared.utils.Extensions.roundToRating
 import eac.qloga.android.core.shared.components.Cards
 import eac.qloga.android.core.shared.theme.gray1
 import eac.qloga.android.core.shared.theme.gray30

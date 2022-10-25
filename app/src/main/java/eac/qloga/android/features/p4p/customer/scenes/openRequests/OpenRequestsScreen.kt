@@ -3,6 +3,7 @@ package eac.qloga.android.features.p4p.customer.scenes.openRequests
 import P4pCustomerScreens
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -47,6 +48,7 @@ fun OpenRequestsScreen(
     val horizontalContentPadding = SCREEN_HORIZONTAL_PADDING.dp
     val showEmptyState = viewModel.showEmptyStateOpenRequest
 
+    val topNavLazyListState = rememberLazyListState()
     //TODO: replace ServiceCategory by the back-end DTO
     /*
     val selectedServices = remember {
@@ -147,6 +149,7 @@ fun OpenRequestsScreen(
                         onClickItem = {  viewModel.onSelectServiceCategory(it) },
                         selectedNav = viewModel.selectedServiceCategory,
                         scrollable = true,
+                        lazyListState = topNavLazyListState,
                         navList = categoriesList
                     )
                     Spacer(modifier = Modifier.height(12.dp))

@@ -1,5 +1,7 @@
 package eac.qloga.android.features.p4p.shared.scenes.businessDetails
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -28,6 +30,7 @@ import eac.qloga.android.features.p4p.shared.viewmodels.AccountSettingsViewModel
 import eac.qloga.android.features.p4p.showroom.shared.components.TextInputFieldAlbum
 import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(
     ExperimentalMaterial3Api::class,
     ExperimentalComposeUiApi::class
@@ -40,9 +43,9 @@ fun BusinessDetailsScreen(
     val containerHorizontalPadding = Dimensions.ScreenHorizontalPadding.dp
     val containerTopPadding = Dimensions.ScreenTopPadding.dp
     val keyboardController = LocalSoftwareKeyboardController.current
-    val descriptionDetailsState = viewModel.businessDescriptionState.value
-    val insuranceDetailsState = viewModel.businessInsuranceState.value
-    val registrationDetailsState = viewModel.registrationDetailsState.value
+    val descriptionDetailsState = AccountSettingsViewModel.businessDescriptionState
+    val insuranceDetailsState = AccountSettingsViewModel.businessInsuranceState
+    val registrationDetailsState = AccountSettingsViewModel.registrationDetailsState
 
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
@@ -109,7 +112,11 @@ fun RegisterEditField(
     val inputFieldHeight = 100.dp
 
     Column(modifier = modifier.fillMaxWidth()) {
-        Text(text = "REGISTRATION DETAILS", style = MaterialTheme.typography.titleMedium, color = gray30)
+        Text(
+            text = "REGISTRATION DETAILS",
+            style = MaterialTheme.typography.titleMedium,
+            color = gray30
+        )
         Spacer(Modifier.height(4.dp))
         TextInputFieldAlbum(
             value = registrationDetailsState.text,
@@ -162,7 +169,11 @@ fun InsuranceEditField(
     val inputFieldHeight = 100.dp
 
     Column(modifier = modifier.fillMaxWidth()) {
-        Text(text = "BUSINESS INSURANCE DETAILS", style = MaterialTheme.typography.titleMedium, color = gray30)
+        Text(
+            text = "BUSINESS INSURANCE DETAILS",
+            style = MaterialTheme.typography.titleMedium,
+            color = gray30
+        )
         Spacer(Modifier.height(4.dp))
         TextInputFieldAlbum(
             modifier = Modifier,

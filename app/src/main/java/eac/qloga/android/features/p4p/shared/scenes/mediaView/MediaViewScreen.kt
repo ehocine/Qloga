@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import eac.qloga.android.R
 import eac.qloga.android.core.shared.components.DividerLines.DividerLine
@@ -57,6 +58,7 @@ import eac.qloga.android.core.shared.theme.gray1
 import eac.qloga.android.core.shared.theme.orange1
 import eac.qloga.android.core.shared.utils.BottomSheetType
 import eac.qloga.android.core.shared.utils.DateConverter
+import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import eac.qloga.android.features.p4p.showroom.shared.components.*
 import eac.qloga.android.features.p4p.showroom.shared.utils.MediaEvent
@@ -70,7 +72,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MediaViewScreen(
     navController: NavController,
-    viewModel: MediaViewModel,
+    viewModel: MediaViewModel = hiltViewModel(),
     albumId: String? = null,
 ) {
     val titleBarHeight = 68.dp
@@ -123,21 +125,22 @@ fun MediaViewScreen(
                         columns = GridCells.Fixed(3),
                         contentPadding = PaddingValues(16.dp)
                     ){
-                        items(viewModel.mediaImages.value, key = {it}){ image ->
-//                            AlbumImagePreview(
-//                                imageId = image.id.toInt(),
-//                                bitmapImage = image.bitmap,
-//                                imageUri = image.imageUri,
-//                                isSelectable = viewModel.isImageSelectable.value,
+                        val i = listOf(1,2,3,4,5)
+                        items(i, key = {it}){ image ->
+                            AlbumImagePreview(
+                                imageId = R.drawable.arch2,
+                                isSelectable = viewModel.isImageSelectable.value,
 //                                isSelected = image in viewModel.selectedImages.value,
-//                                onLongPress = { viewModel.onTriggerEvent(MediaEvent.LongPressImage) },
+                                isSelected = false,
+                                onLongPress = { viewModel.onTriggerEvent(MediaEvent.LongPressImage) },
 //                                onSelect = {  viewModel.onTriggerEvent(MediaEvent.SelectImage(listOf(image)))  },
-//                                onClick = {
-//                                    scope.launch {
-//                                        navController.navigate(Screen.MediaFullView.route+"?id=${image.id}")
-//                                    }
-//                                }
-//                            )
+                                onSelect = {  },
+                                onClick = {
+                                    scope.launch {
+                                        navController.navigate(P4pScreens.Portfolio.route)
+                                    }
+                                }
+                            )
                         }
                     }
 
@@ -323,7 +326,9 @@ private fun TitleBarContent(
                                             scope.launch {
                                                 onChangeBottomSheetType(BottomSheetType.Edit)
                                                 showMenu.value = false
-                                                modalBottomSheetState.animateTo(ModalBottomSheetValue.Expanded)
+                                                modalBottomSheetState.animateTo(
+                                                    ModalBottomSheetValue.Expanded
+                                                )
                                                 viewModel.setStateEditMediaFolder()
                                             }
                                         }

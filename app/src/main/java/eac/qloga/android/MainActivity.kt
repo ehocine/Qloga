@@ -143,6 +143,11 @@ private fun BuildScreen() {
                     showLocationMapView(navController)
                     orderAddrMapview(navController)
                     orderMapGps(navController)
+                    portfolio(navController)
+                    portfolioFullView(navController)
+                    mediaView(navController)
+                    mediaFullView(navController)
+                    selectAlbum(navController)
                 }
             )
         }

@@ -5,9 +5,7 @@ import android.location.Geocoder
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.ui.focus.FocusState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,9 +14,11 @@ import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import eac.qloga.android.QlogaApplication
 import eac.qloga.android.R
+import eac.qloga.android.core.shared.interactors.GetCountry
 import eac.qloga.android.core.shared.utils.*
 import eac.qloga.android.core.shared.viewmodels.ApiViewModel
 import eac.qloga.android.data.p4p.customer.P4pCustomerRepository
+import eac.qloga.android.data.p4p.lookups.StaticResourcesRepository
 import eac.qloga.android.data.p4p.provider.P4pProviderRepository
 import eac.qloga.android.data.qbe.FamiliesRepository
 import eac.qloga.android.data.qbe.PlatformRepository
@@ -27,6 +27,7 @@ import eac.qloga.android.features.p4p.shared.utils.EnrollmentEvent
 import eac.qloga.android.features.p4p.shared.utils.EnrollmentEvent.*
 import eac.qloga.android.features.p4p.shared.utils.EnrollmentType
 import eac.qloga.bare.dto.Contacts
+import eac.qloga.bare.dto.lookups.Country
 import eac.qloga.bare.dto.person.Address
 import eac.qloga.bare.dto.person.Person
 import eac.qloga.p4p.cst.dto.Customer
@@ -44,7 +45,8 @@ class EnrollmentViewModel @Inject constructor(
     private val familiesRepository: FamiliesRepository,
     private val platformRepository: PlatformRepository,
     private val p4pCustomerRepository: P4pCustomerRepository,
-    private val p4pProviderRepository: P4pProviderRepository
+    private val p4pProviderRepository: P4pProviderRepository,
+    private val staticResourcesRepository: StaticResourcesRepository
 ) : ViewModel() {
 
     companion object {
@@ -57,8 +59,8 @@ class EnrollmentViewModel @Inject constructor(
         val addressSaved : MutableState<Boolean> = mutableStateOf(false)
     }
 
-    private val _countryCodes = mutableStateOf<CountryCodes?>(null)
-    val countryCodes: State<CountryCodes?> = _countryCodes
+    var countries by mutableStateOf<List<Country>>(emptyList())
+        private set
 
     init {
         getCountryCodes()
@@ -83,18 +85,8 @@ class EnrollmentViewModel @Inject constructor(
     )
     val addressFieldState: State<InputFieldState> = _addressFieldState
 
-    private val _selectedCountryCode = mutableStateOf(
-        if (ApiViewModel.userProfile.value.contacts.phoneCountry != null) {
-            _countryCodes.value?.countryCodes?.first {
-                it.code == ApiViewModel.userProfile.value.contacts.phoneCountry
-            } ?: CountryCode("United Kingdom", "+44", "GB")
-        } else {
-            CountryCode("United Kingdom", "+44", "GB")
-        }
-    )
-
-    //    private val _selectedCountryCode = mutableStateOf(CountryCode("United Kingdom", "+44", "UK"))
-    val selectedCountryCode: State<CountryCode> = _selectedCountryCode
+    var selectedCountryCode by mutableStateOf(Country("GB","GB","GB","45","United Kingdom"))
+        private set
 
     private val _isCodeSent = mutableStateOf(false)
     val isCodeSent: MutableState<Boolean> = _isCodeSent
@@ -126,7 +118,7 @@ class EnrollmentViewModel @Inject constructor(
                     is FocusAddressInput -> { onFocusAddressInput(event.focusState) }
                     is FocusCodeInput -> { onFocusCodeInput(event.focusState) }
                     is FocusNumberInput -> { onFocusNumberInput(event.focusState) }
-                    is SelectCountryCode -> { _selectedCountryCode.value = event.countryCode }
+                    is SelectCountryCode -> { selectedCountryCode = event.countryCode }
                     is SendCode -> { sendCode() }
                     is SubmitCode -> { submitCode() }
                     is ToggleCheckTermsConditions -> { _isCheckTermsConditions.value = !isCheckTermsConditions.value}
@@ -214,7 +206,7 @@ class EnrollmentViewModel @Inject constructor(
     private fun sendCode() {
         val newContact = Contacts(
             ApiViewModel.userProfile.value.contacts.email,
-            _selectedCountryCode.value.code,
+            selectedCountryCode.dialcode,
             _numberFieldState.value.text.toLong(),
             false,
             ApiViewModel.userProfile.value.contacts.address
@@ -301,12 +293,13 @@ class EnrollmentViewModel @Inject constructor(
     }
 
     private fun getCountryCodes() {
-        val countryCodesJson =
-            application.resources.openRawResource(R.raw.country_codes).bufferedReader()
-                .use { it.readText() }
-        val gson = Gson()
-        val countryCodes = gson.fromJson(countryCodesJson, CountryCodes::class.java)
-        _countryCodes.value = countryCodes
+        viewModelScope.launch {
+            countries = GetCountry(staticResourcesRepository).invoke()
+            val iso2 = ApiViewModel.userProfile.value.contacts.phoneCountry
+            iso2?.let {
+                selectedCountryCode = countries.find { it.iso2 == iso2 }!!
+            }
+        }
     }
 
     var createCustomerState = MutableStateFlow(LoadingState.IDLE)

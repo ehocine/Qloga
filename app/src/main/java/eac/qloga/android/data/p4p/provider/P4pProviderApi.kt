@@ -1,6 +1,7 @@
 package eac.qloga.android.data.p4p.provider
 
 import eac.qloga.android.data.shared.models.Page
+import eac.qloga.android.data.shared.models.responses.ProviderServiceResponse
 import eac.qloga.p4p.cst.dto.CstPublicProfile
 import eac.qloga.p4p.hres.dto.Assign
 import eac.qloga.p4p.order.dto.Order
@@ -56,7 +57,7 @@ interface P4pProviderApi {
     @GET("p4p/prv/{prvId}")
     suspend fun getProvider(
         @Path("prvId") prvId: Long
-    ): Provider
+    ): Response<Provider>
 
     @GET("p4p/prv/{prvId}/reviews")
     suspend fun getPrvReviews(
@@ -117,7 +118,7 @@ interface P4pProviderApi {
     @GET("p4p/prv/{prvId}/services")
     suspend fun getServices(
         @Path("prvId") prvId: Long
-    ): List<ProviderService>
+    ): Response<ProviderServiceResponse>
 
     //=
     @POST("p4p/prv/{prvId}/services")
@@ -132,7 +133,7 @@ interface P4pProviderApi {
     suspend fun updateServices(
         @Path("prvId") prvId: Long,
         @Body bodyParam: List<ProviderService>
-    ): List<ProviderService>
+    ): Response<ProviderServiceResponse>
 
     //=
     @DELETE("p4p/prv/{prvId}/services")

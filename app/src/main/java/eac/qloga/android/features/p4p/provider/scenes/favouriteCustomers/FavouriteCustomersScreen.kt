@@ -83,13 +83,7 @@ fun FavouriteCustomersScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(titleBarHeight))
-            Button(
-                onClick = {
-                    actions.goToProviderDetails(prvId)
-                }
-            ) {
-                Text(text = "Go to Provider")
-            }
+
             when(true){
                 favouriteCustomersList.isNotEmpty() -> {
                     LazyColumn(
@@ -107,9 +101,8 @@ fun FavouriteCustomersScreen(
                                         CustomerProfileViewModel.customerId.value = cstId
                                         CustomerProfileViewModel.providerId.value = prvId
                                         CustomerProfileViewModel.customerProfile.value = favouriteCustomer
-                                        navController.navigate(
-                                            P4pCustomerScreens.CustomerProfile.route
-                                        )
+                                        CustomerProfileViewModel.showHeart.value = true
+                                        navController.navigate( P4pCustomerScreens.CustomerProfile.route )
                                     }
                                     .padding(horizontal = containerHorizontalPadding)
                                 ,

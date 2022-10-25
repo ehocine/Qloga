@@ -33,7 +33,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.google.android.gms.maps.model.LatLng
 import eac.qloga.android.R
-import eac.qloga.android.business.util.Extensions.advancedShadow
+import eac.qloga.android.core.shared.utils.Extensions.advancedShadow
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.components.address.AddressMapView
 import eac.qloga.android.core.shared.theme.gray30

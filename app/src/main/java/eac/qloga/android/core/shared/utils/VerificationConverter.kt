@@ -8,7 +8,7 @@ object VerificationConverter {
         vrfs: List<Verification?>?
     ): String{
         if(vrfs == null) return ""
-        val result = vrfs.map { it?.type?.name }
+        val result = vrfs.map { vrf -> vrf?.type?.name?.lowercase()?.replaceFirstChar { it.uppercase() } }
         if(result.isEmpty()) return ""
         return result.reduce { acc, s -> "$acc, $s" } ?: ""
     }

@@ -15,7 +15,7 @@ interface OrgsApi {
     @PUT("qbe/orgs")
     suspend fun update(
         @Body org: Org
-    ): Org
+    ): Response<Org>
 
     @POST("qbe/orgs")
     suspend fun add(
@@ -35,13 +35,13 @@ interface OrgsApi {
     @POST("qbe/orgs/{oid}/off-time")
     suspend fun setOffTimes(
         @Path("oid") oid: Long,
-        @Path("times") times: List<OffTime>
+        @Body times: List<OffTime>
     ): Response<Unit>
 
     @PUT("qbe/orgs/{oid}/off-time")
     suspend fun addOffTime(
         @Path("oid") oid: Long,
-        @Path("record") record: OffTime,
+        @Body record: OffTime,
     ): Response<Unit>
 
     @DELETE("qbe/orgs/{oid}")
@@ -53,7 +53,7 @@ interface OrgsApi {
     @POST("qbe/orgs/{oid}/work-hours")
     suspend fun setWorkingHours(
         @Path("oid") oid: Long,
-        @Path("hrs") hrs: List<WorkHours>
+        @Body  hrs: List<WorkHours>
     ): Response<Unit>
 
     //0

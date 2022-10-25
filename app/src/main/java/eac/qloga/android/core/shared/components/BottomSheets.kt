@@ -1,7 +1,5 @@
 package eac.qloga.android.core.shared.components
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -32,7 +30,6 @@ import eac.qloga.android.features.p4p.shared.components.BottomSheetDashLine
 import kotlinx.coroutines.launch
 
 object BottomSheets {
-    @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun OrdersSearchFilterBottomSheet(

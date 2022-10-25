@@ -31,6 +31,7 @@ import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.theme.gray30
 import eac.qloga.android.core.shared.theme.green1
 import eac.qloga.android.core.shared.utils.CONTAINER_TOP_PADDING
+import eac.qloga.android.core.shared.utils.PriceConverter
 import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
 import eac.qloga.android.features.p4p.showroom.shared.components.ExpandableConditionsListItem
 import eac.qloga.android.features.p4p.showroom.shared.components.SelectedListItem
@@ -114,7 +115,7 @@ fun ServiceInfoScreen(
                                 modifier = Modifier
                                     .alpha(.75f)
                                     .padding(start = 8.dp),
-                                text = "${services?.unitPrice} £",
+                                text = "£${PriceConverter.priceToFloat(services?.unitPrice?.toFloat())}",
                                 style = MaterialTheme.typography.bodyMedium.copy(
                                     fontSize = 16.sp
                                 ),

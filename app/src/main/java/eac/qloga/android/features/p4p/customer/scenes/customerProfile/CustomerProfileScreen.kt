@@ -7,14 +7,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,9 +33,11 @@ import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
 import eac.qloga.android.features.p4p.shared.scenes.contactDetails.ContactDetailsViewModel
 import eac.qloga.android.features.p4p.shared.scenes.reviews.ReviewsViewModel
 import eac.qloga.android.features.p4p.shared.scenes.verifications.VerificationsViewModel
+import eac.qloga.android.features.p4p.shared.utils.AccountType
 import eac.qloga.android.features.p4p.showroom.shared.components.ProfileCategoryList
 import eac.qloga.android.features.p4p.showroom.shared.components.RatingFiveStar
 import eac.qloga.android.features.p4p.showroom.shared.components.StatusButton
+import eac.qloga.p4p.cst.dto.CstPublicProfile
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,16 +50,17 @@ fun CustomerProfileScreen(
     val imageHeight  = 90.dp
     val imageWidth = 90.dp
     val profileImageId by viewModel.profileImage
-    val customer  = CustomerProfileViewModel.customerProfile.value
+    val customer  = CustomerProfileViewModel.customerProfile.collectAsState().value ?: CstPublicProfile()
     val isHeartSelected by viewModel.isFavourite
     val profileImageState by viewModel.profileImageState.collectAsState()
     val contactAddress = AddressConverter.addressToString(customer.contacts.address)
-    val rating = RatingConverter.ratingToNorm(customer.rating?.toFloat())
+    val rating = RatingConverter.ratingToNorm(customer.rating?.toFloat()) ?: "not yet"
     val verifications = VerificationConverter.verificationToString(customer.vrfs)
 
+    val userProfileState by viewModel.userProfileState.collectAsState()
     val scrollState = rememberScrollState()
 
-    LaunchedEffect(Unit){
+    LaunchedEffect(key1 = Unit, key2 = customer){
         viewModel.preCallsLoad()
     }
 
@@ -100,138 +101,149 @@ fun CustomerProfileScreen(
                 Spacer(modifier = Modifier.height(titleBarHeight))
                 Spacer(modifier = Modifier.height(containerTopPadding))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ){
-                    Box {
-                        val painter = rememberAsyncImagePainter(model = profileImageId)
-                        if(profileImageState == LoadingState.LOADING && profileImageId == null){
-                            PulsePlaceholder(
-                                modifier = Modifier
-                                    .height(imageHeight)
-                                    .width(imageWidth),
-                                roundedCornerShape = CircleShape
-                            )
-                        }else{
-                            Image(
-                                modifier = Modifier
-                                    .width(imageWidth)
-                                    .height(imageHeight)
-                                    .clip(CircleShape)
-                                ,
-                                painter = painter,
-                                contentDescription = "",
-                                contentScale = ContentScale.Crop,
-                                alignment = Alignment.TopCenter
-                            )
-                        }
-                    }
-
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(imageHeight)
-                            .padding(start = 16.dp),
-                        verticalArrangement = Arrangement.SpaceBetween,
+                if(userProfileState == LoadingState.LOADING){
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = customer.fullName,
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.W600,
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
-                        Spacer(modifier= Modifier.height(8.dp))
-                        if(customer.active == true){
-                            Box(
-                                modifier = Modifier
-                                    .clip(CircleShape)
-                                    .border(
-                                        1.dp,
-                                        MaterialTheme.colorScheme.primary,
-                                        CircleShape
-                                    )
-                                    .padding(vertical = 2.dp, horizontal = 8.dp)
-                            ) {
-                                Text(
-                                    text = "Active",
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = MaterialTheme.colorScheme.primary
+                        CircularProgressIndicator()
+                    }
+                }else{
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ){
+                        Box {
+                            val painter = rememberAsyncImagePainter(model = profileImageId ?: R.drawable.cst_default_ava)
+
+                            if(profileImageState == LoadingState.LOADING && profileImageId == null){
+                                PulsePlaceholder(
+                                    modifier = Modifier
+                                        .height(imageHeight)
+                                        .width(imageWidth),
+                                    roundedCornerShape = CircleShape
+                                )
+                            }else{
+                                Image(
+                                    modifier = Modifier
+                                        .width(imageWidth)
+                                        .height(imageHeight)
+                                        .clip(CircleShape)
+                                    ,
+                                    painter = painter,
+                                    contentDescription = "",
+                                    contentScale = ContentScale.Crop,
+                                    alignment = Alignment.TopCenter
                                 )
                             }
                         }
-                        Spacer(modifier= Modifier.height(8.dp))
 
-                        Text(
-                            modifier = Modifier.padding(end = 8.dp),
-
-                            text = "Completed orders: ${customer.orderQuantity ?: 0}",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.W500,
-                            color = gray30
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(24.dp))
-
-                //rating button
-                StatusButton(
-                    leadingIcon = R.drawable.ic_rating_star,
-                    label = "Rating",
-                    count = "$rating/5",
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Column(
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                ) {
-                    customer.ratings?.forEach {  rating ->
-                        RatingFiveStar(
-                            ratings = RatingConverter.ratingToNorm(
-                                rating.rating.toFloat()
-                            )?.toFloat()?.roundToInt()!!,
-                            label = rating?.categoryName ?: ""
-                        )
-                        Spacer(Modifier.height(8.dp))
-                    }
-                }
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Cards.ContainerBorderedCard {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        if(verifications.isNotEmpty()){
-                            ProfileCategoryList(
-                                title = "Verifications",
-                                value = verifications,
-                                iconId = R.drawable.ic_verification
-                            ) {
-                                VerificationsViewModel.verifications.value = customer.vrfs
-                                navController.navigate(P4pScreens.Verifications.route)
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(imageHeight)
+                                .padding(start = 16.dp),
+                            verticalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Text(
+                                text = customer.fullName,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.W600,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                            Spacer(modifier= Modifier.height(8.dp))
+                            if(customer.active == true){
+                                Box(
+                                    modifier = Modifier
+                                        .clip(CircleShape)
+                                        .border(
+                                            1.dp,
+                                            MaterialTheme.colorScheme.primary,
+                                            CircleShape
+                                        )
+                                        .padding(vertical = 2.dp, horizontal = 8.dp)
+                                ) {
+                                    Text(
+                                        text = "Active",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
                             }
-                        }
-                        if(viewModel.reviews.value.isNotEmpty()){
-                            ProfileCategoryList(
-                                title = "Reviews",
-                                value = "${viewModel.reviews.value.size }",
-                                iconId = R.drawable.ic_reviews
-                            ) {
-                                ReviewsViewModel.reviews.value = viewModel.reviews.value
-                                navController.navigate(P4pScreens.Reviews.route)
-                            }
-                        }
-                        if(contactAddress.isNotEmpty()){
-                            ProfileCategoryList(
-                                title = "Contacts",
-                                value = contactAddress ,
-                                iconId = R.drawable.ic_ql_contacts
-                            ) {
-                                ContactDetailsViewModel.contacts.value = customer.contacts
-                                navController.navigate(P4pScreens.ContactDetails.route)
-                            }
+                            Spacer(modifier= Modifier.height(8.dp))
+
+                            Text(
+                                modifier = Modifier.padding(end = 8.dp),
+
+                                text = "Completed orders: ${customer.orderQuantity ?: 0}",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.W500,
+                                color = gray30
+                            )
                         }
                     }
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    //rating button
+                    StatusButton(
+                        leadingIcon = R.drawable.ic_rating_star,
+                        label = "Rating",
+                        count = "$rating/5",
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Column(
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    ) {
+                        customer.ratings?.forEach {  rating ->
+                            RatingFiveStar(
+                                ratings = RatingConverter.ratingToNorm(
+                                    rating.rating.toFloat()
+                                )?.toFloat()?.roundToInt()!!,
+                                label = rating?.categoryName ?: ""
+                            )
+                            Spacer(Modifier.height(8.dp))
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Cards.ContainerBorderedCard {
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            if(verifications.isNotEmpty()){
+                                ProfileCategoryList(
+                                    title = "Verifications",
+                                    value = verifications,
+                                    iconId = R.drawable.ic_verification
+                                ) {
+                                    VerificationsViewModel.accountType = AccountType.CUSTOMER
+                                    VerificationsViewModel.verifications.value = customer.vrfs
+                                    navController.navigate(P4pScreens.Verifications.route)
+                                }
+                            }
+                            if(viewModel.reviews.value.isNotEmpty()){
+                                ProfileCategoryList(
+                                    title = "Reviews",
+                                    value = "${viewModel.reviews.value.size }",
+                                    iconId = R.drawable.ic_reviews
+                                ) {
+                                    ReviewsViewModel.reviews.value = viewModel.reviews.value
+                                    navController.navigate(P4pScreens.Reviews.route)
+                                }
+                            }
+                            if(contactAddress.isNotEmpty()){
+                                ProfileCategoryList(
+                                    title = "Contacts",
+                                    value = contactAddress ,
+                                    iconId = R.drawable.ic_ql_contacts
+                                ) {
+                                    ContactDetailsViewModel.contacts.value = customer.contacts
+                                    navController.navigate(P4pScreens.ContactDetails.route)
+                                }
+                            }
+                        }
+                    }
+                    Spacer(Modifier.height(16.dp))
                 }
-                Spacer(Modifier.height(16.dp))
             }
         }
     }
