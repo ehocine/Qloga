@@ -4,7 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import eac.qloga.android.data.shared.utils.dateToString
 import eac.qloga.android.di.QLOGAApiService
-import eac.qloga.bare.dto.RegistrationRequest
+import eac.qloga.bare.dto.SignUpRequest
 import eac.qloga.bare.dto.person.Address
 import eac.qloga.bare.dto.person.Family
 import eac.qloga.bare.dto.person.Person
@@ -34,7 +34,7 @@ class FamiliesRepository(@QLOGAApiService private val apiService: FamiliesApi) {
     suspend fun registerRelative(
         kin: FamilyRole,
         startDate: ZonedDateTime,
-        registrationRequest: RegistrationRequest
+        registrationRequest: SignUpRequest
     ) = apiService.registerRelative(kin, startDate.dateToString(), registrationRequest)
 
     suspend fun deleteRelative(id: Long) = apiService.deleteRelative(id)

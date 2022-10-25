@@ -1,7 +1,7 @@
 package eac.qloga.android.data.qbe
 
 
-import eac.qloga.bare.dto.RegistrationRequest
+import eac.qloga.bare.dto.SignUpRequest
 import eac.qloga.bare.dto.person.Address
 import eac.qloga.bare.dto.person.Family
 import eac.qloga.bare.dto.person.Person
@@ -77,7 +77,7 @@ interface FamiliesApi {
     suspend fun registerRelative(
         @Query("kin") kin: FamilyRole,
         @Query("startDate") startDate: String,
-        @Body registrationRequest: RegistrationRequest
+        @Body registrationRequest: SignUpRequest
     ): Person
 
     @DELETE("qbe/families/relatives/{pid}")

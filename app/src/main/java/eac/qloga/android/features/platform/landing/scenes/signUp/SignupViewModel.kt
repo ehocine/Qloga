@@ -16,7 +16,8 @@ import eac.qloga.android.core.shared.utils.InputFieldState
 import eac.qloga.android.core.shared.utils.LoadingState
 import eac.qloga.android.core.shared.utils.QTAG
 import eac.qloga.android.data.landing.LandingRepository
-import eac.qloga.bare.dto.RegistrationRequest
+import eac.qloga.bare.dto.SignUpRequest
+import eac.qloga.bare.enums.FamilyRole
 import eac.qloga.bare.enums.Gender
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -92,7 +93,7 @@ class SignupViewModel @Inject constructor(
     fun signUpApply() {
         viewModelScope.launch {
             try {
-                val registrationRequest: RegistrationRequest
+                val registrationRequest: SignUpRequest
                 if (
                     firstName.text.isNotEmpty() &&
                     familyName.text.isNotEmpty() &&
@@ -100,12 +101,13 @@ class SignupViewModel @Inject constructor(
                     birthday != null &&
                     gender != null
                 ) {
-                    registrationRequest = RegistrationRequest(
+                    registrationRequest = SignUpRequest(
                         firstName.text,
                         familyName.text,
                         DateConverter.stringToLocalDate(birthday),
                         emailAddress.text,
-                        gender
+                        gender,
+                        FamilyRole.other
                     )
                     signUpLoadingState.emit(LoadingState.LOADING)
                     val response = landingRepository.register(registrationRequest)
