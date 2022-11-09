@@ -132,10 +132,6 @@ fun ProviderSearchScreen(
     }
 
     LaunchedEffect(key1 = scrollContext.isBottom) {
-        Log.d(
-            "Tag",
-            "Cond: ${servicesList.isNotEmpty()} ${!providersFirstSearch} ${!viewModel.providersLastPage.value}"
-        )
         if (servicesList.isNotEmpty() && !providersFirstSearch && !viewModel.providersLastPage.value) {
             if (getProvidersLoadingState == LoadingState.LOADED || getProvidersLoadingState == LoadingState.IDLE) {
                 getProvidersLoading = true
@@ -205,7 +201,8 @@ fun ProviderSearchScreen(
     LaunchedEffect(key1 = getProvidersLoadingState == LoadingState.LOADED) {
         if (providersList.isNotEmpty()) {
             if (loadAvatars) {
-                viewModel.getProvidersResponse.value.content?.let {
+//                viewModel.getProvidersResponse.value.content?.let {
+                ProviderSearchViewModel.providersList.value.let {
                     it.forEach { provider ->
                         if (provider.prv.org.avatarId != null) {
                             viewModel.getProviderAvatar(provider.prv.org.avatarId)
