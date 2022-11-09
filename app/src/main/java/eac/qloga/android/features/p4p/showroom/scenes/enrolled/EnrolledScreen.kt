@@ -2,7 +2,6 @@ package eac.qloga.android.features.p4p.showroom.scenes.enrolled
 
 import P4pCustomerScreens
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -50,7 +49,7 @@ fun EnrolledScreen(
         it.catGroupOrder
     }
     val currentEnrollment by EnrollmentViewModel.currentEnrollmentType
-    Log.i("Tag", "currentEnrollment: $currentEnrollment")
+    Log.d("Tag", "currentEnrollment: $currentEnrollment")
 
     Scaffold { paddingValues ->
 
@@ -86,29 +85,37 @@ fun EnrolledScreen(
             ) {
                 CustomerCard(
                     onClickCard = {
-                        when(currentEnrollment){
-                            EnrollmentType.CUSTOMER->{
+                        when (currentEnrollment) {
+                            EnrollmentType.CUSTOMER -> {
                                 //User is already a customer, we go to customer dashboard
-                                navController.navigate(P4pCustomerScreens.CustomerDashboard.route)
+                                scope.launch {
+                                    navController.navigate(P4pCustomerScreens.CustomerDashboard.route) {
+                                        launchSingleTop = true
+                                    }
+                                }
                             }
-                            EnrollmentType.PROVIDER->{
+                            EnrollmentType.PROVIDER -> {
                                 //User is already a provider and wants to become a customer
                                 EnrollmentViewModel.enrollmentType.value = EnrollmentType.CUSTOMER
                                 scope.launch {
                                     navController.navigate(P4pScreens.Enrollment.route)
                                 }
                             }
-                            else->{
+                            else -> {
                                 //User is already a customer, we go to customer dashboard
-                                navController.navigate(P4pCustomerScreens.CustomerDashboard.route)
+                                scope.launch {
+                                    navController.navigate(P4pCustomerScreens.CustomerDashboard.route) {
+                                        launchSingleTop = true
+                                    }
+                                }
                             }
                         }
                     }
                 )
                 ProviderCard(
                     onClickCard = {
-                        when(currentEnrollment){
-                            EnrollmentType.PROVIDER->{
+                        when (currentEnrollment) {
+                            EnrollmentType.PROVIDER -> {
                                 //User is already a provider, we go to provider dashboard
                                 scope.launch {
                                     navController.navigate(P4pProviderScreens.ProviderDashboard.route) {
@@ -116,14 +123,14 @@ fun EnrolledScreen(
                                     }
                                 }
                             }
-                            EnrollmentType.CUSTOMER->{
+                            EnrollmentType.CUSTOMER -> {
                                 //User is already a customer and wants to become a provider
                                 EnrollmentViewModel.enrollmentType.value = EnrollmentType.PROVIDER
                                 scope.launch {
                                     navController.navigate(P4pScreens.Enrollment.route)
                                 }
                             }
-                            else->{
+                            else -> {
                                 scope.launch {
                                     navController.navigate(P4pProviderScreens.ProviderDashboard.route) {
                                         launchSingleTop = true

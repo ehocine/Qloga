@@ -1,4 +1,4 @@
-package eac.qloga.android.features.platform.landing.scenes.signUp
+package eac.qloga.android.features.p4p.shared.scenes.orderPayment.platform.landing.scenes.signUp
 
 import android.app.Application
 import android.os.Build

@@ -1,4 +1,4 @@
-package eac.qloga.android.features.platform.landing.scenes.signUp
+package eac.qloga.android.features.p4p.shared.scenes.orderPayment.platform.landing.scenes.signUp
 
 import androidx.compose.ui.focus.FocusState
 import eac.qloga.bare.enums.Gender

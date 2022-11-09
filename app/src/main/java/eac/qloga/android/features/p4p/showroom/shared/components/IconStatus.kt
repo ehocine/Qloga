@@ -7,9 +7,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import eac.qloga.android.core.shared.theme.gray30
 
@@ -17,7 +19,9 @@ import eac.qloga.android.core.shared.theme.gray30
 fun IconStatus(
     modifier: Modifier = Modifier,
     label: String,
-    iconId: Int
+    iconId: Int,
+    fontWeight :FontWeight = FontWeight.W600,
+    textColor:Color = Color.Unspecified
 ) {
     val iconSize = 22.dp
 
@@ -36,9 +40,12 @@ fun IconStatus(
         Spacer(Modifier.height(4.dp))
         Text(
             text = label,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
             style = MaterialTheme.typography.labelMedium,
             textAlign = TextAlign.Center,
-            fontWeight = FontWeight.W600
+            fontWeight = fontWeight,
+            color = textColor
         )
     }
 }

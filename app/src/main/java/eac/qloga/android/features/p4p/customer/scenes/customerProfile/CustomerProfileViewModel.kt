@@ -168,7 +168,7 @@ class CustomerProfileViewModel @Inject constructor(
 
             customerProfile.value?.avatarId?.let {
                 _profileImageState.emit(LoadingState.LOADING)
-                when(val response = mediaRepository.getImageDataUrl(it,MediaSize.Sz150x150)){
+                when(val response = mediaRepository.getImageDataUrl(it,MediaSize.Sz150x150.size)){
                     is NetworkResult.Success -> {
                         val bitmap = BitmapFactory.decodeStream(response.data.byteStream())
                         _profileImage.value = bitmap

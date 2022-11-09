@@ -1,5 +1,6 @@
 package eac.qloga.android.features.p4p.showroom.scenes.categories
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
@@ -7,13 +8,18 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
+import eac.qloga.android.R
 import eac.qloga.android.core.shared.components.TitleBar
+import eac.qloga.android.core.shared.theme.blueTextColor
 import eac.qloga.android.core.shared.utils.CONTAINER_TOP_PADDING
 import eac.qloga.android.core.shared.utils.SCREEN_HORIZONTAL_PADDING
 import eac.qloga.android.core.shared.viewmodels.ApiViewModel
@@ -91,34 +97,74 @@ fun CategoriesScreen(
                 navList = categoriesList
             )
 
-            LaunchedEffect(key1 = catChanged) {
-
-            }
-            Column(
-                modifier = Modifier.verticalScroll(scrollState)
-            ) {
+            if (CategoriesViewModel.selectedNav.value != null) {
                 Column(
-                    modifier = Modifier.padding(
-                        start = horizontalContentPadding,
-                        top = 24.dp,
-                        end = horizontalContentPadding
-                    ),
-                    verticalArrangement = Arrangement.Center
+                    modifier = Modifier.verticalScroll(scrollState)
                 ) {
-                    //expandable description text
-                    if (detailText != null) {
-                        DescriptionText(text = detailText)
+                    Column(
+                        modifier = Modifier.padding(
+                            start = horizontalContentPadding,
+                            top = 24.dp,
+                            end = horizontalContentPadding
+                        ),
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        //expandable description text
+                        if (detailText != null) {
+                            DescriptionText(text = detailText)
+                        }
+                    }
+                    //list card
+                    selectedCategory?.let {
+                        ServicesListCard(
+                            navController = navController,
+                            listOfServices = it.services,
+                            catChanged = catChanged
+                        )
                     }
                 }
-                //list card
-                selectedCategory?.let {
-                    ServicesListCard(
-                        navController = navController,
-                        listOfServices = it.services,
-                        catChanged = catChanged
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    NoCategorySelectedImage(
+                        modifier = Modifier
+                            .size(350.dp)
                     )
                 }
             }
         }
     }
+}
+
+@Composable
+fun NoCategorySelectedImage(modifier: Modifier = Modifier) {
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+        Image(
+            painter = rememberAsyncImagePainter(R.drawable.ic_no_category),
+            modifier = Modifier
+                .align(Alignment.Center)
+                .fillMaxSize(),
+            contentDescription = null,
+            contentScale = ContentScale.Fit
+        )
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 80.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Please select a Category...",
+                color = blueTextColor,
+                style = MaterialTheme.typography.titleLarge
+            )
+        }
+
+    }
+
 }

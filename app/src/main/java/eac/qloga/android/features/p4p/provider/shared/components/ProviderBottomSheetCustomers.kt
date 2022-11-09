@@ -3,45 +3,47 @@ package eac.qloga.android.features.p4p.provider.shared.components
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import eac.qloga.android.core.shared.utils.Extensions.roundToRating
+import androidx.hilt.navigation.compose.hiltViewModel
 import eac.qloga.android.core.shared.components.Cards
 import eac.qloga.android.core.shared.theme.gray1
 import eac.qloga.android.core.shared.theme.gray30
-import eac.qloga.android.features.intro.presentation.components.SliderCard
+import eac.qloga.android.features.p4p.provider.shared.viewModels.ProviderDashboardViewModel
 import eac.qloga.android.features.p4p.shared.components.BottomSheetDashLine
+import eac.qloga.android.features.p4p.showroom.shared.components.SliderCard
+import kotlin.math.roundToInt
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProviderBottomSheetCustomers(
     modifier: Modifier = Modifier,
     selectedVerificationIndexes: List<Int>,
-    onSelectVerificationOption: (Int) -> Unit
+    onSelectVerificationOption: (Int) -> Unit,
+    viewModel: ProviderDashboardViewModel = hiltViewModel()
 ) {
-    val categoriesCheckBox = remember { mutableStateOf(false) }
-    val servicesCheckBox = remember { mutableStateOf(true) }
-    val minimumSumSlider = remember{ mutableStateOf(0)}
-    val distanceSlider = remember{ mutableStateOf(0)}
-    val minimumStartRatingSlider = remember{ mutableStateOf(0f)}
+    val matchByOption by remember {
+        mutableStateOf(viewModel.matchServices)
+    }
+    val minimumSumSlider by remember { mutableStateOf(viewModel.minOfferSum) }
+    val distanceSlider by remember { mutableStateOf(viewModel.proximity) }
+    val minimumStartRatingSlider by remember { mutableStateOf(viewModel.rating) }
     val scrollState = rememberScrollState()
 
-    val ratingSliderValue = remember{ mutableStateOf(1f) }
+    val ratingSliderValue = remember { mutableStateOf(1f) }
 
     Column(modifier = Modifier.fillMaxWidth()) {
         BottomSheetDashLine()
         Text(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .padding(vertical = 8.dp)
-            ,
+                .padding(vertical = 8.dp),
             text = "Search filter",
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onBackground
@@ -59,8 +61,7 @@ fun ProviderBottomSheetCustomers(
             ) {
                 Text(
                     modifier = Modifier
-                        .padding(start = 8.dp, bottom = 4.dp)
-                    ,
+                        .padding(start = 8.dp, bottom = 4.dp),
                     text = "MATCH BY",
                     style = MaterialTheme.typography.titleMedium,
                     color = gray30
@@ -83,13 +84,12 @@ fun ProviderBottomSheetCustomers(
                                 style = MaterialTheme.typography.titleMedium,
                                 color = gray30
                             )
-                            Switch(
+                            RadioButton(
                                 modifier = Modifier.height(24.dp),
-                                checked = categoriesCheckBox.value,
-                                onCheckedChange = { categoriesCheckBox.value = !categoriesCheckBox.value },
-                                colors = SwitchDefaults.colors(
-                                    uncheckedBorderColor = gray1,
-                                    uncheckedTrackColor = MaterialTheme.colorScheme.background
+                                selected = !matchByOption.value,
+                                onClick = { viewModel.matchServices.value = false },
+                                colors = RadioButtonDefaults.colors(
+                                    unselectedColor = gray1
                                 )
                             )
                         }
@@ -104,13 +104,12 @@ fun ProviderBottomSheetCustomers(
                                 style = MaterialTheme.typography.titleMedium,
                                 color = gray30
                             )
-                            Switch(
+                            RadioButton(
                                 modifier = Modifier.height(24.dp),
-                                checked = servicesCheckBox.value,
-                                onCheckedChange = { servicesCheckBox.value = !servicesCheckBox.value },
-                                colors = SwitchDefaults.colors(
-                                    uncheckedBorderColor = gray1,
-                                    uncheckedTrackColor = MaterialTheme.colorScheme.background
+                                selected = matchByOption.value,
+                                onClick = { viewModel.matchServices.value = true },
+                                colors = RadioButtonDefaults.colors(
+                                    unselectedColor = gray1
                                 )
                             )
                         }
@@ -123,30 +122,30 @@ fun ProviderBottomSheetCustomers(
                         .padding(top = 16.dp)
                 ) {
                     SliderCard(
-                        label = "MINIMUM SUM(£): "  + minimumSumSlider.value,
+                        label = "MINIMUM BUDGET(£): " + minimumSumSlider.value / 100,
                         /*** Convert the value into (0-100)% range to show in slider */
-                        value = ( minimumSumSlider.value.toFloat()/500)*100, //maxValue = 500
+                        value = (minimumSumSlider.value.toFloat() / 500), //maxValue = 500
                         onValueChange = {
                             /***** Convert value from percentage(0-100) to normal *********/
-                            minimumSumSlider.value = ((it/100) * 500).toInt()
+                            viewModel.minOfferSum.value = ((it / 100) * 500 * 100).toLong()
                         }
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     SliderCard(
-                        label = "Distance(miles): "  + distanceSlider.value,
-                        value = ( distanceSlider.value.toFloat()/200)*100, //maxValue = 200
+                        label = "DISTANCE (miles): " + distanceSlider.value,
+                        value = (distanceSlider.value.toFloat() / 200) * 100, //maxValue = 200
                         onValueChange = {
-                            distanceSlider.value = ((it/100) * 200).toInt()
+                            viewModel.proximity.value = ((it / 100) * 200).toLong()
                         }
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     SliderCard(
-                        label = "MINIMUM START RATING: "  + minimumStartRatingSlider.value.roundToRating(),
-                        value = minimumStartRatingSlider.value, //maxValue = 5
-                        valueRange = 1f..5f,
-                        steps = 7,
+                        label = "MINIMUM START RATING: " + minimumStartRatingSlider.value / 1000,
+                        value = (minimumStartRatingSlider.value.toFloat()) / 1000, //maxValue = 5
+                        valueRange = 0f..5f,
+                        steps = 4,
                         onValueChange = {
-                            minimumStartRatingSlider.value = it
+                            viewModel.rating.value = it.roundToInt() * 1000
                         }
                     )
                     Spacer(modifier = Modifier.height(16.dp))

@@ -1,4 +1,4 @@
-package eac.qloga.android.features.platform.landing.scenes.signIn
+package eac.qloga.android.features.p4p.shared.scenes.orderPayment.platform.landing.scenes.signIn
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -29,7 +29,7 @@ import eac.qloga.android.core.shared.utils.PreTransition
 import eac.qloga.android.core.shared.viewmodels.ApiViewModel
 import eac.qloga.android.core.shared.viewmodels.AuthenticationViewModel
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
-import eac.qloga.android.features.platform.landing.scenes.LandingScreens
+import eac.qloga.android.features.p4p.shared.scenes.orderPayment.platform.landing.scenes.LandingScreens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import eac.qloga.android.R
 import eac.qloga.android.core.shared.theme.Red10
 import eac.qloga.android.core.shared.theme.gray30
+import eac.qloga.android.core.shared.theme.lightBlack
 
 @Composable
 fun BottomNavItem(
@@ -33,10 +34,12 @@ fun BottomNavItem(
     count: Int = 44,
     icon: Int,
     selectContentColor: Color = MaterialTheme.colorScheme.primary,
-    unSelectedContentColor: Color = gray30,
+    unSelectedTextColor: Color = lightBlack,
+    unSelectedIconColor: Color = gray30,
     onClick: () -> Unit
 ) {
-    val color = remember(isSelected) { derivedStateOf { if(isSelected) selectContentColor else unSelectedContentColor}}
+    val textColor = remember(isSelected) { derivedStateOf { if(isSelected) selectContentColor else unSelectedTextColor}}
+    val iconColor = remember(isSelected) { derivedStateOf { if(isSelected) selectContentColor else unSelectedIconColor}}
 
     Column(
         modifier = modifier
@@ -53,7 +56,7 @@ fun BottomNavItem(
                     modifier = Modifier.size(28.dp),
                     painter = painterResource(id = icon),
                     contentDescription = null,
-                    tint = color.value
+                    tint = iconColor.value
                 )
             }
             
@@ -64,8 +67,7 @@ fun BottomNavItem(
                         .align(Alignment.BottomEnd)
                         .sizeIn(minWidth = 16.dp, minHeight = 16.dp)
                         .clip(CircleShape)
-                        .background(Red10)
-                    ,
+                        .background(Red10),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -87,7 +89,7 @@ fun BottomNavItem(
                 fontSize = 12.sp,
                 fontWeight = FontWeight.W600
             ),
-            color = color.value,
+            color = textColor.value,
         )
     }
 }

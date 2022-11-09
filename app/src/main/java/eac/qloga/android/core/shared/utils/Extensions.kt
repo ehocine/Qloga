@@ -4,6 +4,7 @@ import android.graphics.Color.parseColor
 import android.graphics.Rect
 import android.view.View
 import android.view.ViewTreeObserver
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -18,6 +19,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import eac.qloga.android.core.shared.utils.ScrollContext
 
 object Extensions {
 
@@ -105,8 +107,8 @@ object Extensions {
         }
     }
 
-    fun Float.roundToRating( ): Float{
-        return when(this){
+    fun Float.roundToRating(): Float {
+        return when (this) {
             in 1f..1.2f -> 1f
             in 1.3f..1.6f -> 1.5f
             in 1.7f..2.2f -> 2f
@@ -118,5 +120,24 @@ object Extensions {
             in 4.8f..5.3f -> 5f
             else -> 0f
         }
+    }
+
+    val LazyListState.isLastItemVisible: Boolean
+        get() = layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
+
+    val LazyListState.isFirstItemVisible: Boolean
+        get() = firstVisibleItemIndex == 0
+
+    @Composable
+    fun rememberScrollContext(listState: LazyListState): ScrollContext {
+        val scrollContext by remember {
+            derivedStateOf {
+                ScrollContext(
+                    isTop = listState.isFirstItemVisible,
+                    isBottom = listState.isLastItemVisible
+                )
+            }
+        }
+        return scrollContext
     }
 }

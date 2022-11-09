@@ -1,4 +1,4 @@
-package eac.qloga.android.features.platform.landing.scenes.noAddress
+package eac.qloga.android.features.p4p.shared.scenes.orderPayment.platform.landing.scenes.noAddress
 
 import android.app.Activity
 import android.view.WindowManager
@@ -30,12 +30,12 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import eac.qloga.android.R
 import eac.qloga.android.core.shared.components.SuggestionCard
-import eac.qloga.android.core.shared.utils.Dimensions
 import eac.qloga.android.core.shared.utils.LoadingState
+import eac.qloga.android.core.shared.utils.Padding
 import eac.qloga.android.data.shared.models.address_suggestions.Suggestion
+import eac.qloga.android.features.p4p.shared.viewmodels.AddressViewModel
 import eac.qloga.android.features.p4p.showroom.scenes.P4pShowroomScreens
 import eac.qloga.android.features.p4p.showroom.shared.components.SearchBar
-import eac.qloga.android.features.p4p.shared.viewmodels.AddressViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -90,8 +90,7 @@ fun NoAddressScreen(
                         }
                     )
                 }
-                .padding(horizontal = Dimensions.ScreenHorizontalPadding.dp)
-            ,
+                .padding(horizontal = Padding.containerHorizontalPadding.dp),
             contentAlignment = Alignment.Center
         ) {
             Column(

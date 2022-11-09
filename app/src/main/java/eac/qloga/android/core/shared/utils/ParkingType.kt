@@ -5,9 +5,9 @@ sealed class ParkingType(
 ) {
     object FreeType: ParkingType("Free")
     object PaidType: ParkingType("Paid")
-//    object UnspecifiedType: ParkingType("Unspecified")
+    object UnspecifiedType: ParkingType("Unspecified")
 
     companion object{
-        val listOfParkingType: List<ParkingType> by lazy{ listOf(FreeType, PaidType)}
+        val listOfParkingType: List<ParkingType> by lazy{ listOf(FreeType, PaidType, UnspecifiedType)}
     }
 }

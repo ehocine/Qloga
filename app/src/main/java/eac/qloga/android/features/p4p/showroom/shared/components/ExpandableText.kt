@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
@@ -29,6 +30,8 @@ fun ExpandableText(
     ),
     expandButtonTextStyle: TextStyle = MaterialTheme.typography.bodySmall,
     minimizedMaxLines: Int = 4,
+    expandableText: String = " Learn more",
+    textColor: Color = gray30
 ) {
     var cutText by remember(text) { mutableStateOf<String?>(null) }
     var expanded by remember { mutableStateOf(false) }
@@ -36,14 +39,14 @@ fun ExpandableText(
     val invisibleTextLayoutResultState = remember { mutableStateOf<TextLayoutResult?>(null) }
     val seeMoreSizeState = remember { mutableStateOf<IntSize?>(null) }
     val seeMoreOffsetState = remember { mutableStateOf<Offset?>(null) }
-    var expandBtn by remember{ mutableStateOf(true ) }
+    var expandBtn by remember { mutableStateOf(true) }
 
     // getting raw values for smart cast
     val textLayoutResult = textLayoutResultState.value
     val seeMoreSize = seeMoreSizeState.value
     val seeMoreOffset = seeMoreOffsetState.value
 
-    LaunchedEffect(invisibleTextLayoutResultState.value){
+    LaunchedEffect(invisibleTextLayoutResultState.value) {
         val lineCount = invisibleTextLayoutResultState.value?.lineCount
         lineCount?.let {
             expandBtn = it > minimizedMaxLines
@@ -73,12 +76,14 @@ fun ExpandableText(
     Column {
         Box(modifier.animateContentSize()) {
             // invisible text to count total line of text
-            Box(modifier = Modifier.alpha(0f).height(16.dp)) {
+            Box(modifier = Modifier
+                .alpha(0f)
+                .height(16.dp)) {
                 Text(
                     text = text.trim(),
                     modifier = Modifier.alpha(0f),
                     style = textStyle,
-                    onTextLayout = { invisibleTextLayoutResultState.value = it},
+                    onTextLayout = { invisibleTextLayoutResultState.value = it },
                     maxLines = minimizedMaxLines + 1
                 )
             }
@@ -89,14 +94,14 @@ fun ExpandableText(
                 overflow = TextOverflow.Ellipsis,
                 onTextLayout = { textLayoutResultState.value = it },
                 style = textStyle,
-                color = gray30
+                color = textColor
             )
 
             val density = LocalDensity.current
 
             if (!expanded && expandBtn) {
                 Text(
-                    " Learn more",
+                    expandableText,
                     onTextLayout = { seeMoreSizeState.value = it.size },
                     modifier = Modifier
                         .then(
@@ -118,12 +123,11 @@ fun ExpandableText(
                 )
             }
         }
-        if(expanded && expandBtn){
+        if (expanded && expandBtn) {
             Text(
                 modifier = Modifier
                     .padding(top = 4.dp)
-                    .clickable { expanded = false }
-                ,
+                    .clickable { expanded = false },
                 text = "Show less",
                 style = textStyle,
                 color = MaterialTheme.colorScheme.primary

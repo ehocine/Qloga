@@ -21,7 +21,7 @@ interface MediaApi {
     @POST("qbe/images")
     suspend fun upload(
         @Body fileData: String,
-        @Query("access") access: AccessLevel= AccessLevel.PRIVATE,
+        @Query("access") access: AccessLevel = AccessLevel.PRIVATE,
         @Query("aid") aid: Long?
     ): MediaMeta
 

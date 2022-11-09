@@ -128,8 +128,7 @@ fun CustomerProfileScreen(
                                     modifier = Modifier
                                         .width(imageWidth)
                                         .height(imageHeight)
-                                        .clip(CircleShape)
-                                    ,
+                                        .clip(CircleShape),
                                     painter = painter,
                                     contentDescription = "",
                                     contentScale = ContentScale.Crop,

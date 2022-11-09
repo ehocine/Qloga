@@ -5,6 +5,7 @@ import androidx.compose.runtime.remember
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.rememberCameraPositionState
+import eac.qloga.android.core.shared.components.CustomersMapViewContainer
 import eac.qloga.android.core.shared.components.MapViewContainer
 import eac.qloga.android.core.shared.utils.CustomMarkerState
 
@@ -35,7 +36,7 @@ fun AddressMapView(
     MapViewContainer(
         cameraPositionState = cameraPositionState,
         listOfMarkers = listOf(
-            CustomMarkerState(latitude, longitude, title = title, description = description),
+            CustomMarkerState(latitude, longitude, name = title, description = description),
         ),
         onMapClick = { onClickMap(it) }
     )

@@ -1,5 +1,6 @@
 package eac.qloga.android.features.p4p.shared.scenes.choosingNewAddress
 
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -17,6 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
@@ -24,16 +26,13 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.PopupProperties
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import eac.qloga.android.R
+import eac.qloga.android.core.shared.components.*
 import eac.qloga.android.core.shared.components.Buttons.FullRoundedButton
 import eac.qloga.android.core.shared.components.Cards.ContainerBorderedCard
-import eac.qloga.android.core.shared.components.DotCircleArcCanvas
-import eac.qloga.android.core.shared.components.DottedLine
-import eac.qloga.android.core.shared.components.ExistAddressOptions
-import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.components.address.AddressSearchBar
 import eac.qloga.android.core.shared.theme.gray1
 import eac.qloga.android.core.shared.theme.green1
@@ -70,6 +69,10 @@ fun ChoosingNewAddressScreen(
 
     val addressesList by EnrollmentViewModel.addressesList
 
+    val newAddressList = addressesList.distinctBy { it.shortAddress }
+    newAddressList.forEach {
+        Log.d("add", it.shortAddress)
+    }
 
     ModalBottomSheetLayout(
         sheetShape = RoundedCornerShape(topEnd = 24.dp, topStart = 24.dp),
@@ -105,7 +108,10 @@ fun ChoosingNewAddressScreen(
                     .fillMaxSize()
                     .pointerInput(Unit) {
                         detectTapGestures(
-                            onTap = { focusManager.clearFocus() }
+                            onTap = {
+                                expanded = false
+                                focusManager.clearFocus()
+                            }
                         )
                     }
             ) {
@@ -115,7 +121,6 @@ fun ChoosingNewAddressScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Spacer(modifier = Modifier.height(topPadding + 4.dp))
-
                     Box(
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -158,9 +163,7 @@ fun ChoosingNewAddressScreen(
                             )
                         }
                     }
-
                     Spacer(modifier = Modifier.height(24.dp))
-
                     Column(modifier = Modifier.padding(horizontal = containerHorizontalPadding)) {
                         Box(
                             modifier = Modifier
@@ -174,65 +177,141 @@ fun ChoosingNewAddressScreen(
                             )
                         }
                         Spacer(modifier = Modifier.height(16.dp))
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(3.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Row(modifier = Modifier
-                                    .fillMaxWidth()
-                                    .onGloballyPositioned {
-                                        parentSize = it.size
-                                    }) {
-                                    AddressSearchBar(
-                                        value = currentAddress,
-                                        hint = addressViewModel.addressInputFieldState.value.hint,
-                                        isFocused = addressViewModel.addressInputFieldState.value.isFocused,
-                                        onValueChange = {
-                                            viewModel.onTriggerEvent(EnrollmentEvent.EnterAddress(it))
-                                            addressViewModel.getAddressSuggestions(
-                                                term = it
-                                            )
+                        Box {
+                            ConstraintLayout {
+                                val (searchBar, suggestionCard, addresses) = createRefs()
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(3.dp)
+                                        .constrainAs(searchBar) {
+                                            top.linkTo(parent.bottom)
+                                            bottom.linkTo(parent.top)
                                         },
-                                        onSubmit = {
-
-                                        },
-                                        onClear = { viewModel.onTriggerEvent(EnrollmentEvent.ClearAddress) },
-                                        onFocusedChanged = {
-                                            viewModel.onTriggerEvent(
-                                                EnrollmentEvent.FocusAddressInput(
-                                                    it
-                                                )
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Box(
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .onGloballyPositioned {
+                                                    parentSize = it.size
+                                                }
+                                        ) {
+                                            AddressSearchBar(
+                                                value = currentAddress,
+                                                hint = addressViewModel.addressInputFieldState.value.hint,
+                                                isFocused = addressViewModel.addressInputFieldState.value.isFocused,
+                                                onValueChange = {
+                                                    viewModel.onTriggerEvent(
+                                                        EnrollmentEvent.EnterAddress(
+                                                            it
+                                                        )
+                                                    )
+                                                    addressViewModel.getAddressSuggestions(
+                                                        term = it
+                                                    )
+                                                },
+                                                onSubmit = {
+                                                },
+                                                onClear = { viewModel.onTriggerEvent(EnrollmentEvent.ClearAddress) },
+                                                onFocusedChanged = {
+                                                    viewModel.onTriggerEvent(
+                                                        EnrollmentEvent.FocusAddressInput(
+                                                            it
+                                                        )
+                                                    )
+                                                }
                                             )
                                         }
-                                    )
+                                    }
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(CircleShape)
+                                            .clickable {
+                                                coroutineScope.launch {
+                                                    navController.navigate(P4pScreens.SelectLocationMap.route)
+                                                }
+                                            }
+                                            .padding(4.dp)
+                                    ) {
+                                        Image(
+                                            modifier = Modifier.size(24.dp),
+                                            painter = painterResource(
+                                                id = R.drawable.ic_location_point
+                                            ),
+                                            contentDescription = ""
+                                        )
+                                    }
+                                }
 
-                                    when (addressSuggestionsLoadingState) {
-                                        LoadingState.LOADED -> {
-                                            expanded = true
-                                            LaunchedEffect(key1 = true) {
-                                                addressViewModel.getAddressSuggestionsLoadingState.value =
-                                                    LoadingState.IDLE
+                                when (addressSuggestionsLoadingState) {
+                                    LoadingState.LOADED -> {
+                                        expanded = true
+                                        LaunchedEffect(key1 = true) {
+                                            addressViewModel.getAddressSuggestionsLoadingState.value =
+                                                LoadingState.IDLE
+                                        }
+                                    }
+                                }
+                                Column(modifier = Modifier.constrainAs(addresses) {
+                                    top.linkTo(
+                                        searchBar.bottom
+                                    )
+                                }) {
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    // if there are family's addresses
+                                    if (addressesList.isNotEmpty()) {
+                                        Text(
+                                            text = "Or pick your existing address",
+                                            style = MaterialTheme.typography.titleMedium,
+                                            modifier = Modifier.padding(3.dp)
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        ContainerBorderedCard(modifier = Modifier.height(350.dp)) {
+                                            Column(
+                                                Modifier
+                                                    .padding(8.dp)
+                                                    .verticalScroll(scrollState)
+                                            ) {
+                                                newAddressList.forEach { address ->
+                                                    AddressItem(
+                                                        address = address,
+                                                        isSelected = EnrollmentViewModel.selectedAddress.value.shortAddress == address.shortAddress,
+                                                        selectAddress = {
+                                                            viewModel.onTriggerEvent(
+                                                                EnrollmentEvent.EnterAddress(
+                                                                    it.shortAddress
+                                                                )
+                                                            )
+                                                            EnrollmentViewModel.selectedAddress.value =
+                                                                it
+                                                        }
+                                                    )
+                                                }
                                             }
                                         }
                                     }
-
-                                    if (addressSuggestions.isNotEmpty()) {
-                                        androidx.compose.material.DropdownMenu(
-                                            modifier = Modifier
-                                                .width(with(LocalDensity.current) { parentSize.width.toDp() }),
-                                            expanded = expanded,
-                                            properties = PopupProperties(focusable = false),
-                                            onDismissRequest = { expanded = false }
-                                        ) {
-                                            addressSuggestions.forEach { addressSuggestion ->
-                                                androidx.compose.material.DropdownMenuItem(
-                                                    onClick = {
+                                }
+                                if (addressSuggestions.isNotEmpty()) {
+                                    SuggestionCard(
+                                        modifier = Modifier
+                                            .constrainAs(suggestionCard) {
+                                                top.linkTo(searchBar.bottom)
+                                            }
+                                            .verticalScroll(scrollState),
+                                        width = with(LocalDensity.current) { parentSize.width.toDp() },
+                                        roundedCornerShape = RoundedCornerShape(8.dp),
+                                        expanded = expanded,
+                                    ) {
+                                        addressSuggestions.forEach { addressSuggestion ->
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .clickable {
                                                         expanded = false
                                                         viewModel.onTriggerEvent(
                                                             EnrollmentEvent.EnterAddress(
@@ -243,69 +322,28 @@ fun ChoosingNewAddressScreen(
                                                             addressSuggestion
                                                         EnrollmentViewModel.addressSaved.value =
                                                             false
-                                                        AddressViewModel.searchAddress.value = true
+                                                        AddressViewModel.searchAddress.value =
+                                                            true
                                                         coroutineScope.launch {
                                                             navController.navigate(
                                                                 P4pScreens.SaveNewAddress.route
                                                             )
                                                         }
                                                     }
-                                                ) {
-                                                    androidx.compose.material.Text(text = addressSuggestion.address)
-                                                }
+                                                    .padding(
+                                                        start = 12.dp,
+                                                        end = 12.dp,
+                                                        top = 8.dp,
+                                                        bottom = 8.dp
+                                                    )
+                                            ) {
+                                                androidx.compose.material.Text(
+                                                    modifier = Modifier,
+                                                    text = addressSuggestion.address,
+                                                    style = MaterialTheme.typography.titleSmall,
+                                                )
                                             }
                                         }
-                                    }
-
-                                }
-                            }
-                            Box(
-                                modifier = Modifier
-                                    .clip(CircleShape)
-                                    .clickable {
-                                        coroutineScope.launch {
-                                            navController.navigate(P4pScreens.SelectLocationMap.route)
-                                        }
-                                    }
-                                    .padding(4.dp)
-                            ) {
-                                Image(
-                                    modifier = Modifier.size(24.dp),
-                                    painter = painterResource(
-                                        id = R.drawable.ic_location_point
-                                    ),
-                                    contentDescription = ""
-                                )
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        // if there are family's addresses
-                        if (addressesList.isNotEmpty()) {
-                            Text(
-                                text = "Or pick your existing address",
-                                style = MaterialTheme.typography.titleMedium,
-                                modifier = Modifier.padding(3.dp)
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            ContainerBorderedCard(modifier = Modifier.height(350.dp)) {
-                                Column(
-                                    Modifier
-                                        .padding(8.dp)
-                                        .verticalScroll(scrollState)
-                                ) {
-                                    addressesList.forEach { address ->
-                                        AddressItem(
-                                            address = address,
-                                            isSelected = EnrollmentViewModel.selectedAddress.value == address,
-                                            selectAddress = {
-                                                viewModel.onTriggerEvent(
-                                                    EnrollmentEvent.EnterAddress(
-                                                        it.shortAddress
-                                                    )
-                                                )
-                                                EnrollmentViewModel.selectedAddress.value = it
-                                            })
                                     }
                                 }
                             }
@@ -340,7 +378,7 @@ fun AddressItem(
     Text(
         text = address.shortAddress,
         style = MaterialTheme.typography.titleMedium,
-        color = if (isSelected) green1 else gray1,
+        color = if (isSelected) green1 else Color.Black,
         modifier = Modifier
             .clickable { selectAddress(address) }
             .padding(8.dp)

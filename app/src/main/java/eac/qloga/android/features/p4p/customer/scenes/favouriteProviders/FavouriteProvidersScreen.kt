@@ -38,7 +38,7 @@ fun FavouriteProvidersScreen(
     viewModel: CustomerDashboardViewModel = hiltViewModel()
 ) {
     val containerHorizontalPadding = 24.dp
-    val isProvidersEmpty = remember{ mutableStateOf(false) }
+    val isProvidersEmpty = remember { mutableStateOf(false) }
     val lazyScrollState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
@@ -71,22 +71,24 @@ fun FavouriteProvidersScreen(
         val titleBarHeight = paddingValues.calculateTopPadding()
         Column(
             modifier = Modifier
-                .fillMaxSize()
-            ,
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(titleBarHeight))
 
-            if(isProvidersEmpty.value){
+            if (isProvidersEmpty.value) {
                 //TODO SVG
-                OrdersEmptyStateCard(modifier = Modifier.weight(1f), imageId = R.drawable.ic_fv_emtpy)
-            }else{
-                val providersList = listOf( 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
+                OrdersEmptyStateCard(
+                    modifier = Modifier.weight(1f),
+                    imageId = R.drawable.ic_fv_emtpy
+                )
+            } else {
+                val providersList = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
                 LazyColumn(
                     state = lazyScrollState,
                     contentPadding = PaddingValues(vertical = 16.dp)
-                ){
-                    items(providersList, key = {it} ){
+                ) {
+                    items(providersList, key = { it }) {
                         FavouriteProvidersListItem(
                             modifier = Modifier
                                 .clickable {
@@ -94,8 +96,7 @@ fun FavouriteProvidersScreen(
                                         //navController.navigate(Screen.FavouriteProviderView.route)
                                     }
                                 }
-                                .padding(horizontal = containerHorizontalPadding)
-                            ,
+                                .padding(horizontal = containerHorizontalPadding),
                             imageId = R.drawable.pvr_profile_ava,
                             name = "Kai's Cleaning agency",
                             location = "Edinburgh",

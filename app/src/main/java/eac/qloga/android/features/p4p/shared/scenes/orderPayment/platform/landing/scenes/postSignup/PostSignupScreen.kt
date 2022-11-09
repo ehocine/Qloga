@@ -1,4 +1,4 @@
-package eac.qloga.android.features.platform.landing.scenes.postSignup
+package eac.qloga.android.features.p4p.shared.scenes.orderPayment.platform.landing.scenes.postSignup
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -20,7 +20,7 @@ import eac.qloga.android.R
 import eac.qloga.android.core.shared.components.Buttons
 import eac.qloga.android.core.shared.theme.gray30
 import eac.qloga.android.core.shared.theme.info_sky
-import eac.qloga.android.features.platform.landing.scenes.LandingScreens
+import eac.qloga.android.features.p4p.shared.scenes.orderPayment.platform.landing.scenes.LandingScreens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

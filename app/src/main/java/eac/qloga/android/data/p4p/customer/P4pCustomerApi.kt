@@ -3,6 +3,7 @@ package eac.qloga.android.data.p4p.customer
 import eac.qloga.android.data.shared.models.Page
 import eac.qloga.p4p.cst.dto.CstPublicProfile
 import eac.qloga.p4p.cst.dto.Customer
+import eac.qloga.p4p.cst.dto.PrvSearchMatchRqFirstPage
 import eac.qloga.p4p.cst.dto.PrvSearchResult
 import eac.qloga.p4p.order.dto.Order
 import eac.qloga.p4p.order.dto.OrderActionResult
@@ -88,7 +89,7 @@ interface P4pCustomerApi {
         @Query("psize") psize: Long,
         @Query("filter") filter: String?,
         @Query("selector") selector: String?
-    ): Page<Rq>
+    ): Response<Page<Rq>>
 
     @PATCH("p4p/cst/requests")
     suspend fun workWithRequest(
@@ -139,7 +140,14 @@ interface P4pCustomerApi {
         @Query("psize") psize: Long,
         @Query("filter") filter: String?,
         @Query("fields") fields: List<String>?
-    ): Page<PrvSearchResult>
+    ): Response<Page<PrvSearchResult>>
+
+    @GET("p4p/cst/providers/rqs")
+    suspend fun getRequestsFirstPage(
+        @Query("psize") psize: Long,
+        @Query("filter") filter: String?,
+        @Query("fields") fields: List<String>?
+    ): Response<PrvSearchMatchRqFirstPage>
 
     @GET("p4p/cst/providers/{prvId}")
     suspend fun getProviderInfo(

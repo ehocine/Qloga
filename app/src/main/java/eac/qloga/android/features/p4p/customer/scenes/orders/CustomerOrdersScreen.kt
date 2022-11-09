@@ -1,9 +1,7 @@
 package eac.qloga.android.features.p4p.customer.scenes.orders
 
 import P4pCustomerScreens
-import android.os.Build
 import androidx.activity.compose.BackHandler
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -44,26 +42,28 @@ import kotlinx.coroutines.launch
 @OptIn(
     ExperimentalMaterial3Api::class,
     ExperimentalMaterialApi::class,
-    ExperimentalPagerApi::class)
+    ExperimentalPagerApi::class
+)
 @Composable
 fun CustomerOrdersScreen(
     navController: NavController,
     hideNavBar: (Boolean) -> Unit = {},
     viewModel: CustomerDashboardViewModel = hiltViewModel()
 ) {
-    val orderNumberState = remember{ mutableStateOf(InputFieldState(text = "10" ))}
-    val isOrdersEmpty = remember{ mutableStateOf(false) }
-    val isQuotesEmpty = remember{ mutableStateOf(false) }
-    val isInquiresEmpty = remember{ mutableStateOf(false) }
-    val isTodayEmpty = remember{ mutableStateOf(true) }
-    val fromDate = remember{ mutableStateOf("")}
-    val toDate = remember{ mutableStateOf("")}
+    val orderNumberState = remember { mutableStateOf(InputFieldState(text = "10")) }
+    val isOrdersEmpty = remember { mutableStateOf(false) }
+    val isQuotesEmpty = remember { mutableStateOf(false) }
+    val isInquiresEmpty = remember { mutableStateOf(false) }
+    val isTodayEmpty = remember { mutableStateOf(true) }
+    val fromDate = remember { mutableStateOf("") }
+    val toDate = remember { mutableStateOf("") }
 
     val pagerState = rememberPagerState()
     val scope = rememberCoroutineScope()
-    val modalBottomSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    val modalBottomSheetState =
+        rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
 
-    LaunchedEffect(modalBottomSheetState.isVisible){
+    LaunchedEffect(modalBottomSheetState.isVisible) {
         hideNavBar(modalBottomSheetState.isVisible)
     }
 
@@ -73,15 +73,19 @@ fun CustomerOrdersScreen(
 
     ModalBottomSheetLayout(
         sheetState = modalBottomSheetState,
-        sheetShape = RoundedCornerShape(topEnd = 16.dp , topStart = 16.dp),
+        sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
         sheetContent = {
             CustomerOrdersSearchFilter(
                 orderNumberState = orderNumberState.value,
                 selectedStatus = viewModel.selectedStatus,
                 fromDate = fromDate.value,
                 toDate = toDate.value,
-                onChangeOrderValue = { orderNumberState.value = orderNumberState.value.copy(text =it)},
-                onFocusOrderValue = { orderNumberState.value = orderNumberState.value.copy(isFocused = it.isFocused) },
+                onChangeOrderValue = {
+                    orderNumberState.value = orderNumberState.value.copy(text = it)
+                },
+                onFocusOrderValue = {
+                    orderNumberState.value = orderNumberState.value.copy(isFocused = it.isFocused)
+                },
                 onPickFromDate = { fromDate.value = it },
                 onPickToDate = { toDate.value = it },
                 onStatusSelect = { viewModel.onSelectStatusOption(it) }
@@ -122,8 +126,7 @@ fun CustomerOrdersScreen(
             val titleBarHeight = paddingValues.calculateTopPadding()
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                ,
+                    .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 //space for title bar
@@ -143,7 +146,7 @@ fun CustomerOrdersScreen(
                     count = OrdersTabTypes.listOfItems.size,
                     state = pagerState
                 ) { page ->
-                    when(page){
+                    when (page) {
                         0 -> {
                             CustomerOrdersTab(
                                 isOrdersEmpty = isOrdersEmpty.value,
@@ -166,8 +169,8 @@ fun CustomerOrdersScreen(
                         }
 
                         3 -> {
-                            if(isTodayEmpty.value){
-                                OrdersEmptyStateCard( imageId = R.drawable.empty_state_holder2 )
+                            if (isTodayEmpty.value) {
+                                OrdersEmptyStateCard(imageId = R.drawable.empty_state_holder2)
                             }
                         }
                     }

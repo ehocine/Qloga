@@ -1,4 +1,4 @@
-package eac.qloga.android.features.intro.presentation.components
+package eac.qloga.android.features.p4p.showroom.shared.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,7 +18,7 @@ import eac.qloga.android.core.shared.theme.gray30
 fun SliderCard(
     label: String,
     value : Float,
-    valueRange: ClosedFloatingPointRange<Float> = 1f..100f,
+    valueRange: ClosedFloatingPointRange<Float> = 0f..100f,
     steps: Int = 0,
     onValueChange: (Float) -> Unit
 ){

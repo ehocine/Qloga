@@ -3,9 +3,7 @@ package eac.qloga.android.features.p4p.shared.scenes.saveNewAddress
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -21,7 +19,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -30,19 +27,19 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.PopupProperties
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import eac.qloga.android.R
 import eac.qloga.android.core.shared.components.Buttons.FullRoundedButton
 import eac.qloga.android.core.shared.components.DotCircleArcCanvas
 import eac.qloga.android.core.shared.components.DottedLine
+import eac.qloga.android.core.shared.components.SuggestionCard
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.components.address.AddressCard
 import eac.qloga.android.core.shared.components.address.AddressSearchBar
 import eac.qloga.android.core.shared.theme.dangerRed
 import eac.qloga.android.core.shared.theme.gray1
-import eac.qloga.android.core.shared.theme.gray30
 import eac.qloga.android.core.shared.theme.green1
 import eac.qloga.android.core.shared.utils.InputFieldState
 import eac.qloga.android.core.shared.utils.LoadingState
@@ -50,9 +47,9 @@ import eac.qloga.android.core.shared.utils.ParkingType
 import eac.qloga.android.core.shared.viewmodels.ApiViewModel
 import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
 import eac.qloga.android.features.p4p.shared.utils.EnrollmentEvent
+import eac.qloga.android.features.p4p.shared.viewmodels.AddressViewModel
 import eac.qloga.android.features.p4p.shared.viewmodels.EnrollmentViewModel
 import eac.qloga.android.features.p4p.showroom.shared.components.ParkingSelection
-import eac.qloga.android.features.p4p.shared.viewmodels.AddressViewModel
 import eac.qloga.bare.dto.person.Address
 import eac.qloga.bare.enums.Parking
 import kotlinx.coroutines.launch
@@ -70,6 +67,7 @@ fun SaveNewAddressScreen(
     val infoMsg = "Address of your business is required to proceed with the order."
     val containerHorizontalPadding = 24.dp
     val focusManager = LocalFocusManager.current
+    val scrollState = rememberScrollState()
 
     val currentUser by ApiViewModel.userProfile
 
@@ -89,27 +87,25 @@ fun SaveNewAddressScreen(
         rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
 
     var line1 by remember {
-        mutableStateOf(InputFieldState(text = selectedAddress.value.line1 ?: "", hint = "Line 1"))
+        mutableStateOf(InputFieldState(text = selectedAddress.value.line1 ?: ""))
     }
     var line2 by remember {
-        mutableStateOf(InputFieldState(text = selectedAddress.value.line2 ?: "", hint = "Line 2"))
+        mutableStateOf(InputFieldState(text = selectedAddress.value.line2 ?: ""))
     }
     var line3 by remember {
-        mutableStateOf(InputFieldState(text = selectedAddress.value.line3 ?: "", hint = "Line 3"))
+        mutableStateOf(InputFieldState(text = selectedAddress.value.line3 ?: ""))
     }
     var city by remember {
         mutableStateOf(
             InputFieldState(
-                text = selectedAddress.value.town ?: "",
-                hint = "City"
+                text = selectedAddress.value.town ?: ""
             )
         )
     }
     var postcode by remember {
         mutableStateOf(
             InputFieldState(
-                text = selectedAddress.value.postcode ?: "",
-                hint = "Postcode"
+                text = selectedAddress.value.postcode ?: ""
             )
         )
     }
@@ -118,7 +114,8 @@ fun SaveNewAddressScreen(
         mutableStateOf(
             when (selectedAddress.value.parking) {
                 Parking.FREE -> ParkingType.FreeType
-                else -> ParkingType.PaidType
+                Parking.PAID -> ParkingType.PaidType
+                else -> ParkingType.UnspecifiedType
             }
         )
     }
@@ -200,7 +197,10 @@ fun SaveNewAddressScreen(
                     .fillMaxSize()
                     .pointerInput(Unit) {
                         detectTapGestures(
-                            onTap = { focusManager.clearFocus() }
+                            onTap = {
+                                expanded = false
+                                focusManager.clearFocus()
+                            }
                         )
                     }
             ) {
@@ -210,7 +210,6 @@ fun SaveNewAddressScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Spacer(modifier = Modifier.height(topPadding + 4.dp))
-
                     Box(
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -267,64 +266,193 @@ fun SaveNewAddressScreen(
                             )
                         }
                         Spacer(modifier = Modifier.height(16.dp))
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(3.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Row(modifier = Modifier
-                                    .fillMaxWidth()
-                                    .onGloballyPositioned {
-                                        parentSize = it.size
-                                    }) {
-                                    AddressSearchBar(
-                                        value = currentAddress,
-                                        hint = addressViewModel.addressInputFieldState.value.hint,
-                                        isFocused = addressViewModel.addressInputFieldState.value.isFocused,
-                                        onValueChange = {
-                                            currentAddress = it
-                                            addressViewModel.getAddressSuggestions(
-                                                term = it
-                                            )
-                                        },
-                                        onSubmit = {
+                        Box {
+                            ConstraintLayout {
+                                val (searchBar, suggestionCard, other) = createRefs()
+                                Row(
+                                    modifier = Modifier
+                                        .constrainAs(searchBar) {
+                                            top.linkTo(parent.bottom)
+                                            bottom.linkTo(parent.top)
+                                        }
+                                        .fillMaxWidth()
+                                        .padding(3.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Box(
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Row(modifier = Modifier
+                                            .fillMaxWidth()
+                                            .onGloballyPositioned {
+                                                parentSize = it.size
+                                            }
+                                        ) {
+                                            AddressSearchBar(
+                                                value = currentAddress,
+                                                hint = addressViewModel.addressInputFieldState.value.hint,
+                                                isFocused = addressViewModel.addressInputFieldState.value.isFocused,
+                                                onValueChange = {
+                                                    currentAddress = it
+                                                    addressViewModel.getAddressSuggestions(
+                                                        term = it
+                                                    )
+                                                },
+                                                onSubmit = {
 
-                                        },
-                                        onClear = { currentAddress = "" },
-                                        onFocusedChanged = {
-                                            viewModel.onTriggerEvent(
-                                                EnrollmentEvent.FocusAddressInput(
-                                                    it
-                                                )
+                                                },
+                                                onClear = { currentAddress = "" },
+                                                onFocusedChanged = {
+                                                    viewModel.onTriggerEvent(
+                                                        EnrollmentEvent.FocusAddressInput(
+                                                            it
+                                                        )
+                                                    )
+                                                }
                                             )
                                         }
+                                    }
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(CircleShape)
+                                            .clickable {
+                                                coroutineScope.launch {
+                                                    if (gpsCoords && EnrollmentViewModel.addressSaved.value) {
+                                                        navController.navigate(P4pScreens.SelectLocationMap.route)
+                                                    } else {
+                                                        if (!EnrollmentViewModel.addressSaved.value) Toast
+                                                            .makeText(
+                                                                context,
+                                                                "Save the address first",
+                                                                Toast.LENGTH_SHORT
+                                                            )
+                                                            .show()
+                                                        if (!gpsCoords) Toast
+                                                            .makeText(
+                                                                context,
+                                                                "GPS coords invalid",
+                                                                Toast.LENGTH_SHORT
+                                                            )
+                                                            .show()
+                                                    }
+                                                }
+                                            }
+                                            .padding(4.dp)
+                                    ) {
+                                        Image(
+                                            modifier = Modifier.size(24.dp),
+                                            painter = painterResource(
+                                                id = R.drawable.ic_location_point
+                                            ),
+                                            contentDescription = ""
+                                        )
+                                    }
+                                }
+                                when (addressSuggestionsLoadingState) {
+                                    LoadingState.LOADED -> {
+                                        expanded = true
+                                        LaunchedEffect(key1 = true) {
+                                            addressViewModel.getAddressSuggestionsLoadingState.value =
+                                                LoadingState.IDLE
+                                        }
+                                    }
+                                }
+                                Column(modifier = Modifier.constrainAs(other) {
+                                    top.linkTo(
+                                        searchBar.bottom
                                     )
-                                    when (addressSuggestionsLoadingState) {
-                                        LoadingState.LOADED -> {
-                                            expanded = true
-                                            LaunchedEffect(key1 = true) {
-                                                addressViewModel.getAddressSuggestionsLoadingState.value =
-                                                    LoadingState.IDLE
+                                }) {
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    AddressCard(
+                                        parkingType = parking,
+                                        line1State = line1,
+                                        line2State = line2,
+                                        line3State = line3,
+                                        cityState = city,
+                                        postcodeState = postcode,
+                                        onChangeLine1 = {
+                                            oldSelectedAddress = selectedAddress.value
+                                            EnrollmentViewModel.addressSaved.value = false
+                                            line1 = InputFieldState(text = it)
+                                        },
+                                        onChangeLine3 = {
+                                            oldSelectedAddress = selectedAddress.value
+                                            EnrollmentViewModel.addressSaved.value = false
+                                            line3 = InputFieldState(text = it)
+                                        },
+                                        onChangeCity = {
+                                            oldSelectedAddress = selectedAddress.value
+                                            EnrollmentViewModel.addressSaved.value = false
+                                            city = InputFieldState(text = it)
+                                        },
+                                        onChangeLine2 = {
+                                            oldSelectedAddress = selectedAddress.value
+                                            EnrollmentViewModel.addressSaved.value = false
+                                            line2 = InputFieldState(text = it)
+                                        },
+                                        onChangePostcode = {
+                                            oldSelectedAddress = selectedAddress.value
+                                            EnrollmentViewModel.addressSaved.value = false
+                                            postcode = InputFieldState(text = it)
+                                        },
+                                        onFocusLine1 = {
+                                        },
+                                        onFocusLine3 = {
+                                        },
+                                        onFocusCity = {
+                                        },
+                                        onFocusLine2 = {
+                                        },
+                                        onFocusPostcode = {
+                                        },
+                                        onClickParkingType = {
+                                            coroutineScope.launch {
+                                                modalBottomSheetState.animateTo(
+                                                    ModalBottomSheetValue.Expanded
+                                                )
+                                            }
+                                        },
+                                    )
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    if (!gpsCoords) {
+                                        Box(
+                                            Modifier.fillMaxWidth(),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Warning,
+                                                    contentDescription = "",
+                                                    tint = dangerRed
+                                                )
+                                                Spacer(modifier = Modifier.padding(4.dp))
+                                                Text(
+                                                    text = "No GPS coords",
+                                                    style = MaterialTheme.typography.titleMedium,
+                                                    color = dangerRed
+                                                )
                                             }
                                         }
                                     }
+                                }
+                                if (addressSuggestions.isNotEmpty()) {
 
-                                    if (addressSuggestions.isNotEmpty()) {
-                                        DropdownMenu(
-                                            modifier = Modifier
-                                                .width(with(LocalDensity.current) { parentSize.width.toDp() }),
-                                            expanded = expanded,
-                                            properties = PopupProperties(focusable = false),
-                                            onDismissRequest = { expanded = false }
-                                        ) {
-                                            addressSuggestions.forEach { addressSuggestion ->
-                                                DropdownMenuItem(
-                                                    onClick = {
+                                    SuggestionCard(
+                                        modifier = Modifier
+                                            .constrainAs(suggestionCard) {
+                                                top.linkTo(searchBar.bottom)
+                                            }
+                                            .verticalScroll(scrollState),
+                                        width = with(LocalDensity.current) { parentSize.width.toDp() },
+                                        roundedCornerShape = RoundedCornerShape(8.dp),
+                                        expanded = expanded,
+                                    ) {
+                                        addressSuggestions.forEach { addressSuggestion ->
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .clickable {
                                                         expanded = false
                                                         currentAddress = addressSuggestion.address
                                                         oldSelectedAddress = selectedAddress.value
@@ -334,120 +462,22 @@ fun SaveNewAddressScreen(
                                                         EnrollmentViewModel.addressSaved.value =
                                                             false
                                                     }
-                                                ) {
-                                                    androidx.compose.material.Text(text = addressSuggestion.address)
-                                                }
+                                                    .padding(
+                                                        start = 12.dp,
+                                                        end = 12.dp,
+                                                        top = 8.dp,
+                                                        bottom = 8.dp
+                                                    )
+                                            ) {
+                                                androidx.compose.material.Text(
+                                                    modifier = Modifier,
+                                                    text = addressSuggestion.address,
+                                                    style = MaterialTheme.typography.titleSmall,
+                                                )
                                             }
                                         }
                                     }
                                 }
-                            }
-                            Box(
-                                modifier = Modifier
-                                    .clip(CircleShape)
-                                    .clickable {
-                                        if (EnrollmentViewModel.addressSaved.value) {
-                                            coroutineScope.launch {
-                                                if (gpsCoords && EnrollmentViewModel.addressSaved.value) {
-                                                    navController.navigate(P4pScreens.SelectLocationMap.route)
-                                                } else {
-                                                    if (!EnrollmentViewModel.addressSaved.value) Toast
-                                                        .makeText(
-                                                            context,
-                                                            "Save the address first",
-                                                            Toast.LENGTH_SHORT
-                                                        )
-                                                        .show()
-                                                    if (!gpsCoords) Toast
-                                                        .makeText(
-                                                            context,
-                                                            "GPS coords invalid",
-                                                            Toast.LENGTH_SHORT
-                                                        )
-                                                        .show()
-                                                }
-                                            }
-                                        }
-                                    }
-                                    .padding(4.dp)
-                            ) {
-                                Image(
-                                    modifier = Modifier.size(24.dp),
-                                    painter = painterResource(
-                                        id = R.drawable.ic_location_point
-                                    ),
-                                    contentDescription = "",
-                                    colorFilter = ColorFilter.tint(color = if (EnrollmentViewModel.addressSaved.value) green1 else gray30)
-                                )
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        AddressCard(
-                            parkingType = parking,
-                            line1State = line1,
-                            line2State = line2,
-                            line3State = line3,
-                            cityState = city,
-                            postcodeState = postcode,
-                            onChangeLine1 = {
-                                oldSelectedAddress = selectedAddress.value
-                                EnrollmentViewModel.addressSaved.value = false
-                                line1 = InputFieldState(text = it)
-                            },
-                            onChangeLine3 = {
-                                oldSelectedAddress = selectedAddress.value
-                                EnrollmentViewModel.addressSaved.value = false
-                                line3 = InputFieldState(text = it)
-                            },
-                            onChangeCity = {
-                                oldSelectedAddress = selectedAddress.value
-                                EnrollmentViewModel.addressSaved.value = false
-                                city = InputFieldState(text = it)
-                            },
-                            onChangeLine2 = {
-                                oldSelectedAddress = selectedAddress.value
-                                EnrollmentViewModel.addressSaved.value = false
-                                line2 = InputFieldState(text = it)
-                            },
-                            onChangePostcode = {
-                                oldSelectedAddress = selectedAddress.value
-                                EnrollmentViewModel.addressSaved.value = false
-                                postcode = InputFieldState(text = it)
-                            },
-                            onFocusLine1 = {
-                            },
-                            onFocusLine3 = {
-                            },
-                            onFocusCity = {
-                            },
-                            onFocusLine2 = {
-                            },
-                            onFocusPostcode = {
-                            },
-                            onClickParkingType = {
-                                coroutineScope.launch {
-                                    modalBottomSheetState.animateTo(ModalBottomSheetValue.Expanded)
-                                }
-                            },
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        if (!gpsCoords) {
-                            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.Default.Warning,
-                                        contentDescription = "",
-                                        tint = dangerRed
-                                    )
-                                    Spacer(modifier = Modifier.padding(4.dp))
-                                    Text(
-                                        text = "No GPS coords",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        color = dangerRed
-                                    )
-                                }
-
                             }
                         }
                     }
@@ -461,14 +491,16 @@ fun SaveNewAddressScreen(
                         )
                     }
                     saveFamilyAddressLoadingState == LoadingState.LOADED || updateAddressLoadingState == LoadingState.LOADED -> {
+                        EnrollmentViewModel.addressSaved.value = true
                         EnrollmentViewModel.selectedAddress.value =
                             addressViewModel.saveAddressResponse.value
                         selectedAddress.value = addressViewModel.saveAddressResponse.value
 
+
+
                         gpsCoords =
                             ((saveAddressResponse.lat != null) && (saveAddressResponse.lat != 0.0)
                                     && (saveAddressResponse.lng != null) && (saveAddressResponse.lng != 0.0))
-                        EnrollmentViewModel.addressSaved.value = true
 
                         LaunchedEffect(key1 = true) {
                             viewModel.getAddresses(currentUser.familyId)
@@ -492,7 +524,8 @@ fun SaveNewAddressScreen(
                             if (!EnrollmentViewModel.addressSaved.value) {
                                 val parkingType = when (parking.label) {
                                     "Free" -> Parking.FREE
-                                    else -> Parking.PAID
+                                    "Paid" -> Parking.PAID
+                                    else -> Parking.UNSET
                                 }
                                 if (line1.text != oldSelectedAddress.line1
                                     && postcode.text != oldSelectedAddress.postcode

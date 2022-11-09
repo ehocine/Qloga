@@ -1,5 +1,6 @@
 package eac.qloga.android.features.p4p.showroom.scenes.addAddress
 
+//Test
 import android.app.Activity
 import android.os.Build
 import android.view.WindowManager
@@ -301,7 +302,6 @@ fun AddAddressScreen(
                                     }
                                 }
                                 if (addressSuggestions.isNotEmpty()) {
-
                                     DropdownMenu(
                                         modifier = Modifier
                                             .width(with(LocalDensity.current) { parentSize.width.toDp() }),
@@ -533,7 +533,8 @@ fun AddAddressScreen(
                             if (!AddressViewModel.addressSaved.value) {
                                 val parking = when (parkingType.label) {
                                     "Free" -> Parking.FREE
-                                    else -> Parking.PAID
+                                    "Paid" -> Parking.PAID
+                                    else-> Parking.UNSET
                                 }
                                 if (line1State.text != oldSelectedAddress.line1
                                     && postCodeState.text != oldSelectedAddress.postcode

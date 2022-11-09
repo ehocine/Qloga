@@ -1,11 +1,16 @@
 package eac.qloga.android.features.p4p.customer.scenes.dashboard
 
 import P4pCustomerScreens
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -23,21 +28,24 @@ import eac.qloga.android.features.p4p.shared.components.ProfileInfoDialog
 import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
 import eac.qloga.android.features.p4p.shared.scenes.account.AccountViewModel
 import eac.qloga.android.features.p4p.shared.scenes.providerSearch.ProviderSearchScreen
+import eac.qloga.android.features.p4p.shared.scenes.providerSearch.ProvidersTabItems
 import eac.qloga.android.features.p4p.shared.utils.AccountType
+import eac.qloga.android.features.p4p.shared.viewmodels.ProviderSearchViewModel
 import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomerDashboardScreen(
     navController: NavController,
     viewModel: CustomerDashboardViewModel = hiltViewModel(),
 ) {
-    val selectedNavItem = viewModel.selectNavItem
+    val selectedNavItem = CustomerDashboardViewModel.selectedNavItem.value
     val showBottomNavBar = remember { mutableStateOf(true) }
     val alreadyShownProfileInfoDialog = CustomerDashboardViewModel.alreadyShownProfileInfoDialog
     val scope = rememberCoroutineScope()
 
-    Scaffold{ paddingValues ->
+    Scaffold { paddingValues ->
         val titleBarHeight = paddingValues.calculateTopPadding()
 
         Box(modifier = Modifier.fillMaxSize()) {
@@ -51,11 +59,11 @@ fun CustomerDashboardScreen(
                         .fillMaxWidth()
                         .weight(1f)
                 ) {
-                    when(selectedNavItem){
+                    when (selectedNavItem) {
                         CustomerBottomNavItems.ORDERS -> {
                             CustomerOrdersScreen(
                                 navController = navController,
-                                hideNavBar = { showBottomNavBar.value = !it}
+                                hideNavBar = { showBottomNavBar.value = !it }
                             )
                         }
 
@@ -93,11 +101,10 @@ fun CustomerDashboardScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .align(Alignment.Start)
-                                .weight(1f)
-                            ,
+                                .weight(1f),
                             label = CustomerBottomNavItems.ORDERS.label,
                             icon = CustomerBottomNavItems.ORDERS.icon,
-                            count =  4,
+                            count = 4,
                             isSelected = selectedNavItem == CustomerBottomNavItems.ORDERS,
                             onClick = {
                                 viewModel.onSelectNavItem(CustomerBottomNavItems.ORDERS)
@@ -107,11 +114,10 @@ fun CustomerDashboardScreen(
                         BottomNavItem(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .weight(1f)
-                            ,
+                                .weight(1f),
                             label = CustomerBottomNavItems.REQUESTS.label,
                             icon = CustomerBottomNavItems.REQUESTS.icon,
-                            count =  0,
+                            count = 0,
                             isSelected = selectedNavItem == CustomerBottomNavItems.REQUESTS,
                             onClick = {
                                 viewModel.onSelectNavItem(CustomerBottomNavItems.REQUESTS)
@@ -122,13 +128,19 @@ fun CustomerDashboardScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .align(Alignment.Start)
-                                .weight(1f)
-                            ,
+                                .weight(1f),
                             label = CustomerBottomNavItems.PROVIDERS.label,
                             icon = CustomerBottomNavItems.PROVIDERS.icon,
-                            count =  0,
+                            count = 0,
                             isSelected = selectedNavItem == CustomerBottomNavItems.PROVIDERS,
                             onClick = {
+                                ProviderSearchViewModel.providersFirstSearch.value = true
+                                ProviderSearchViewModel.singleService.value = null
+                                ProviderSearchViewModel.selectedServiceId.value = null
+                                ProviderSearchViewModel.servicesList.value = mutableListOf()
+                                ProviderSearchViewModel.providersList.value = mutableListOf()
+                                ProviderSearchViewModel.selectedProvidersTab.value =
+                                    ProvidersTabItems.MATCH_REQUEST
                                 viewModel.onSelectNavItem(CustomerBottomNavItems.PROVIDERS)
                             }
                         )
@@ -137,11 +149,10 @@ fun CustomerDashboardScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .align(Alignment.Start)
-                                .weight(1f)
-                            ,
+                                .weight(1f),
                             label = CustomerBottomNavItems.FAVOURITES.label,
                             icon = CustomerBottomNavItems.FAVOURITES.icon,
-                            count =  0,
+                            count = 0,
                             isSelected = selectedNavItem == CustomerBottomNavItems.FAVOURITES,
                             onClick = {
                                 viewModel.onSelectNavItem(CustomerBottomNavItems.FAVOURITES)
@@ -151,7 +162,7 @@ fun CustomerDashboardScreen(
                 }
             }
 
-            if(viewModel.showProfileInfoDialog && !alreadyShownProfileInfoDialog){
+            if (viewModel.showProfileInfoDialog && !alreadyShownProfileInfoDialog) {
                 Dialog(
                     onDismissRequest = {
                         viewModel.onDismissInfoDialog()
@@ -160,9 +171,9 @@ fun CustomerDashboardScreen(
                     ProfileInfoDialog(
                         accountType = AccountType.CUSTOMER,
                         isDontShowAgainChecked = !viewModel.showProfileInfoDialogCheck,
-                        onClickCheckBox = { viewModel.toggleProfileInfoDialogCheck()},
+                        onClickCheckBox = { viewModel.toggleProfileInfoDialogCheck() },
                         goToProfile = {
-                            scope.launch{
+                            scope.launch {
                                 AccountViewModel.selectedAccountType = AccountType.CUSTOMER
                                 navController.navigate(P4pScreens.Account.route)
                                 viewModel.onDismissInfoDialog()

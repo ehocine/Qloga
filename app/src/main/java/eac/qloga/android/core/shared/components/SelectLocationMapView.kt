@@ -35,7 +35,7 @@ fun SelectLocationMapView(
     MapViewContainer(
         cameraPositionState = cameraPositionState,
         listOfMarkers = listOf(
-            CustomMarkerState(latitude, longitude, title = title, description = description),
+            CustomMarkerState(latitude, longitude, name = title, description = description),
         ),
         onMapClick = { onMapClick(it) }
     )

@@ -19,10 +19,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import eac.qloga.android.core.shared.theme.Red10
 import eac.qloga.android.core.shared.theme.gray1
-import eac.qloga.android.core.shared.theme.grayTextColor
+import eac.qloga.android.core.shared.theme.green1
 import eac.qloga.android.core.shared.utils.ParkingType
 
 /**
@@ -32,13 +34,12 @@ import eac.qloga.android.core.shared.utils.ParkingType
 fun ParkingSelection(
     onSelect: (ParkingType) -> Unit,
     selected: ParkingType = ParkingType.FreeType
-){
+) {
     val interactionSource = remember { MutableInteractionSource() }
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
-        ,
+            .padding(8.dp),
     ) {
         Box(
             modifier = Modifier.fillMaxWidth(),
@@ -55,7 +56,7 @@ fun ParkingSelection(
 
         ParkingType.listOfParkingType.forEach { type ->
             Row(
-                modifier= Modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp)
                     .clickable(
@@ -63,14 +64,18 @@ fun ParkingSelection(
                         indication = null
                     ) {
                         onSelect(type)
-                    }
-                ,
+                    },
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = type.label,
-                    color = if(selected == type) MaterialTheme.colorScheme.primary else grayTextColor,
+//                    color = if(selected == type) MaterialTheme.colorScheme.primary else grayTextColor,
+                    color = when (type) {
+                        ParkingType.PaidType -> Red10
+                        ParkingType.FreeType -> green1
+                        else -> Color.Unspecified
+                    },
                     style = MaterialTheme.typography.titleMedium
                 )
                 AnimatedVisibility(
@@ -92,7 +97,7 @@ fun ParkingSelection(
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewParkingSelection(){
+fun PreviewParkingSelection() {
     ParkingSelection(onSelect = {})
 }
 

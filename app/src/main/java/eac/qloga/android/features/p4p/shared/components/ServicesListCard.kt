@@ -11,15 +11,21 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import eac.qloga.android.core.shared.components.Cards.ContainerBorderedCard
 import eac.qloga.android.core.shared.utils.Dimensions
+import eac.qloga.android.core.shared.utils.LoadingState
 import eac.qloga.android.core.shared.utils.PriceConverter
 import eac.qloga.android.data.shared.models.ServicesWithConditions
+import eac.qloga.android.features.p4p.customer.shared.components.CustomerBottomNavItems
+import eac.qloga.android.features.p4p.customer.shared.viewModels.CustomerDashboardViewModel
 import eac.qloga.android.features.p4p.provider.scenes.P4pProviderScreens
 import eac.qloga.android.features.p4p.provider.shared.viewModels.ProviderServicesViewModel
 import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
+import eac.qloga.android.features.p4p.shared.scenes.providerSearch.ProvidersTabItems
 import eac.qloga.android.features.p4p.shared.scenes.serviceInfo.ServiceInfoViewModel
+import eac.qloga.android.features.p4p.shared.viewmodels.ProviderSearchViewModel
 import eac.qloga.android.features.p4p.showroom.shared.components.ServicesListItem
 import eac.qloga.p4p.lookups.dto.QService
 import eac.qloga.p4p.prv.dto.ProviderService
+import eac.qloga.p4p.rq.dto.RqService
 import kotlinx.coroutines.launch
 
 @Composable
@@ -70,16 +76,26 @@ fun ServicesListCard(
                             }
                         },
                         onShowProviders = {
-                            /*
-                            if(parentRoute == Screen.CustomerNavContainer.route){
-                                navController.navigateUp()
-                            }else{
-                                coroutineScope.launch {
-                                    // navController.navigate(Screen.Providers.route+"?$PARENT_ROUTE_KEY=$parentRoute")
+                            //                            ProviderSearchViewModel.loadRequests.value = false
+                            ProviderSearchViewModel.providersFirstSearch.value = false
+                            ProviderSearchViewModel.singleServiceFirstSearch.value = true
+                            ProviderSearchViewModel.selectedServiceId.value = service.id
+                            ProviderSearchViewModel.singleService.value = service.let {
+                                RqService(it.id, it.id, 0)
+                            }
+                            ProviderSearchViewModel.selectedProvidersTab.value =
+                                ProvidersTabItems.SELECT_SERVICES
+
+                            coroutineScope.launch {
+                                ProviderSearchViewModel.getFirstRqsState.emit(LoadingState.LOADED)
+                                CustomerDashboardViewModel.selectedNavItem.value =
+                                    CustomerBottomNavItems.PROVIDERS
+                                CustomerDashboardViewModel.alreadyShownProfileInfoDialog =
+                                    true
+                                navController.navigate(P4pCustomerScreens.CustomerDashboard.route) {
+                                    launchSingleTop = true
                                 }
                             }
-
-                             */
                         }
                     )
                 }

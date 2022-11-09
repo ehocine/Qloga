@@ -1,4 +1,4 @@
-package eac.qloga.android.features.platform.landing.scenes.noAddress
+package eac.qloga.android.features.p4p.shared.scenes.orderPayment.platform.landing.scenes.noAddress
 
 import android.util.Log
 import androidx.compose.runtime.MutableState

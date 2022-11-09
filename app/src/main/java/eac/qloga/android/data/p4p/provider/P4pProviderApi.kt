@@ -42,7 +42,7 @@ interface P4pProviderApi {
         @Query("psize") psize: Long,
         @Query("filter") filter: String?,
         @Query("selector") selector: String?
-    ): Page<RqSearchResult>
+    ): Response<Page<RqSearchResult>>
 
     @DELETE("p4p/prv/{prvId}")
     suspend fun delete(

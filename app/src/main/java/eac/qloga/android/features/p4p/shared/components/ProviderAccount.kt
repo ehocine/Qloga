@@ -52,7 +52,7 @@ fun ProviderAccount(
         apiViewModel.getUserProfile()
         val avatarId = ApiViewModel.orgs[0].avatarId
         avatarImageLoading = LoadingState.LOADING
-        apiViewModel.getAvatarBitmap(avatarId, MediaSize.Sz150x150)
+        apiViewModel.getAvatarBitmap(avatarId, MediaSize.Sz150x150.size)
         avatarImage = ApiViewModel.bitmapImages[avatarId]
         avatarImageLoading = LoadingState.LOADED
     }

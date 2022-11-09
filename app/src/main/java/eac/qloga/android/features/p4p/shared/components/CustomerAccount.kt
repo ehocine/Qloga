@@ -47,7 +47,7 @@ fun CustomerAccount(
 
     LaunchedEffect(key1 = Unit ){
         avatarLoadingState = LoadingState.LOADING
-        apiViewModel.getAvatarBitmap(ApiViewModel.userProfile.value.avatarId,MediaSize.Sz150x150)
+        apiViewModel.getAvatarBitmap(ApiViewModel.userProfile.value.avatarId,MediaSize.Sz150x150.size)
         avatarImage = ApiViewModel.bitmapImages[ApiViewModel.userProfile.value.avatarId]
         avatarLoadingState = LoadingState.LOADED
     }

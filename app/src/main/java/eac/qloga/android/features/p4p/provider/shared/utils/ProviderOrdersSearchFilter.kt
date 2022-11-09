@@ -1,11 +1,16 @@
 package eac.qloga.android.features.p4p.provider.shared.utils
 
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState
 import eac.qloga.android.core.shared.components.BottomSheets
 import eac.qloga.android.core.shared.utils.InputFieldState
 
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProviderOrdersSearchFilter(
     modifier: Modifier = Modifier,

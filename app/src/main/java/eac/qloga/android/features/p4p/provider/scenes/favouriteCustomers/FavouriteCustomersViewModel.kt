@@ -41,7 +41,7 @@ class FavouriteCustomersViewModel @Inject constructor(
 
     private val _providerId = mutableStateOf<Long?>(1001)
     val providerId: State<Long?> = _providerId
-    
+
     private val _cstPublicProfileState = MutableStateFlow(LoadingState.IDLE)
     val cstPublicProfileState = _cstPublicProfileState.asStateFlow()
 

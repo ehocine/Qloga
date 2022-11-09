@@ -1,5 +1,6 @@
 package eac.qloga.android.features.p4p.customer.shared.viewModels
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -20,14 +21,14 @@ import javax.inject.Inject
 @HiltViewModel
 class CustomerDashboardViewModel @Inject constructor(
     private val datastoreRepository: DatastoreRepository
-): ViewModel() {
+) : ViewModel() {
 
-    companion object{
+    companion object {
+        var selectedNavItem: MutableState<CustomerBottomNavItems> =
+            mutableStateOf(CustomerBottomNavItems.listOfItems[0])
         var alreadyShownProfileInfoDialog by mutableStateOf(false)
     }
 
-    var selectNavItem by mutableStateOf(CustomerBottomNavItems.listOfItems[0])
-        private set
 
     var selectedServiceCategory by mutableStateOf(ServiceCategory())
         private set
@@ -41,7 +42,7 @@ class CustomerDashboardViewModel @Inject constructor(
     var selectedStatus by mutableStateOf<List<Int>>(emptyList())
         private set
 
-    var  showEmptyStateOpenRequest by mutableStateOf(true)
+    var showEmptyStateOpenRequest by mutableStateOf(true)
         private set
 
     var showProfileInfoDialog by mutableStateOf(false)
@@ -54,7 +55,7 @@ class CustomerDashboardViewModel @Inject constructor(
         observePreferences()
     }
 
-    fun onShowEmptyStateOpenRequest(value: Boolean){
+    fun onShowEmptyStateOpenRequest(value: Boolean) {
         showEmptyStateOpenRequest = value
     }
 
@@ -66,55 +67,55 @@ class CustomerDashboardViewModel @Inject constructor(
         }
     }
 
-    fun onSelectStatusOption(index: Int){
+    fun onSelectStatusOption(index: Int) {
         val copyList = ArrayList(selectedStatus)
-        if(index in copyList){
+        if (index in copyList) {
             copyList.remove(index)
-        }else{
+        } else {
             copyList.add(index)
         }
-        selectedStatus= copyList
+        selectedStatus = copyList
     }
 
-    fun onAlreadyShowProfileInfoDialog(value: Boolean){
+    fun onAlreadyShowProfileInfoDialog(value: Boolean) {
         alreadyShownProfileInfoDialog = value
     }
 
-    fun onDismissInfoDialog(){
+    fun onDismissInfoDialog() {
         alreadyShownProfileInfoDialog = true
-        if(showProfileInfoDialogCheck != showProfileInfoDialog){
+        if (showProfileInfoDialogCheck != showProfileInfoDialog) {
             toggleProfileInfoDialogCheck()
         }
     }
 
-    fun onProfileInfoDialogCheck(){
+    fun onProfileInfoDialogCheck() {
         showProfileInfoDialogCheck = !showProfileInfoDialogCheck
     }
 
-    fun toggleProfileInfoDialogCheck(){
+    fun toggleProfileInfoDialogCheck() {
         viewModelScope.launch {
             datastoreRepository.toggleCustomerProfileInfoDialog()
         }
     }
 
-    fun onSelectNavItem(navItems: CustomerBottomNavItems){
-        selectNavItem = navItems
+    fun onSelectNavItem(navItems: CustomerBottomNavItems) {
+        selectedNavItem.value = navItems
     }
 
-    fun onSelectServiceCategory(serviceCategory: ServiceCategory){
+    fun onSelectServiceCategory(serviceCategory: ServiceCategory) {
         selectedServiceCategory = serviceCategory
     }
 
-    fun onEnterNotes(value: String){
-        notes = notes.copy( text = value )
+    fun onEnterNotes(value: String) {
+        notes = notes.copy(text = value)
     }
 
-    fun onFocusNotes(focusState: FocusState){
-        notes = notes.copy( isFocused = focusState.isFocused )
+    fun onFocusNotes(focusState: FocusState) {
+        notes = notes.copy(isFocused = focusState.isFocused)
     }
 
-    fun onChangeSliderFilter(type: FilterTypes, value: Int){
-        when(type){
+    fun onChangeSliderFilter(type: FilterTypes, value: Int) {
+        when (type) {
             is FilterTypes.Distance -> {
                 searchFilterState = searchFilterState.copy(
                     distance = Distance(value = value)
@@ -148,7 +149,7 @@ class CustomerDashboardViewModel @Inject constructor(
      * **/
     fun getFilterSliderState(filterTypes: FilterTypes): Array<Int> {
 
-        return when(filterTypes){
+        return when (filterTypes) {
 
             is FilterTypes.Distance -> {
                 arrayOf(searchFilterState.distance.value, searchFilterState.distance.max)
@@ -159,23 +160,31 @@ class CustomerDashboardViewModel @Inject constructor(
             }
 
             is FilterTypes.MinStartRating -> {
-                arrayOf(searchFilterState.minStartRating.value, searchFilterState.minStartRating.max)
+                arrayOf(
+                    searchFilterState.minStartRating.value,
+                    searchFilterState.minStartRating.max
+                )
             }
 
             is FilterTypes.OrdersDelivered -> {
-                arrayOf(searchFilterState.ordersDelivered.value, searchFilterState.ordersDelivered.max)
+                arrayOf(
+                    searchFilterState.ordersDelivered.value,
+                    searchFilterState.ordersDelivered.max
+                )
             }
 
-            else -> { arrayOf(0,0)}
+            else -> {
+                arrayOf(0, 0)
+            }
         }
     }
 
-    fun onSelectProvidersType(index: Int){
+    fun onSelectProvidersType(index: Int) {
         val selectedIndexes = ArrayList(searchFilterState.providersType)
 
-        if( index in searchFilterState.providersType){
+        if (index in searchFilterState.providersType) {
             selectedIndexes.remove(index)
-        }else{
+        } else {
             selectedIndexes.add(index)
         }
         searchFilterState = searchFilterState.copy(
@@ -183,12 +192,12 @@ class CustomerDashboardViewModel @Inject constructor(
         )
     }
 
-    fun onSelectProvidersVerification(index: Int){
+    fun onSelectProvidersVerification(index: Int) {
         val selectedIndexes = ArrayList(searchFilterState.providersVerifications)
 
-        if( index in searchFilterState.providersVerifications){
+        if (index in searchFilterState.providersVerifications) {
             selectedIndexes.remove(index)
-        }else{
+        } else {
             selectedIndexes.add(index)
         }
         searchFilterState = searchFilterState.copy(
@@ -196,12 +205,12 @@ class CustomerDashboardViewModel @Inject constructor(
         )
     }
 
-    fun onSelectProvidersAdminVerification(index: Int){
+    fun onSelectProvidersAdminVerification(index: Int) {
         val selectedIndexes = ArrayList(searchFilterState.providersAdminVerifications)
 
-        if( index in searchFilterState.providersAdminVerifications){
+        if (index in searchFilterState.providersAdminVerifications) {
             selectedIndexes.remove(index)
-        }else{
+        } else {
             selectedIndexes.add(index)
         }
         searchFilterState = searchFilterState.copy(
@@ -209,12 +218,12 @@ class CustomerDashboardViewModel @Inject constructor(
         )
     }
 
-    fun onSelectClearanceCertificates(index: Int){
+    fun onSelectClearanceCertificates(index: Int) {
         val selectedIndexes = ArrayList(searchFilterState.clearanceCertifications)
 
-        if( index in searchFilterState.clearanceCertifications){
+        if (index in searchFilterState.clearanceCertifications) {
             selectedIndexes.remove(index)
-        }else{
+        } else {
             selectedIndexes.add(index)
         }
         searchFilterState = searchFilterState.copy(

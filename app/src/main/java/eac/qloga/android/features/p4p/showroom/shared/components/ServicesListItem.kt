@@ -125,7 +125,7 @@ fun ServicesListItem(
                 ) {
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth(.6f)
+                            .fillMaxWidth(.8f)
                             .height(buttonHeight)
                             .clip(CircleShape)
                             .clickable { onShowProviders() }
@@ -133,7 +133,7 @@ fun ServicesListItem(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "Show providers",
+                            text = "Select & search providers",
                             style = MaterialTheme.typography.titleMedium,
                             color = Color.White
                         )

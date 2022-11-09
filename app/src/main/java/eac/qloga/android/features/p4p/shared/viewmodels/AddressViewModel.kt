@@ -80,10 +80,11 @@ class AddressViewModel @Inject constructor(
     private val parking = if (ApiViewModel.userProfile.value.contacts?.address != null) {
         when (ApiViewModel.userProfile.value.contacts.address.parking) {
             Parking.PAID -> ParkingType.PaidType
-            else -> ParkingType.FreeType
+            Parking.FREE -> ParkingType.FreeType
+            else -> ParkingType.UnspecifiedType
         }
     } else {
-        ParkingType.FreeType
+        ParkingType.UnspecifiedType
     }
     private val _parkingType = mutableStateOf(parking)
     val parkingType: State<ParkingType> = _parkingType

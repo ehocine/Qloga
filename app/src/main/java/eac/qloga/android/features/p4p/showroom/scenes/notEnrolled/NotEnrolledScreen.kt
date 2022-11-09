@@ -36,7 +36,7 @@ import eac.qloga.android.features.p4p.showroom.shared.components.LeftNavBar
 import eac.qloga.android.features.p4p.showroom.shared.components.MainContent
 import eac.qloga.android.features.p4p.showroom.shared.components.SearchBar
 import eac.qloga.android.features.p4p.shared.viewmodels.AddressViewModel
-import eac.qloga.android.features.platform.landing.scenes.LandingScreens
+import eac.qloga.android.features.p4p.shared.scenes.orderPayment.platform.landing.scenes.LandingScreens
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -202,7 +202,7 @@ fun NotEnrolledScreen(
                             },
                             onClickProviderSearch = {
                                 scope.launch {
-                                    // navController.navigate(Screen.ServiceCategories.route)
+                                    navController.navigate(P4pShowroomScreens.Categories.route)
                                 }
                             }
                         )

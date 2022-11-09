@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
@@ -38,9 +39,10 @@ fun NavItem(
     isSelected: Boolean = false,
     strokeColor: Color,
     BGColor: Color,
+    labelFontSize: TextUnit = 13.sp,
     onClick: () -> Unit
 ) {
-    val labelFontSize = 13.sp
+//    val labelFontSize = 13.sp
 
     Column(
         modifier = modifier,

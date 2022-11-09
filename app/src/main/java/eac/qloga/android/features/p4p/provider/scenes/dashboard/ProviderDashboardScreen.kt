@@ -1,10 +1,15 @@
 package eac.qloga.android.features.p4p.provider.scenes.dashboard
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -24,18 +29,24 @@ import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
 import eac.qloga.android.features.p4p.shared.scenes.account.AccountViewModel
 import eac.qloga.android.features.p4p.shared.utils.AccountType
 
-@OptIn(ExperimentalMaterial3Api::class,)
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProviderDashboardScreen(
     navController: NavController,
     viewModel: ProviderDashboardViewModel = hiltViewModel()
 ) {
-    val showBottomNavBar = remember{ mutableStateOf(true) }
-    val selectedNavItem = viewModel.selectedNavItem.value
-    val alreadyShownProfileInfoDialog  = ProviderDashboardViewModel.alreadyShownProfileInfoDialog
-    var showDialog = remember{ mutableStateOf(false) }
+    val showBottomNavBar = remember { mutableStateOf(true) }
+    val selectedNavItem = ProviderDashboardViewModel.selectedNavItem.value
+    val dontShowInfoDialogAgain = viewModel.notShowAgainProviderInfoDialog.value
+    val showDialog = remember { mutableStateOf(true) }
+    val alreadyShownProfileInfoDialog = ProviderDashboardViewModel.alreadyShownProfileInfoDialog
 
-    Scaffold{ paddingValues ->
+    LaunchedEffect(Unit) {
+        showDialog.value = !dontShowInfoDialogAgain
+    }
+
+    Scaffold { paddingValues ->
 
         val titleBarHeight = paddingValues.calculateTopPadding()
 
@@ -50,10 +61,11 @@ fun ProviderDashboardScreen(
                         .fillMaxWidth()
                         .weight(1f)
                 ) {
-                    when(selectedNavItem){
+                    when (selectedNavItem) {
                         ProviderBottomNavItems.ORDERS -> {
                             ProviderOrdersScreen(
                                 navController = navController,
+                                viewModel = viewModel,
                                 hideNavBar = { showBottomNavBar.value = it }
                             )
                         }
@@ -68,6 +80,7 @@ fun ProviderDashboardScreen(
                         ProviderBottomNavItems.CUSTOMERS -> {
                             CustomersScreen(
                                 navController = navController,
+                                viewModel = viewModel,
                                 hideNavBar = { showBottomNavBar.value = it }
                             )
                         }
@@ -85,11 +98,10 @@ fun ProviderDashboardScreen(
                         BottomNavItem(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .weight(1f)
-                            ,
+                                .weight(1f),
                             label = ProviderBottomNavItems.ORDERS.label,
                             icon = ProviderBottomNavItems.ORDERS.icon,
-                            count =  4,
+                            count = 4,
                             isSelected = selectedNavItem == ProviderBottomNavItems.ORDERS,
                             onClick = {
                                 viewModel.onSelectNavItem(ProviderBottomNavItems.ORDERS)
@@ -98,11 +110,10 @@ fun ProviderDashboardScreen(
                         BottomNavItem(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .weight(1f)
-                            ,
+                                .weight(1f),
                             label = ProviderBottomNavItems.CUSTOMERS.label,
                             icon = ProviderBottomNavItems.CUSTOMERS.icon,
-                            count =  0,
+                            count = 0,
                             isSelected = selectedNavItem == ProviderBottomNavItems.CUSTOMERS,
                             onClick = {
                                 viewModel.onSelectNavItem(ProviderBottomNavItems.CUSTOMERS)
@@ -111,11 +122,10 @@ fun ProviderDashboardScreen(
                         BottomNavItem(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .weight(1f)
-                            ,
+                                .weight(1f),
                             label = ProviderBottomNavItems.FAVOURITES.label,
                             icon = ProviderBottomNavItems.FAVOURITES.icon,
-                            count =  0,
+                            count = 0,
                             isSelected = selectedNavItem == ProviderBottomNavItems.FAVOURITES,
                             onClick = {
                                 viewModel.onSelectNavItem(ProviderBottomNavItems.FAVOURITES)
@@ -124,7 +134,7 @@ fun ProviderDashboardScreen(
                     }
                 }
             }
-            if(viewModel.showProviderInfoDialog && !alreadyShownProfileInfoDialog){
+            if (viewModel.showProviderInfoDialog && !alreadyShownProfileInfoDialog) {
                 Dialog(
                     onDismissRequest = {
                         ProviderDashboardViewModel.alreadyShownProfileInfoDialog = true

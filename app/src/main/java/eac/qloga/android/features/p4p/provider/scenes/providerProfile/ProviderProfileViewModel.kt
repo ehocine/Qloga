@@ -173,7 +173,7 @@ class ProviderProfileViewModel @Inject constructor(
             }
 
             _avatarState.emit(LoadingState.LOADING)
-            when(val response = mediaRepository.getImageDataUrl(id,MediaSize.Sz150x150)){
+            when(val response = mediaRepository.getImageDataUrl(id,MediaSize.Sz150x150.size)){
                 is NetworkResult.Success -> {
                     val bitmap = BitmapFactory.decodeStream(response.data.byteStream())
                     ApiViewModel.bitmapImages[id] = bitmap

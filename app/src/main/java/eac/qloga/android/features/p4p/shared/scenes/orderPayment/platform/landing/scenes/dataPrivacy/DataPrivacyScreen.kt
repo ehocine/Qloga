@@ -1,4 +1,4 @@
-package eac.qloga.android.features.platform.landing.scenes.dataPrivacy
+package eac.qloga.android.features.p4p.shared.scenes.orderPayment.platform.landing.scenes.dataPrivacy
 
 import android.graphics.Bitmap
 import android.webkit.WebView
@@ -24,7 +24,7 @@ import eac.qloga.android.NavigationActions
 import eac.qloga.android.core.shared.components.Cards
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.utils.QLOGA_DATA_PRIVACY_LINK
-import eac.qloga.android.features.platform.landing.scenes.LandingScreens
+import eac.qloga.android.features.p4p.shared.scenes.orderPayment.platform.landing.scenes.LandingScreens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

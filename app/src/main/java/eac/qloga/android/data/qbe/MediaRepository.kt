@@ -1,6 +1,5 @@
 package eac.qloga.android.data.qbe
 
-
 import eac.qloga.android.data.shared.models.MediaSize
 import eac.qloga.android.data.shared.utils.apiHandler
 import eac.qloga.android.di.QLOGAApiService
@@ -16,7 +15,7 @@ class MediaRepository(@QLOGAApiService private val apiService: MediaApi) {
 
     suspend fun updateMedia(meta: MediaMeta) = apiService.updateMedia(meta)
     suspend fun getOriginalImage(mid: Long) = apiService.getOriginalImage(mid)
-    suspend fun getImageDataUrl(mid: Long, size: MediaSize?) = apiHandler { apiService.getImageDataUrl(mid, size?.size) }
+    suspend fun getImageDataUrl(mid: Long, size: Int?) = apiHandler {apiService.getImageDataUrl(mid, size)}
     suspend fun deleteMedia(mid: Long) = apiService.deleteMedia(mid)
     suspend fun getImage(mid: Long, size: MediaSize) = apiService.getImage(size, mid)
     suspend fun getAvatarDataUrl(type: AvatarType, id: Long, size: MediaSize?) =

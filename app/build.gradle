@@ -151,8 +151,13 @@ dependencies {
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.17.0"
 
     //google map
-    implementation "com.google.maps.android:maps-compose:2.1.1"
+    implementation "com.google.maps.android:maps-compose:2.7.2"
     implementation "com.google.android.gms:play-services-maps:18.1.0"
+    implementation 'com.google.maps.android:android-maps-utils:2.3.0'
+//    implementation 'com.google.maps.android:maps-utils-ktx:3.4.0'
+//    implementation "com.google.android.libraries.maps:maps:3.1.0-beta"
+//    implementation "com.google.maps.android:maps-v3-ktx:2.2.0"
+//    implementation "androidx.fragment:fragment-ktx:1.5.3"
 
     implementation "com.google.accompanist:accompanist-flowlayout:0.24.8-beta"
 

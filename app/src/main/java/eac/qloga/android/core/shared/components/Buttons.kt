@@ -65,7 +65,29 @@ object Buttons {
     fun InfoButton(onClick: () -> Unit, color: Color) {
         IconButton(onClick = { onClick() }, color = color, iconId = R.drawable.ic_info)
     }
+    @Composable
+    fun WavingHandButton(onClick: () -> Unit, color: Color){
+        IconButton(onClick = { onClick() }, color = color, iconId = R.drawable.ic_hand)
+    }
 
+    @Composable
+    fun PersSettingsButton(onClick: () -> Unit, color: Color){
+        IconButton(onClick = { onClick() }, color = color, iconId = R.drawable.ic_pers_settings)
+    }
+
+    @Composable
+    fun SearchButton(onClick: () -> Unit, color: Color) {
+        IconButton(onClick = { onClick() }, color = color, iconId = R.drawable.ic_ql_search)
+    }
+
+    @Composable
+    fun OrdersButton(onClick: () -> Unit, color: Color) {
+        IconButton(onClick = { onClick() }, color = color, iconId = R.drawable.ic_orders)
+    }
+    @Composable
+    fun HeartButton(onClick: () -> Unit, color: Color) {
+        IconButton(onClick = { onClick() }, color = color, iconId = R.drawable.ic_ql_heart)
+    }
     @Composable
     fun SortButton(onClick: () -> Unit, color: Color) {
         Box(modifier = Modifier
@@ -128,16 +150,16 @@ object Buttons {
     fun FullRoundedButton(
         modifier: Modifier = Modifier,
         buttonText: String = "",
+        buttonTextStyle: TextStyle = MaterialTheme.typography.bodyMedium,
         backgroundColor: Color = MaterialTheme.colorScheme.primary,
         textColor: Color = Color.White,
         showBorder: Boolean = false,
         borderColor: Color = Color.Gray,
         enabled: Boolean = true,
         content: ComposeFun? = null,
+        buttonHeight: Dp = BUTTON_HEIGHT.dp,
         onClick: () -> Unit
     ) {
-        val buttonHeight = BUTTON_HEIGHT.dp
-
         Box(
             modifier = modifier
                 .fillMaxWidth()
@@ -158,7 +180,7 @@ object Buttons {
             } else {
                 Text(
                     text = buttonText,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = buttonTextStyle,
                     color = textColor
                 )
             }
@@ -254,6 +276,46 @@ object Buttons {
                     style = textStyle
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun RoundedButton(
+    modifier: Modifier = Modifier,
+    buttonText: String = "",
+    backgroundColor: Color = MaterialTheme.colorScheme.primary,
+    textColor: Color = Color.White,
+    showBorder: Boolean = false,
+    borderColor: Color = Color.Gray,
+    enabled: Boolean = true,
+    content: ComposeFun? = null,
+    onClick: () -> Unit
+) {
+    val buttonHeight = BUTTON_HEIGHT.dp
+
+    Box(
+        modifier = modifier
+            .height(buttonHeight)
+            .clip(CircleShape)
+            .alpha(if (!enabled) 0.5f else 1f)
+            .clickable(enabled = enabled) { onClick() }
+            .border(
+                width = if (showBorder) 1.4.dp else 0.dp,
+                color = if (showBorder) borderColor else Color.Transparent,
+                shape = CircleShape
+            )
+            .background(backgroundColor),
+        contentAlignment = Alignment.Center
+    ) {
+        if (content != null) {
+            content()
+        } else {
+            Text(
+                text = buttonText,
+                style = MaterialTheme.typography.bodyMedium,
+                color = textColor
+            )
         }
     }
 }

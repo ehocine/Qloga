@@ -6,34 +6,39 @@ import androidx.compose.runtime.remember
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.rememberCameraPositionState
-import eac.qloga.android.R
-import eac.qloga.android.core.shared.components.MapViewContainer
+import eac.qloga.android.core.shared.components.CustomersMapViewContainer
 import eac.qloga.android.core.shared.utils.CustomMarkerState
+import eac.qloga.android.core.shared.viewmodels.ApiViewModel
 
-const val InitialZoom = 15f
+const val InitialZoom = 13f
+
 /**
  *  Google map which show the one marker according to the
  *  location. Only one address marker
  * */
 @Composable
 fun CustomersMapView(
-    coordinates: List<CustomMarkerState>,
+    listOfCustomers: List<CustomMarkerState>,
 ) {
-    val addressLocations = remember(coordinates){ coordinates }
+    val addressLocations = remember(listOfCustomers) { listOfCustomers }
     val cameraPositionState = rememberCameraPositionState(addressLocations.toString()) {
         try {
             position = CameraPosition.fromLatLngZoom(
-                LatLng(coordinates[0].latitude, coordinates[0].longitude),
+                LatLng(
+                    ApiViewModel.userProfile.value.contacts.address.lat,
+                    ApiViewModel.userProfile.value.contacts.address.lng
+                ),
                 InitialZoom
             )
-        }catch (e: Exception){
+        } catch (e: Exception) {
             Log.d("TAG", "ProvidersMapView: ${e.printStackTrace()}")
         }
     }
 
-    MapViewContainer(
+    CustomersMapViewContainer(
         cameraPositionState = cameraPositionState,
-        customMarkerIcon = R.drawable.ic_tap_marker,
-        listOfMarkers = coordinates
+        customMarkerIcon = null,
+        showInfo = true,
+        listOfMarkers = listOfCustomers
     )
 }

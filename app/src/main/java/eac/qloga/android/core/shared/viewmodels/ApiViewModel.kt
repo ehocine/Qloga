@@ -112,7 +112,7 @@ class ApiViewModel @Inject constructor(
         getOrgs()
     }
 
-    suspend fun getAvatarBitmap(id: Long?, size: MediaSize?): Boolean {
+    suspend fun getAvatarBitmap(id: Long?, size: Int?): Boolean {
         if(bitmapImages[id] != null) return true
         if(id == null) return false
         return when(val response = mediaRepository.getImageDataUrl(id,size)){

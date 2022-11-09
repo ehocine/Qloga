@@ -1,4 +1,4 @@
-package eac.qloga.android.features.platform.landing.scenes
+package eac.qloga.android.features.p4p.shared.scenes.orderPayment.platform.landing.scenes
 
 sealed class LandingScreens(
     val route: String,

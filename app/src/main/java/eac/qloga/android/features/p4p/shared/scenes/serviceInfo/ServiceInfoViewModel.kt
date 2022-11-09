@@ -17,6 +17,7 @@ class ServiceInfoViewModel @Inject constructor() : ViewModel() {
     companion object {
         const val TAG = "${QTAG}-ServiceInfoViewModel"
         val servicesWithConditions = mutableStateOf<ServicesWithConditions?>(null)
+        val selectedService: MutableState<QService?> = mutableStateOf(null)
     }
 
     private val _checked = mutableStateOf(false)

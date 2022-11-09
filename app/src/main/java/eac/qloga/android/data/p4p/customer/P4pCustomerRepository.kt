@@ -18,7 +18,6 @@ import eac.qloga.p4p.rq.enums.RqAction
 import eac.qloga.p4p.search_filters.CstRequestSearchFilter
 import eac.qloga.p4p.search_filters.OrderFilter
 import eac.qloga.p4p.search_filters.PrvSearchFilter
-import javax.inject.Inject
 
 class P4pCustomerRepository(@QLOGAApiService private val apiService: P4pCustomerApi) {
     //Customer
@@ -88,6 +87,12 @@ class P4pCustomerRepository(@QLOGAApiService private val apiService: P4pCustomer
         filter: PrvSearchFilter?,
         fields: List<PrvFields>?
     ) = apiService.getProviders(page, psize, filter?.toJsonString(), fields?.listToString())
+
+    suspend fun getRequestsFirstPage(
+        psize: Long,
+        filter: PrvSearchFilter?,
+        fields: List<PrvFields>?
+    ) = apiService.getRequestsFirstPage(psize, filter?.toJsonString(), fields?.listToString())
 
     suspend fun getProviderInfo(prvId: Long) = apiService.getProviderInfo(prvId)
     suspend fun getProviderReviews(prvId: Long) = apiService.getProviderReviews(prvId)

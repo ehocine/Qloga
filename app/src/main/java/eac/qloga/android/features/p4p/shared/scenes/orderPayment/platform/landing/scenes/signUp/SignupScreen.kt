@@ -1,4 +1,4 @@
-package eac.qloga.android.features.platform.landing.scenes.signUp
+package eac.qloga.android.features.p4p.shared.scenes.orderPayment.platform.landing.scenes.signUp
 
 import android.os.Build
 import android.widget.Toast
@@ -41,7 +41,7 @@ import eac.qloga.android.core.shared.theme.Red10
 import eac.qloga.android.core.shared.theme.gray30
 import eac.qloga.android.core.shared.theme.green1
 import eac.qloga.android.core.shared.utils.*
-import eac.qloga.android.features.platform.landing.scenes.LandingScreens
+import eac.qloga.android.features.p4p.shared.scenes.orderPayment.platform.landing.scenes.LandingScreens
 import eac.qloga.bare.enums.Gender
 import kotlinx.coroutines.launch
 
