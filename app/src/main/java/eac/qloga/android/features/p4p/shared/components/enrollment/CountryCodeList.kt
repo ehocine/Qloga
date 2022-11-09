@@ -39,8 +39,7 @@ fun CountryCodeList(
                 .fillMaxWidth(.15f)
                 .align(Alignment.CenterHorizontally)
                 .clip(CircleShape)
-                .background(gray1)
-            ,
+                .background(gray1),
         )
 
         Spacer(modifier = Modifier.height(16.dp))

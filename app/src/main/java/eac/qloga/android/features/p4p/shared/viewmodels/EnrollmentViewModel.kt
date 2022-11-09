@@ -85,7 +85,7 @@ class EnrollmentViewModel @Inject constructor(
     )
     val addressFieldState: State<InputFieldState> = _addressFieldState
 
-    var selectedCountryCode by mutableStateOf(Country("GB","GB","GB","45","United Kingdom"))
+    var selectedCountryCode by mutableStateOf(Country("GB","GB","GB","44","United Kingdom"))
         private set
 
     private val _isCodeSent = mutableStateOf(false)
@@ -206,7 +206,7 @@ class EnrollmentViewModel @Inject constructor(
     private fun sendCode() {
         val newContact = Contacts(
             ApiViewModel.userProfile.value.contacts.email,
-            selectedCountryCode.dialcode,
+            selectedCountryCode.iso2,
             _numberFieldState.value.text.toLong(),
             false,
             ApiViewModel.userProfile.value.contacts.address
