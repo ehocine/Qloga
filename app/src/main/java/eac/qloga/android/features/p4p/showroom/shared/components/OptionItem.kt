@@ -43,7 +43,7 @@ fun OptionItem(
                 .weight(1f)
                 .padding(end = 16.dp),
             text = label,
-            color = if(isSelected) MaterialTheme.colorScheme.primary else grayTextColor,
+            color = if(isSelected) MaterialTheme.colorScheme.primary else Color.Black,
             style = MaterialTheme.typography.titleMedium
         )
 

@@ -1,5 +1,6 @@
 package eac.qloga.android.features.p4p.shared.scenes.tc
 
+import P4pCustomerScreens
 import android.graphics.Bitmap
 import android.util.Log
 import android.webkit.WebView
@@ -13,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -26,7 +28,6 @@ import eac.qloga.android.core.shared.components.DotCircleArcCanvas
 import eac.qloga.android.core.shared.components.DottedLine
 import eac.qloga.android.core.shared.components.TitleBar
 import eac.qloga.android.core.shared.theme.gray1
-import eac.qloga.android.core.shared.theme.grayTextColor
 import eac.qloga.android.core.shared.theme.green1
 import eac.qloga.android.core.shared.utils.CUSTOMER_TERMS_CONDITIONS_LINK
 import eac.qloga.android.core.shared.utils.LoadingState
@@ -176,10 +177,9 @@ fun EnrollmentTcScreen(
                             onCheckedChange = { viewModel.onTriggerEvent(EnrollmentEvent.ToggleCheckTermsConditions) },
                         )
                         Text(
-                            modifier = Modifier.alpha(.65f),
                             text = "Agree with the terms and conditions",
                             style = MaterialTheme.typography.titleMedium,
-                            color = grayTextColor
+                            color = Color.Black
                         )
                     }
                     if (!loadingState) {
@@ -229,12 +229,12 @@ fun EnrollmentTcScreen(
                                     //go to customer dashboard
                                     EnrollmentViewModel.currentEnrollmentType.value =
                                         EnrollmentType.CUSTOMER
-                                    Toast.makeText(
-                                        context,
-                                        "You have been successfully enrolled as a customer, there is no customer dashboard for now",
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                    loadingState = false
+                                    LaunchedEffect(key1 = true) {
+                                        navController.navigate(P4pCustomerScreens.CustomerDashboard.route) {
+                                            popUpTo(navController.graph.findStartDestination().id)
+                                            launchSingleTop = true
+                                        }
+                                    }
                                 }
                                 else -> loadingState = false
                             }

@@ -10,11 +10,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import eac.qloga.android.core.shared.components.Cards
 import eac.qloga.android.core.shared.theme.gray1
-import eac.qloga.android.core.shared.theme.gray30
 import eac.qloga.android.features.p4p.provider.shared.viewModels.ProviderDashboardViewModel
 import eac.qloga.android.features.p4p.shared.components.BottomSheetDashLine
 import eac.qloga.android.features.p4p.showroom.shared.components.SliderCard
@@ -64,7 +64,7 @@ fun ProviderBottomSheetCustomers(
                         .padding(start = 8.dp, bottom = 4.dp),
                     text = "MATCH BY",
                     style = MaterialTheme.typography.titleMedium,
-                    color = gray30
+                    color = Color.Black
                 )
                 Cards.ContainerBorderedCard(
                     cornerRadius = 12.dp
@@ -82,7 +82,7 @@ fun ProviderBottomSheetCustomers(
                             Text(
                                 text = "Categories",
                                 style = MaterialTheme.typography.titleMedium,
-                                color = gray30
+                                color = Color.Black
                             )
                             RadioButton(
                                 modifier = Modifier.height(24.dp),
@@ -102,7 +102,7 @@ fun ProviderBottomSheetCustomers(
                             Text(
                                 text = "Services",
                                 style = MaterialTheme.typography.titleMedium,
-                                color = gray30
+                                color = Color.Black
                             )
                             RadioButton(
                                 modifier = Modifier.height(24.dp),

@@ -1,5 +1,6 @@
 package eac.qloga.android.features.p4p.shared.components
 
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -10,11 +11,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import eac.qloga.android.core.shared.components.Cards
 import eac.qloga.android.core.shared.theme.gray1
-import eac.qloga.android.core.shared.theme.gray30
 import eac.qloga.android.features.p4p.shared.utils.ClearanceCertificationsOptions
 import eac.qloga.android.features.p4p.shared.utils.FilterTypes
 import eac.qloga.android.features.p4p.shared.utils.ProvidersAdminVerificationsOptions
@@ -111,7 +113,7 @@ fun BottomSheetFilter(
                         .padding(start = 8.dp, bottom = 4.dp),
                     text = FilterTypes.ProvidersType.label,
                     style = MaterialTheme.typography.titleMedium,
-                    color = gray30
+                    color = Color.Black
                 )
                 Cards.ContainerBorderedCard(
                     cornerRadius = 12.dp
@@ -129,7 +131,7 @@ fun BottomSheetFilter(
                             Text(
                                 text = "All",
                                 style = MaterialTheme.typography.titleMedium,
-                                color = gray30
+                                color = Color.Black
                             )
                             RadioButton(
                                 modifier = Modifier.height(24.dp),
@@ -149,7 +151,7 @@ fun BottomSheetFilter(
                             Text(
                                 text = "Individual",
                                 style = MaterialTheme.typography.titleMedium,
-                                color = gray30
+                                color = Color.Black
                             )
                             RadioButton(
                                 modifier = Modifier.height(24.dp),
@@ -169,7 +171,7 @@ fun BottomSheetFilter(
                             Text(
                                 text = "Agency",
                                 style = MaterialTheme.typography.titleMedium,
-                                color = gray30
+                                color = Color.Black
                             )
                             RadioButton(
                                 modifier = Modifier.height(24.dp),
@@ -208,7 +210,7 @@ fun BottomSheetFilter(
                         .padding(start = 8.dp, bottom = 4.dp),
                     text = FilterTypes.ClearanceCertificates.label,
                     style = MaterialTheme.typography.titleMedium,
-                    color = gray30
+                    color = Color.Black
                 )
                 Cards.ContainerBorderedCard(
                     cornerRadius = 12.dp
@@ -227,10 +229,12 @@ fun BottomSheetFilter(
                                 text = ClearanceCertificationsOptions.listValue[0].label,
                                 modifier = Modifier.weight(9f),
                                 style = MaterialTheme.typography.titleMedium,
-                                color = gray30
+                                color = Color.Black
                             )
                             RadioButton(
-                                modifier = Modifier.height(24.dp).weight(1f),
+                                modifier = Modifier
+                                    .height(24.dp)
+                                    .weight(1f),
                                 selected = clearanceTypeId == 1L,
                                 onClick = { onSelectClearanceCertificates(0) },
                                 colors = RadioButtonDefaults.colors(
@@ -248,10 +252,12 @@ fun BottomSheetFilter(
                                 text = ClearanceCertificationsOptions.listValue[1].label,
                                 modifier = Modifier.weight(9f),
                                 style = MaterialTheme.typography.titleMedium,
-                                color = gray30
+                                color = Color.Black
                             )
                             RadioButton(
-                                modifier = Modifier.height(24.dp).weight(1f),
+                                modifier = Modifier
+                                    .height(24.dp)
+                                    .weight(1f),
                                 selected = clearanceTypeId == 2L,
                                 onClick = { onSelectClearanceCertificates(1) },
                                 colors = RadioButtonDefaults.colors(
@@ -269,10 +275,12 @@ fun BottomSheetFilter(
                                 text = ClearanceCertificationsOptions.listValue[2].label,
                                 modifier = Modifier.weight(9f),
                                 style = MaterialTheme.typography.titleMedium,
-                                color = gray30
+                                color = Color.Black
                             )
                             RadioButton(
-                                modifier = Modifier.height(24.dp).weight(1f),
+                                modifier = Modifier
+                                    .height(24.dp)
+                                    .weight(1f),
                                 selected = clearanceTypeId == 3L,
                                 onClick = { onSelectClearanceCertificates(2) },
                                 colors = RadioButtonDefaults.colors(
@@ -290,10 +298,12 @@ fun BottomSheetFilter(
                                 text = ClearanceCertificationsOptions.listValue[3].label,
                                 modifier = Modifier.weight(9f),
                                 style = MaterialTheme.typography.titleMedium,
-                                color = gray30
+                                color = Color.Black
                             )
                             RadioButton(
-                                modifier = Modifier.height(24.dp).weight(1f),
+                                modifier = Modifier
+                                    .height(24.dp)
+                                    .weight(1f),
                                 selected = clearanceTypeId == 4L,
                                 onClick = { onSelectClearanceCertificates(3) },
                                 colors = RadioButtonDefaults.colors(
@@ -311,10 +321,12 @@ fun BottomSheetFilter(
                                 text = ClearanceCertificationsOptions.listValue[4].label,
                                 modifier = Modifier.weight(9f),
                                 style = MaterialTheme.typography.titleMedium,
-                                color = gray30
+                                color = Color.Black
                             )
                             RadioButton(
-                                modifier = Modifier.height(24.dp).weight(1f),
+                                modifier = Modifier
+                                    .height(24.dp)
+                                    .weight(1f),
                                 selected = clearanceTypeId == null,
                                 onClick = { onSelectClearanceCertificates(4) },
                                 colors = RadioButtonDefaults.colors(

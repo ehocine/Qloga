@@ -7,6 +7,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import eac.qloga.android.core.shared.components.Cards.ContainerBorderedCard
 import eac.qloga.android.core.shared.theme.gray30
@@ -29,7 +30,7 @@ fun CustomerVerificationOptionCard(
             ,
             text = label,
             style = MaterialTheme.typography.titleMedium,
-            color = gray30
+            color = Color.Black
         )
         ContainerBorderedCard(
             cornerRadius = 12.dp

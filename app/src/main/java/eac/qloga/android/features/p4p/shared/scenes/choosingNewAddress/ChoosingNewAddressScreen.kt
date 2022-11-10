@@ -39,8 +39,8 @@ import eac.qloga.android.core.shared.theme.green1
 import eac.qloga.android.core.shared.utils.LoadingState
 import eac.qloga.android.features.p4p.shared.scenes.P4pScreens
 import eac.qloga.android.features.p4p.shared.utils.EnrollmentEvent
-import eac.qloga.android.features.p4p.shared.viewmodels.EnrollmentViewModel
 import eac.qloga.android.features.p4p.shared.viewmodels.AddressViewModel
+import eac.qloga.android.features.p4p.shared.viewmodels.EnrollmentViewModel
 import eac.qloga.bare.dto.person.Address
 import kotlinx.coroutines.launch
 
@@ -70,9 +70,6 @@ fun ChoosingNewAddressScreen(
     val addressesList by EnrollmentViewModel.addressesList
 
     val newAddressList = addressesList.distinctBy { it.shortAddress }
-    newAddressList.forEach {
-        Log.d("add", it.shortAddress)
-    }
 
     ModalBottomSheetLayout(
         sheetShape = RoundedCornerShape(topEnd = 24.dp, topStart = 24.dp),
@@ -217,7 +214,9 @@ fun ChoosingNewAddressScreen(
                                                 },
                                                 onSubmit = {
                                                 },
-                                                onClear = { viewModel.onTriggerEvent(EnrollmentEvent.ClearAddress) },
+                                                onClear = {
+                                                    viewModel.onTriggerEvent(EnrollmentEvent.ClearAddress)
+                                                },
                                                 onFocusedChanged = {
                                                     viewModel.onTriggerEvent(
                                                         EnrollmentEvent.FocusAddressInput(

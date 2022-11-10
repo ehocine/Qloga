@@ -10,6 +10,7 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import eac.qloga.android.core.shared.components.Cards.ContainerBorderedCard
 import eac.qloga.android.core.shared.theme.gray30
@@ -28,11 +29,10 @@ fun SliderCard(
     ) {
         Text(
             modifier = Modifier
-                .padding(start = 8.dp, bottom = 4.dp)
-            ,
+                .padding(start = 8.dp, bottom = 4.dp),
             text = label,
             style = MaterialTheme.typography.titleMedium,
-            color = gray30
+            color = Color.Black
         )
 
         ContainerBorderedCard(

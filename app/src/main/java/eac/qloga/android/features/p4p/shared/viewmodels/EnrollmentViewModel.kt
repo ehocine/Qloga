@@ -10,10 +10,8 @@ import androidx.compose.ui.focus.FocusState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
-import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import eac.qloga.android.QlogaApplication
-import eac.qloga.android.R
 import eac.qloga.android.core.shared.interactors.GetCountry
 import eac.qloga.android.core.shared.utils.*
 import eac.qloga.android.core.shared.viewmodels.ApiViewModel
@@ -56,7 +54,7 @@ class EnrollmentViewModel @Inject constructor(
             mutableStateOf(ApiViewModel.userProfile.value.contacts.address)
         val enrollmentType: MutableState<EnrollmentType?> = mutableStateOf(null)
         val currentEnrollmentType: MutableState<EnrollmentType?> = mutableStateOf(null)
-        val addressSaved : MutableState<Boolean> = mutableStateOf(false)
+        val addressSaved: MutableState<Boolean> = mutableStateOf(false)
     }
 
     var countries by mutableStateOf<List<Country>>(emptyList())
@@ -85,7 +83,7 @@ class EnrollmentViewModel @Inject constructor(
     )
     val addressFieldState: State<InputFieldState> = _addressFieldState
 
-    var selectedCountryCode by mutableStateOf(Country("GB","GB","GB","44","United Kingdom"))
+    var selectedCountryCode by mutableStateOf(Country("GB", "GBR", "GB", "44", "United Kingdom"))
         private set
 
     private val _isCodeSent = mutableStateOf(false)
@@ -111,18 +109,43 @@ class EnrollmentViewModel @Inject constructor(
     fun onTriggerEvent(event: EnrollmentEvent) {
         try {
             viewModelScope.launch {
-                when(event){
-                    is EnterCode -> { enterCode(event.code)}
-                    is EnterNumber -> { enterNumber(event.number) }
-                    is EnterAddress -> { enterAddress(event.address) }
-                    is FocusAddressInput -> { onFocusAddressInput(event.focusState) }
-                    is FocusCodeInput -> { onFocusCodeInput(event.focusState) }
-                    is FocusNumberInput -> { onFocusNumberInput(event.focusState) }
-                    is SelectCountryCode -> { selectedCountryCode = event.countryCode }
-                    is SendCode -> { sendCode() }
-                    is SubmitCode -> { submitCode() }
-                    is ToggleCheckTermsConditions -> { _isCheckTermsConditions.value = !isCheckTermsConditions.value}
-                    is ClickMap -> { _userLocation.value = event.latLng }
+                when (event) {
+                    is EnterCode -> {
+                        enterCode(event.code)
+                    }
+                    is EnterNumber -> {
+                        enterNumber(event.number)
+                    }
+                    is EnterAddress -> {
+                        enterAddress(event.address)
+                    }
+                    is FocusAddressInput -> {
+                        onFocusAddressInput(event.focusState)
+                    }
+                    is FocusCodeInput -> {
+                        onFocusCodeInput(event.focusState)
+                    }
+                    is FocusNumberInput -> {
+                        onFocusNumberInput(event.focusState)
+                    }
+                    is SelectCountryCode -> {
+                        selectedCountryCode = event.countryCode
+                    }
+                    is SendCode -> {
+                        sendCode()
+                    }
+                    is SubmitCode -> {
+                        submitCode()
+                    }
+                    is ToggleCheckTermsConditions -> {
+                        _isCheckTermsConditions.value = !isCheckTermsConditions.value
+                    }
+                    is ClickMap -> {
+                        _userLocation.value = event.latLng
+                    }
+                    is ClearAddress -> {
+                        _addressFieldState.value = _addressFieldState.value.copy(text = "")
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -130,7 +153,7 @@ class EnrollmentViewModel @Inject constructor(
         }
     }
 
-    private fun submitCode(){
+    private fun submitCode() {
 
     }
 

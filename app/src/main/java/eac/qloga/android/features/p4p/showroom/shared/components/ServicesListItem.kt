@@ -88,7 +88,7 @@ fun ServicesListItem(
                         modifier = Modifier.padding(horizontal = 4.dp),
                         text = "$value",
                         style = MaterialTheme.typography.titleSmall,
-                        color = gray30
+                        color = Color.Black
                     )
                 }
                 Icon(
@@ -113,7 +113,7 @@ fun ServicesListItem(
                     style = MaterialTheme.typography.titleSmall.copy(
                         fontSize = 15.sp
                     ),
-                    color = gray30
+                    color = Color.Black
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
