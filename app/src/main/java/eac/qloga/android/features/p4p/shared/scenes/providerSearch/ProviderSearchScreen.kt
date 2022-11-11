@@ -115,7 +115,7 @@ fun ProviderSearchScreen(
         if (providersFirstSearch && !singleServiceFirstSearch) {
             getProvidersLoading = true
             loadAvatars = true
-            ProviderSearchViewModel.providersFirstSearch.value = false
+//            ProviderSearchViewModel.providersFirstSearch.value = false
             viewModel.getFirstRqPage()
         }
     }
@@ -415,6 +415,7 @@ fun ProviderSearchScreen(
                                                                     label = ApiViewModel.qServices.value.first { it.id == service }.name,
                                                                     isSelected = ProviderSearchViewModel.selectedServiceId.value == service,
                                                                     onSelect = {
+                                                                        ProviderSearchViewModel.loading.value = true
                                                                         viewModel.providersLastPage.value =
                                                                             false
                                                                         ProviderSearchViewModel.providersList.value =
@@ -422,6 +423,7 @@ fun ProviderSearchScreen(
                                                                         serviceChanged = true
                                                                         ProviderSearchViewModel.selectedServiceId.value =
                                                                             service
+
                                                                     }
                                                                 )
                                                             }
@@ -684,7 +686,7 @@ fun ProviderSearchScreen(
                                                     } else {
                                                         when (getProvidersLoadingState) {
                                                             LoadingState.LOADED -> {
-                                                                if (!filtersOpened) {
+                                                                if (!filtersOpened && !ProviderSearchViewModel.loading.value) {
                                                                     Box(
                                                                         modifier = Modifier
                                                                             .fillMaxSize(),
@@ -703,17 +705,19 @@ fun ProviderSearchScreen(
                                                     }
                                                 }
                                             } else {
-                                                Box(
-                                                    modifier = Modifier
-                                                        .fillMaxSize(),
-                                                    contentAlignment = Alignment.Center
-                                                ) {
-                                                    ZeroStateImage(
+                                                if (!ProviderSearchViewModel.loading.value){
+                                                    Box(
                                                         modifier = Modifier
-                                                            .size(400.dp),
-                                                        navController = navController,
-                                                        scope = coroutineScope
-                                                    )
+                                                            .fillMaxSize(),
+                                                        contentAlignment = Alignment.Center
+                                                    ) {
+                                                        ZeroStateImage(
+                                                            modifier = Modifier
+                                                                .size(400.dp),
+                                                            navController = navController,
+                                                            scope = coroutineScope
+                                                        )
+                                                    }
                                                 }
                                             }
                                         }

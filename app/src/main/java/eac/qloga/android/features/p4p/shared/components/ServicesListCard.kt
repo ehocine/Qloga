@@ -76,7 +76,6 @@ fun ServicesListCard(
                             }
                         },
                         onShowProviders = {
-                            //                            ProviderSearchViewModel.loadRequests.value = false
                             ProviderSearchViewModel.providersFirstSearch.value = false
                             ProviderSearchViewModel.singleServiceFirstSearch.value = true
                             ProviderSearchViewModel.selectedServiceId.value = service.id

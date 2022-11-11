@@ -68,13 +68,16 @@ class ProviderSearchViewModel @Inject constructor(
         val singleService: MutableState<RqService?> = mutableStateOf(null)
         val selectedServiceId: MutableState<Long?> =
             mutableStateOf(null)
-//        val loadRequests: MutableState<Boolean> = mutableStateOf(true)
         val getFirstRqsState = MutableStateFlow(LoadingState.IDLE)
-        var selectedProvidersTab: MutableState<ProvidersTabItems> = mutableStateOf(ProvidersTabItems.MATCH_REQUEST)
-        val providersFirstSearch : MutableState<Boolean> = mutableStateOf(true)
-        val singleServiceFirstSearch : MutableState<Boolean> = mutableStateOf(false)
+        var selectedProvidersTab: MutableState<ProvidersTabItems> =
+            mutableStateOf(ProvidersTabItems.MATCH_REQUEST)
+        val providersFirstSearch: MutableState<Boolean> = mutableStateOf(true)
+        val singleServiceFirstSearch: MutableState<Boolean> = mutableStateOf(false)
+
         @SuppressLint("MutableCollectionMutableState")
-        val providersList: MutableState<MutableList<PrvSearchResult>> = mutableStateOf(mutableListOf())
+        val providersList: MutableState<MutableList<PrvSearchResult>> =
+            mutableStateOf(mutableListOf())
+        val loading: MutableState<Boolean> = mutableStateOf(true)
     }
 
     val providersLastPage: MutableState<Boolean> = mutableStateOf(false)
@@ -120,6 +123,7 @@ class ProviderSearchViewModel @Inject constructor(
     fun getFirstRqPage() {
         viewModelScope.launch {
             try {
+                loading.value = true
                 getFirstRqsState.emit(LoadingState.LOADING)
                 val response = p4pCustomerRepository.getRequestsFirstPage(
                     psize = 15,
@@ -141,6 +145,8 @@ class ProviderSearchViewModel @Inject constructor(
                     }
                     getFirstRqsState.emit(LoadingState.LOADED)
                     getProvidersLoadingState.emit(LoadingState.LOADED)
+                    providersFirstSearch.value = false
+                    loading.value = false
                 } else {
                     getFirstRqsState.emit(LoadingState.ERROR)
                 }
@@ -155,6 +161,7 @@ class ProviderSearchViewModel @Inject constructor(
     fun getProviders() {
         viewModelScope.launch {
             try {
+                loading.value = true
                 getProvidersLoadingState.emit(LoadingState.LOADING)
                 val response = p4pCustomerRepository.getProviders(
                     page = pageNumber.value,
@@ -181,8 +188,8 @@ class ProviderSearchViewModel @Inject constructor(
                     } else {
                         providersLastPage.value = true
                     }
-
                     getProvidersLoadingState.emit(LoadingState.LOADED)
+                    loading.value = false
                 } else {
                     getProvidersLoadingState.emit(LoadingState.ERROR)
                 }
@@ -254,16 +261,16 @@ class ProviderSearchViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 _avatarImageState.emit(LoadingState.LOADING)
-                when(val response = mediaRepository.getImageDataUrl(id, MediaSize.Sz50x50.size)){
-                    is NetworkResult.Success->{
+                when (val response = mediaRepository.getImageDataUrl(id, MediaSize.Sz50x50.size)) {
+                    is NetworkResult.Success -> {
                         val avatarBitmap = BitmapFactory.decodeStream(response.data.byteStream())
                         listOfAvatars.value.add(mapOf(id to avatarBitmap))
                         _avatarImageState.emit(LoadingState.LOADED)
                     }
-                    is NetworkResult.Error->{
+                    is NetworkResult.Error -> {
                         _avatarImageState.emit(LoadingState.ERROR)
                     }
-                    is NetworkResult.Exception->{
+                    is NetworkResult.Exception -> {
                         _avatarImageState.emit(LoadingState.ERROR)
                     }
                 }
