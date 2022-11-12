@@ -634,8 +634,17 @@ fun ProviderSearchScreen(
                                                                                 ) {
                                                                                     if (provider.prv.calloutCharge) {
                                                                                         Text(
-                                                                                            text = "Callout\nCharge",
-                                                                                            maxLines = 2,
+                                                                                            text = "Callout",
+                                                                                            maxLines = 1,
+                                                                                            overflow = TextOverflow.Ellipsis,
+                                                                                            style = MaterialTheme.typography.labelMedium,
+                                                                                            textAlign = TextAlign.Center,
+                                                                                            color = orange2,
+                                                                                            fontWeight = FontWeight.W600
+                                                                                        )
+                                                                                        Text(
+                                                                                            text = "Charge",
+                                                                                            maxLines = 1,
                                                                                             overflow = TextOverflow.Ellipsis,
                                                                                             style = MaterialTheme.typography.labelMedium,
                                                                                             textAlign = TextAlign.Center,
